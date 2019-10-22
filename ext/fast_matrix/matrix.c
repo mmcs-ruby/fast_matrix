@@ -223,6 +223,47 @@ VALUE transpose(VALUE self)
     return result;
 }
 
+VALUE add_with(VALUE self, VALUE value)
+{
+	struct matrix* A;
+    struct matrix* B;
+	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
+	TypedData_Get_Struct(value, struct matrix, &matrix_type, B);
+
+    if(A->m != B->m && A->m != B->m)
+        rb_raise(matrix_eIndexError, "Different sizes matrices");
+
+    int m = B->m;
+    int n = A->n;
+
+    struct matrix* C;
+    VALUE result = TypedData_Make_Struct(cMatrix, struct matrix, &matrix_type, C);
+
+    c_matrix_init(C, m, n);
+    add_d_arrays_to_result(n * m, A->data, B->data, C->data);
+
+    return result;
+}
+
+
+VALUE add_from(VALUE self, VALUE value)
+{
+	struct matrix* A;
+    struct matrix* B;
+	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
+	TypedData_Get_Struct(value, struct matrix, &matrix_type, B);
+
+    if(A->m != B->m && A->m != B->m)
+        rb_raise(matrix_eIndexError, "Different sizes matrices");
+
+    int m = B->m;
+    int n = A->n;
+
+    add_d_arrays_to_first(n * m, A->data, B->data);
+
+    return self;
+}
+
 void init_fm_matrix()
 {
     VALUE  mod = rb_define_module("FastMatrix");
@@ -242,4 +283,7 @@ void init_fm_matrix()
 	rb_define_method(cMatrix, "row_count", column_size, 0);
 	rb_define_method(cMatrix, "copy", matrix_copy, 0);
 	rb_define_method(cMatrix, "transpose", transpose, 0);
+
+	rb_define_method(cMatrix, "+", add_with, 1);
+	rb_define_method(cMatrix, "+=", add_from, 1);
 }

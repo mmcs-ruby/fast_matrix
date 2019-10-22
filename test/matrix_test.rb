@@ -89,4 +89,14 @@ class FastMatrixTest < Minitest::Test
 
     assert_equal m1, m2.transpose
   end
+  
+  def test_sum
+    m1 = FastMatrix::Matrix[[1, -2], [3, 4], [7, 0]]
+    m2 = FastMatrix::Matrix[[4, 0], [-3, 4], [2, 2]]
+    m  = FastMatrix::Matrix[[5, -2], [0, 8], [9, 2]]
+
+    assert_equal m, m1 + m2
+    m1 += m2;
+    assert_equal m, m1
+  end
 end
