@@ -1,8 +1,8 @@
+[![Build Status](https://travis-ci.org/mmcs-ruby/fast_matrix.svg?branch=master)](https://travis-ci.org/mmcs-ruby/fast_matrix)
+
 # FastMatrix
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/fast_matrix`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+Ruby wrapper around C matrices implementation written as exercise by two MMCS students.
 
 ## Installation
 
@@ -32,7 +32,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/fast_matrix. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/mmcs-ruby/fast_matrix. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 ## License
 
@@ -40,4 +40,4 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the FastMatrix project’s codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/fast_matrix/blob/master/CODE_OF_CONDUCT.md).
+Everyone interacting in the FastMatrix project’s codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/mmcs-ruby/fast_matrix/blob/master/CODE_OF_CONDUCT.md).

@@ -9,6 +9,5 @@ COPY lib/fast_matrix ./lib/fast_matrix
 RUN bundle install
 
 COPY . .
-RUN bundler exec rake compile
 
 CMD ["rake"]
