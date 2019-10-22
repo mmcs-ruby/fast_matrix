@@ -1,7 +1,14 @@
----
-sudo: false
 language: ruby
 cache: bundler
 rvm:
   - 2.6.5
 before_install: gem install bundler -v 2.0.2
+before_script: bundle exec rake compile
+before_deploy: bundle exec rake test
+deploy:
+  provider: rubygems
+  api_key: $API_KEY
+  gem: fast_matrix
+  on:
+    tags: true
+    repo: mmcs-ruby/fast_matrix

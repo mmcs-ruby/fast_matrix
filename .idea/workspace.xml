@@ -2,26 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ccef7546-e07c-4573-a9ce-1eb7931bd394" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.travis.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CODE_OF_CONDUCT.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Gemfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LICENSE.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Rakefile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/bin/console" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/bin/setup" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ext/fast_matrix/extconf.rb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ext/fast_matrix/fast_matrix.c" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ext/fast_matrix/fast_matrix.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/fast_matrix.gemspec" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/fast_matrix.rb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/fast_matrix/version.rb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test/fast_matrix_test.rb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test/test_helper.rb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.travis.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.travis.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fast_matrix.gemspec" beforeDir="false" afterPath="$PROJECT_DIR$/fast_matrix.gemspec" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -65,7 +48,7 @@
       <option name="presentableId" value="Default" />
       <updated>1571727251935</updated>
       <workItem from="1571727255133" duration="32000" />
-      <workItem from="1571727312110" duration="15000" />
+      <workItem from="1571727312110" duration="389000" />
     </task>
     <servers />
   </component>

@@ -5,17 +5,15 @@ require "fast_matrix/version"
 Gem::Specification.new do |spec|
   spec.name          = "fast_matrix"
   spec.version       = FastMatrix::VERSION
-  spec.authors       = ["wolwer1ne"]
-  spec.email         = ["wolwerine@yandex.ru"]
+  spec.authors       = ["mmcs_ruby"]
+  spec.email         = ["poganesyan@sfedu.ru"]
 
-  spec.summary       = %q{TODO: Write a short summary, because RubyGems requires one.}
+  spec.summary       = %q{Ruby wrapper around C matrices implementation}
   spec.description   = %q{TODO: Write a longer description or delete this line.}
-  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.homepage      = "https://github.com/mmcs-ruby/fast_matrix"
   spec.license       = "MIT"
 
-  spec.metadata["allowed_push_host"] = "TODO: Set to 'http://mygemserver.com'"
-
-  spec.metadata["homepage_uri"] = spec.homepage
+   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = "TODO: Put your gem's public repo URL here."
   spec.metadata["changelog_uri"] = "TODO: Put your gem's CHANGELOG.md URL here."
 
