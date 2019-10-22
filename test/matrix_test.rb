@@ -6,8 +6,8 @@ require 'matrix'
 class FastMatrixTest < Minitest::Test
   def test_init
     m = FastMatrix::Matrix.new(2, 4)
-    assert_equal 2, m.column_size
-    assert_equal 4, m.row_size
+    assert_equal 2, m.row_count
+    assert_equal 4, m.column_count
   end
 
   def test_init_from_brackets

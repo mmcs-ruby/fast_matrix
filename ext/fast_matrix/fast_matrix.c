@@ -288,8 +288,8 @@ void Init_fast_matrix()
 	rb_define_method(cMatrix, "[]", matrix_get, 2);
 	rb_define_method(cMatrix, "[]=", matrix_set, 3);
 	rb_define_method(cMatrix, "*", matrix_multiply, 1);
-	rb_define_method(cMatrix, "row_size", row_size, 0);
-	rb_define_method(cMatrix, "column_size", column_size, 0);
+	rb_define_method(cMatrix, "column_count", row_size, 0);
+	rb_define_method(cMatrix, "row_count", column_size, 0);
 	rb_define_method(cMatrix, "copy", matrix_copy, 0);
 	rb_define_method(cMatrix, "transpose", transpose, 0);
 }

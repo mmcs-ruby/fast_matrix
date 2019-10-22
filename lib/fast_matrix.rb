@@ -6,13 +6,24 @@ module FastMatrix
 
   # Matrix with fast implementations of + - * determinate in C
   class Matrix
+
+    # Aliases just for capability with standard matrix
+    #
+    # Returns the number of rows.
+    #
+    alias_method :row_size, :row_count
+    #
+    # Returns the number of columns.
+    #
+    alias_method :column_size, :column_count
+
     #
     # Create fast matrix from standard matrix
     #
     def self.convert(matrix)
-      fast_matrix = Matrix.new(matrix.row_size, matrix.column_size)
-      (0...matrix.row_size).each do |i|
-        (0...matrix.column_size).each do |j|
+      fast_matrix = Matrix.new(matrix.row_count, matrix.column_count)
+      (0...matrix.row_count).each do |i|
+        (0...matrix.column_count).each do |j|
           fast_matrix[i, j] = matrix[i, j]
         end
       end
@@ -20,16 +31,16 @@ module FastMatrix
     end
 
     def each_with_indexes
-      (0...column_size).each do |i|
-        (0...row_size).each do |j|
+      (0...row_count).each do |i|
+        (0...column_count).each do |j|
           yield self[i, j], i, j
         end
       end
     end
 
     def each_with_indexes!
-      (0...column_size).each do |i|
-        (0...row_size).each do |j|
+      (0...row_count).each do |i|
+        (0...column_count).each do |j|
           self[i, j] = yield self[i, j], i, j
         end
       end
