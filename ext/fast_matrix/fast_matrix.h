@@ -3,4 +3,5 @@
 
 #include "ruby.h"
 
+void Init_fast_matrix();
 #endif /* FAST_MATRIX_H */

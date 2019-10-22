@@ -12,4 +12,4 @@
 *.a
 mkmf.log
 .idea/
-
+Gemfile.lock
