@@ -8,7 +8,7 @@ module FastMatrix
   # Matrix with fast implementations of + - * determinate in C
   class Matrix
 
-    # Aliases just for capability with standard matrix
+    # Aliases just for compatibility with standard matrix
     #
     # Returns the number of rows.
     #
