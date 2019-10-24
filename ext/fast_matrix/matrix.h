@@ -3,8 +3,6 @@
 
 #include "ruby.h"
 
-static VALUE matrix_eTypeError;
-static VALUE matrix_eIndexError;
 static VALUE cMatrix;
 
 // matrix

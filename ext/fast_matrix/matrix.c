@@ -1,5 +1,6 @@
 #include "matrix.h"
 #include "c_array_operations.h"
+#include "errors.h"
 
 void matrix_free(void* data)
 {
@@ -19,31 +20,6 @@ VALUE matrix_alloc(VALUE self)
 	return TypedData_Wrap_Struct(self, &matrix_type, mtx);
 }
 
-double raise_rb_value_to_double(VALUE v)
-{
-    if(RB_FLOAT_TYPE_P(v) || FIXNUM_P(v)
-        || RB_TYPE_P(v, T_BIGNUM))
-        return NUM2DBL(v);
-
-    rb_raise(matrix_eTypeError, "Value is not number");
-    return 0;
-}
-
-int raise_rb_value_to_int(VALUE v)
-{
-    if(FIXNUM_P(v))
-        return NUM2INT(v);
-
-    rb_raise(matrix_eTypeError, "Index is not integer");
-    return 0;
-}
-
-void raise_check_range(int v, int min, int max)
-{
-    if(v < min || v >= max)
-        rb_raise(matrix_eIndexError, "Index out of range");
-}
-
 void c_matrix_init(struct matrix* mtr, int m, int n)
 {
     mtr->m = m;
@@ -58,7 +34,7 @@ VALUE matrix_initialize(VALUE self, VALUE rows_count, VALUE columns_count)
     int n = raise_rb_value_to_int(rows_count);
 
     if(m <= 0 || n <= 0)
-        rb_raise(matrix_eIndexError, "Size cannot be negative or zero");
+        rb_raise(fm_eIndexError, "Size cannot be negative or zero");
 
 	TypedData_Get_Struct(self, struct matrix, &matrix_type, data);
 
@@ -141,7 +117,7 @@ VALUE matrix_multiply_mm(VALUE self, VALUE other)
 	TypedData_Get_Struct(other, struct matrix, &matrix_type, B);
 
     if(A->m != B->n)
-        rb_raise(matrix_eIndexError, "First columns differs from second rows");
+        rb_raise(fm_eIndexError, "First columns differs from second rows");
 
     int m = B->m;
     int k = A->m;
@@ -231,7 +207,7 @@ VALUE add_with(VALUE self, VALUE value)
 	TypedData_Get_Struct(value, struct matrix, &matrix_type, B);
 
     if(A->m != B->m && A->m != B->m)
-        rb_raise(matrix_eIndexError, "Different sizes matrices");
+        rb_raise(fm_eIndexError, "Different sizes matrices");
 
     int m = B->m;
     int n = A->n;
@@ -254,7 +230,7 @@ VALUE add_from(VALUE self, VALUE value)
 	TypedData_Get_Struct(value, struct matrix, &matrix_type, B);
 
     if(A->m != B->m && A->m != B->m)
-        rb_raise(matrix_eIndexError, "Different sizes matrices");
+        rb_raise(fm_eIndexError, "Different sizes matrices");
 
     int m = B->m;
     int n = A->n;
@@ -268,10 +244,6 @@ void init_fm_matrix()
 {
     VALUE  mod = rb_define_module("FastMatrix");
 	cMatrix = rb_define_class_under(mod, "Matrix", rb_cData);
-
-    matrix_eTypeError  = rb_define_class_under(cMatrix, "TypeError",  rb_eTypeError);
-    matrix_eIndexError = rb_define_class_under(cMatrix, "IndexError", rb_eIndexError);
-
 
 	rb_define_alloc_func(cMatrix, matrix_alloc);
 

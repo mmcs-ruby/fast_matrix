@@ -25,19 +25,19 @@ class FastMatrixTest < Minitest::Test
 
   def test_get_out_of_range
     m = FastMatrix::Matrix.new(2, 4)
-    assert_raises(FastMatrix::Matrix::IndexError) { m[3, 5] }
-    assert_raises(FastMatrix::Matrix::IndexError) { m[-2, 2] }
+    assert_raises(FastMatrix::IndexError) { m[3, 5] }
+    assert_raises(FastMatrix::IndexError) { m[-2, 2] }
   end
 
   def test_set_out_of_range
     m = FastMatrix::Matrix.new(2, 4)
-    assert_raises(FastMatrix::Matrix::IndexError) { m[3, 5] = 0 }
-    assert_raises(FastMatrix::Matrix::IndexError) { m[-2, 2] = 0 }
+    assert_raises(FastMatrix::IndexError) { m[3, 5] = 0 }
+    assert_raises(FastMatrix::IndexError) { m[-2, 2] = 0 }
   end
 
   def test_set_nan
     m = FastMatrix::Matrix.new(2, 4)
-    assert_raises(FastMatrix::Matrix::TypeError) { m[1, 1] = 'not a number' }
+    assert_raises(FastMatrix::TypeError) { m[1, 1] = 'not a number' }
   end
 
   def test_multiply_mm

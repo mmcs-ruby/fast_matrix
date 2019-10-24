@@ -35,4 +35,11 @@ class InitializationTest < Minitest::Test
     expected = FastMatrix::Matrix[[0, 1, 2, 3], [-1, 0, 1, 2]]
     assert_equal expected, actual
   end
+
+  def test_vector_init
+    v = FastMatrix::Vector.new(5)
+    v[3] = 7
+    assert 7, v[3]
+    assert 5, v.size
+  end
 end
