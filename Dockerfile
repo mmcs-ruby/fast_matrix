@@ -8,6 +8,11 @@ COPY Gemfile fast_matrix.gemspec ./
 COPY lib/fast_matrix ./lib/fast_matrix
 RUN bundle install
 
-COPY . .
+COPY Rakefile ./
+COPY ext/ ./ext
+RUN rake compile
 
-CMD ["rake"]
+COPY . .
+RUN rake test
+
+CMD /bin/bash
