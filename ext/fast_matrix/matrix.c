@@ -199,14 +199,14 @@ VALUE transpose(VALUE self)
     return result;
 }
 
-VALUE add_with(VALUE self, VALUE value)
+VALUE matrix_add_with(VALUE self, VALUE value)
 {
 	struct matrix* A;
     struct matrix* B;
 	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
 	TypedData_Get_Struct(value, struct matrix, &matrix_type, B);
 
-    if(A->m != B->m && A->m != B->m)
+    if(A->m != B->m && A->n != B->n)
         rb_raise(fm_eIndexError, "Different sizes matrices");
 
     int m = B->m;
@@ -222,14 +222,14 @@ VALUE add_with(VALUE self, VALUE value)
 }
 
 
-VALUE add_from(VALUE self, VALUE value)
+VALUE matrix_add_from(VALUE self, VALUE value)
 {
 	struct matrix* A;
     struct matrix* B;
 	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
 	TypedData_Get_Struct(value, struct matrix, &matrix_type, B);
 
-    if(A->m != B->m && A->m != B->m)
+    if(A->m != B->m && A->n != B->n)
         rb_raise(fm_eIndexError, "Different sizes matrices");
 
     int m = B->m;
@@ -256,6 +256,6 @@ void init_fm_matrix()
 	rb_define_method(cMatrix, "copy", matrix_copy, 0);
 	rb_define_method(cMatrix, "transpose", transpose, 0);
 
-	rb_define_method(cMatrix, "+", add_with, 1);
-	rb_define_method(cMatrix, "+=", add_from, 1);
+	rb_define_method(cMatrix, "+", matrix_add_with, 1);
+	rb_define_method(cMatrix, "+=", matrix_add_from, 1);
 }

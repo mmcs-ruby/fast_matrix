@@ -29,3 +29,11 @@ void add_d_arrays_to_first(int len, double* sum, const double* added)
     for(int i = 0; i < len; ++i)
         sum[i] += added[i];
 }
+
+bool equal_d_arrays(int len, double* A, double* B)
+{
+    for(int i = 0; i < len; ++i)
+        if(A[i] != B[i])
+            return false;
+    return true;
+}

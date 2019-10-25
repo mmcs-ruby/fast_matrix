@@ -77,6 +77,62 @@ VALUE c_vector_size(VALUE self)
 }
 
 
+VALUE vector_add_with(VALUE self, VALUE value)
+{
+	struct vector* A;
+    struct vector* B;
+	TypedData_Get_Struct(self, struct vector, &vector_type, A);
+	TypedData_Get_Struct(value, struct vector, &vector_type, B);
+
+    if(A->n != B->n)
+        rb_raise(fm_eIndexError, "Different sizes matrices");
+
+    int n = A->n;
+
+    struct vector* C;
+    VALUE result = TypedData_Make_Struct(cVector, struct vector, &vector_type, C);
+
+    c_vector_init(C, n);
+    add_d_arrays_to_result(n, A->data, B->data, C->data);
+
+    return result;
+}
+
+
+VALUE vector_add_from(VALUE self, VALUE value)
+{
+	struct vector* A;
+    struct vector* B;
+	TypedData_Get_Struct(self, struct vector, &vector_type, A);
+	TypedData_Get_Struct(value, struct vector, &vector_type, B);
+
+    if(A->n != B->n)
+        rb_raise(fm_eIndexError, "Different sizes matrices");
+
+    int n = A->n;
+
+    add_d_arrays_to_first(n, A->data, B->data);
+
+    return self;
+}
+
+VALUE vector_equal(VALUE self, VALUE value)
+{
+	struct vector* A;
+    struct vector* B;
+	TypedData_Get_Struct(self, struct vector, &vector_type, A);
+	TypedData_Get_Struct(value, struct vector, &vector_type, B);
+
+    if(A->n != B->n)
+		return Qfalse;
+
+    int n = A->n;
+
+    if(equal_d_arrays(n, A->data, B->data))
+		return Qtrue;
+	return Qfalse;
+}
+
 void init_fm_vector()
 {
     VALUE  mod = rb_define_module("FastMatrix");
@@ -88,4 +144,7 @@ void init_fm_vector()
 	rb_define_method(cVector, "[]", vector_get, 1);
 	rb_define_method(cVector, "[]=", vector_set, 2);
 	rb_define_method(cVector, "size", c_vector_size, 0);
+	rb_define_method(cVector, "+", vector_add_with, 1);
+	rb_define_method(cVector, "+=", vector_add_from, 1);
+	rb_define_method(cVector, "==", vector_equal, 1);
 }
