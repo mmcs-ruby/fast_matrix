@@ -3,8 +3,8 @@
 
 #include "ruby.h"
 
-static VALUE fm_eTypeError;
-static VALUE fm_eIndexError;
+extern VALUE fm_eTypeError;
+extern VALUE fm_eIndexError;
 
 //  convert ruby value to double or raise an error if this is not possible
 double raise_rb_value_to_double(VALUE v);

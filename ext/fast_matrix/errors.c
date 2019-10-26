@@ -1,5 +1,8 @@
 #include "errors.h"
 
+VALUE fm_eTypeError;
+VALUE fm_eIndexError;
+
 double raise_rb_value_to_double(VALUE v)
 {
     if(RB_FLOAT_TYPE_P(v) || FIXNUM_P(v)

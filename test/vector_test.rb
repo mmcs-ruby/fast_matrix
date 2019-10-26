@@ -24,4 +24,27 @@ class FastVectorTest < Minitest::Test
 
     assert_equal m1, m2
   end
+  
+  def test_multiply_vm
+    v = FastMatrix::Vector[3, -1]
+    m = FastMatrix::Matrix[[2, 3, 1]]
+    r = FastMatrix::Matrix[[6, 9, 3], [-2, -3, -1]]
+
+    assert_equal r, v * m
+  end
+
+  def test_multiply_vn
+    m1 = FastMatrix::Vector[3, 5, 10, -2, 0]
+    m2 = FastMatrix::Vector[15, 25, 50, -10, 0]
+
+    assert_equal m2, m1 * 5
+  end
+
+  def test_multiply_vv
+    v1 = FastMatrix::Vector[2, 3, -1, 4, 7]
+    v2 = FastMatrix::Vector[2]
+    r = FastMatrix::Vector[4, 6, -2, 8, 14]
+    
+    assert_equal r, v1 * v2
+  end
 end

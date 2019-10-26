@@ -1,6 +1,7 @@
 #include "vector.h"
 #include "c_array_operations.h"
 #include "errors.h"
+#include "matrix.h"
 
 VALUE cVector;
 
@@ -165,6 +166,94 @@ VALUE vector_copy(VALUE v)
     return result;
 }
 
+// V - vector n
+// M - matrix m x 1
+// R - matrix m x n
+void c_vector_matrix_multiply(int n, int m, const double* V, const double* M, double* R)
+{
+    fill_d_array(m * n, R, 0);
+
+    for(int j = 0; j < n; ++j)
+    {
+        double* p_r = R + m * j;
+        double d_v = V[j];
+        
+        for(int i = 0; i < m; ++i)
+            p_r[i] += d_v * M[i];
+    }
+}
+
+VALUE vector_multiply_vm(VALUE self, VALUE other)
+{
+	struct vector* V;
+    struct matrix* M;
+	TypedData_Get_Struct(self, struct vector, &vector_type, V);
+	TypedData_Get_Struct(other, struct matrix, &matrix_type, M);
+
+    if(M->n != 1)
+        rb_raise(fm_eIndexError, "Number of rows must be 1");
+
+    int m = M->m;
+    int n = V->n;
+
+    struct matrix* R;
+    VALUE result = TypedData_Make_Struct(cMatrix, struct matrix, &matrix_type, R);
+
+    c_matrix_init(R, m, n);
+    c_vector_matrix_multiply(n, m, V->data, M->data, R->data);
+
+    return result;
+}
+
+VALUE vector_multiply_vn(VALUE self, VALUE value)
+{
+	struct vector* A;
+	TypedData_Get_Struct(self, struct vector, &vector_type, A);
+
+    double d = NUM2DBL(value);
+
+    struct vector* R;
+    VALUE result = TypedData_Make_Struct(cVector, struct vector, &vector_type, R);
+
+    c_vector_init(R, A->n);
+    copy_d_array(R->n, A->data, R->data);
+    multiply_d_array(R->n, R->data, d);
+
+    return result;
+}
+
+VALUE vector_multiply_vv(VALUE self, VALUE other)
+{
+    struct vector* A;
+    struct vector* B;
+    TypedData_Get_Struct(self, struct vector, &vector_type, A);
+    TypedData_Get_Struct(other, struct vector, &vector_type, B);
+    
+    if(B->n != 1)
+        rb_raise(fm_eIndexError, "Length of vector must be equal to 1");
+
+    struct vector* R;
+    VALUE result = TypedData_Make_Struct(cVector, struct vector, &vector_type, R);
+
+    c_vector_init(R, A->n);
+    copy_d_array(A->n, A->data, R->data);
+    multiply_d_array(R->n, R->data, B->data[0]);
+
+    return result;
+}
+
+VALUE vector_multiply(VALUE self, VALUE v)
+{
+    if(RB_FLOAT_TYPE_P(v) || FIXNUM_P(v)
+        || RB_TYPE_P(v, T_BIGNUM))
+        return vector_multiply_vn(self, v);
+    if(RBASIC_CLASS(v) == cMatrix)
+        return vector_multiply_vm(self, v);
+    if(RBASIC_CLASS(v) == cVector);
+        return vector_multiply_vv(self, v);
+    rb_raise(fm_eTypeError, "Invalid klass for multiply");
+}
+
 void init_fm_vector()
 {
     VALUE  mod = rb_define_module("FastMatrix");
@@ -180,4 +269,5 @@ void init_fm_vector()
 	rb_define_method(cVector, "+=", vector_add_from, 1);
 	rb_define_method(cVector, "==", vector_equal, 1);
 	rb_define_method(cVector, "clone", vector_copy, 0);
+	rb_define_method(cVector, "*", vector_multiply, 1);
 }

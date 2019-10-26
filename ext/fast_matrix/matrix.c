@@ -214,7 +214,7 @@ VALUE matrix_multiply(VALUE self, VALUE v)
         return matrix_multiply_mm(self, v);
     if(RBASIC_CLASS(v) == cVector);
         return matrix_multiply_mv(self, v);
-    rb_raise(fm_eTypeError, "Not valid klass for multiply");
+    rb_raise(fm_eTypeError, "Invalid klass for multiply");
 }
 
 VALUE matrix_copy(VALUE mtrx)
@@ -315,7 +315,6 @@ void init_fm_matrix()
 	rb_define_method(cMatrix, "row_count", column_size, 0);
 	rb_define_method(cMatrix, "clone", matrix_copy, 0);
 	rb_define_method(cMatrix, "transpose", transpose, 0);
-
 	rb_define_method(cMatrix, "+", matrix_add_with, 1);
 	rb_define_method(cMatrix, "+=", matrix_add_from, 1);
 }
