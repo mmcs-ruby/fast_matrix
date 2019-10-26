@@ -2,6 +2,24 @@
 #include "c_array_operations.h"
 #include "errors.h"
 
+VALUE cVector;
+
+void vector_free(void* data);
+size_t vector_size(const void* data);
+
+const rb_data_type_t vector_type =
+{
+    .wrap_struct_name = "vector",
+    .function =
+    {
+                .dmark = NULL,
+                .dfree = vector_free,
+                .dsize = vector_size,
+        },
+        .data = NULL,
+        .flags = RUBY_TYPED_FREE_IMMEDIATELY,
+};
+
 void vector_free(void* data)
 {
 	free(((*(struct vector*)data)).data);
@@ -133,6 +151,20 @@ VALUE vector_equal(VALUE self, VALUE value)
 	return Qfalse;
 }
 
+VALUE vector_copy(VALUE v)
+{
+	struct vector* V;
+	TypedData_Get_Struct(v, struct vector, &vector_type, V);
+
+    struct vector* R;
+    VALUE result = TypedData_Make_Struct(cVector, struct vector, &vector_type, R);
+
+    c_vector_init(R, V->n);
+    copy_d_array(R->n, V->data, R->data);
+
+    return result;
+}
+
 void init_fm_vector()
 {
     VALUE  mod = rb_define_module("FastMatrix");
@@ -147,4 +179,5 @@ void init_fm_vector()
 	rb_define_method(cVector, "+", vector_add_with, 1);
 	rb_define_method(cVector, "+=", vector_add_from, 1);
 	rb_define_method(cVector, "==", vector_equal, 1);
+	rb_define_method(cVector, "clone", vector_copy, 0);
 }

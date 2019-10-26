@@ -1,10 +1,29 @@
 #include "matrix.h"
 #include "c_array_operations.h"
 #include "errors.h"
+#include "vector.h"
+
+VALUE cMatrix;
+
+void matrix_free(void* data);
+size_t matrix_size(const void* data);
+
+const rb_data_type_t matrix_type =
+{
+    .wrap_struct_name = "matrix",
+    .function =
+    {
+        .dmark = NULL,
+        .dfree = matrix_free,
+        .dsize = matrix_size,
+    },
+    .data = NULL,
+    .flags = RUBY_TYPED_FREE_IMMEDIATELY,
+};
 
 void matrix_free(void* data)
 {
-	free(((*(struct matrix*)data)).data);
+    free(((*(struct matrix*)data)).data);
     free(data);
 }
 
@@ -109,6 +128,43 @@ void c_matrix_multiply(int n, int k, int m, const double* A, const double* B, do
     }
 }
 
+// M - matrix m x n
+// V - vector m
+// R - vector n
+void c_matrix_vector_multiply(int n, int m, const double* M, const double* V, double* R)
+{
+    fill_d_array(n, R, 0);
+
+    for(int j = 0; j < n; ++j)
+    {
+        const double* p_m = M + m * j;
+        for(int i = 0; i < m; ++i)
+            R[j] += V[i] * p_m[i];
+    }
+}
+
+VALUE matrix_multiply_mv(VALUE self, VALUE other)
+{
+    struct matrix* M;
+    struct vector* V;
+    TypedData_Get_Struct(self, struct matrix, &matrix_type, M);
+    TypedData_Get_Struct(other, struct vector, &vector_type, V);
+
+    if(M->m != V->n)
+        rb_raise(fm_eIndexError, "Matrix columns differs from vector size");
+
+    int m = M->m;
+    int n = M->n;
+
+    struct vector* R;
+    VALUE result = TypedData_Make_Struct(cVector, struct vector, &vector_type, R);
+
+    c_vector_init(R, n);
+    c_matrix_vector_multiply(n, m, M->data, V->data, R->data);
+
+    return result;
+}
+
 VALUE matrix_multiply_mm(VALUE self, VALUE other)
 {
 	struct matrix* A;
@@ -154,7 +210,11 @@ VALUE matrix_multiply(VALUE self, VALUE v)
     if(RB_FLOAT_TYPE_P(v) || FIXNUM_P(v)
         || RB_TYPE_P(v, T_BIGNUM))
         return matrix_multiply_mn(self, v);
-    return matrix_multiply_mm(self, v);
+    if(RBASIC_CLASS(v) == cMatrix)
+        return matrix_multiply_mm(self, v);
+    if(RBASIC_CLASS(v) == cVector);
+        return matrix_multiply_mv(self, v);
+    rb_raise(fm_eTypeError, "Not valid klass for multiply");
 }
 
 VALUE matrix_copy(VALUE mtrx)
@@ -253,7 +313,7 @@ void init_fm_matrix()
 	rb_define_method(cMatrix, "*", matrix_multiply, 1);
 	rb_define_method(cMatrix, "column_count", row_size, 0);
 	rb_define_method(cMatrix, "row_count", column_size, 0);
-	rb_define_method(cMatrix, "copy", matrix_copy, 0);
+	rb_define_method(cMatrix, "clone", matrix_copy, 0);
 	rb_define_method(cMatrix, "transpose", transpose, 0);
 
 	rb_define_method(cMatrix, "+", matrix_add_with, 1);

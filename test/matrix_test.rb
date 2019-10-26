@@ -55,9 +55,17 @@ class FastMatrixTest < Minitest::Test
     assert_equal m2, m1 * 5
   end
 
-  def test_copy
+  def test_multiply_mv
+    m = FastMatrix::Matrix[[1, 2], [3, 4], [7, 0], [-3, 1]]
+    v = FastMatrix::Vector[5, 10]
+    r = FastMatrix::Vector[25, 55, 35, -5]
+    
+    assert_equal r, m * v
+  end
+
+  def test_clone
     m1 = FastMatrix::Matrix[[1, 2], [3, 4], [7, 0]]
-    m2 = m1.copy
+    m2 = m1.clone
 
     assert_equal m1, m2
   end

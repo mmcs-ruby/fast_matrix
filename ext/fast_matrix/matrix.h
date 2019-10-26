@@ -3,7 +3,8 @@
 
 #include "ruby.h"
 
-static VALUE cMatrix;
+extern VALUE cMatrix;
+extern const rb_data_type_t matrix_type;
 
 // matrix
 //     m --->
@@ -20,21 +21,7 @@ struct matrix
     double* data;
 };
 
-void matrix_free(void* data);
-size_t matrix_size(const void* data);
-
-static const rb_data_type_t matrix_type =
-{
-	.wrap_struct_name = "matrix",
-	.function =
-    {
-		.dmark = NULL,
-		.dfree = matrix_free,
-		.dsize = matrix_size,
-	},
-	.data = NULL,
-	.flags = RUBY_TYPED_FREE_IMMEDIATELY,
-};
+void c_matrix_init(struct matrix* mtr, int m, int n);
 
 void init_fm_matrix();
 

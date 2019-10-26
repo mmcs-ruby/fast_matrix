@@ -17,4 +17,11 @@ class FastVectorTest < Minitest::Test
     v1 += v2
     assert_equal v, v1
   end
+  
+  def test_clone
+    m1 = FastMatrix::Vector[1, 3, -5, 6, 6, 7]
+    m2 = m1.clone
+
+    assert_equal m1, m2
+  end
 end

@@ -3,9 +3,8 @@
 
 #include "ruby.h"
 
-static VALUE vector_eTypeError;
-static VALUE vector_eIndexError;
-static VALUE cVector;
+extern VALUE cVector;
+extern const rb_data_type_t vector_type;
 
 // vector
 struct vector
@@ -14,21 +13,7 @@ struct vector
     double* data;
 };
 
-void vector_free(void* data);
-size_t vector_size(const void* data);
-
-static const rb_data_type_t vector_type =
-{
-	.wrap_struct_name = "vector",
-	.function =
-    {
-		.dmark = NULL,
-		.dfree = vector_free,
-		.dsize = vector_size,
-	},
-	.data = NULL,
-	.flags = RUBY_TYPED_FREE_IMMEDIATELY,
-};
+void c_vector_init(struct vector* vect, int n);
 
 void init_fm_vector();
 
