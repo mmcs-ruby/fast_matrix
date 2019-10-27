@@ -1,42 +1,61 @@
-require 'test_helper'
-require 'matrix'
+require 'matrix/compatibility_helper'
 
-# noinspection RubyInstanceMethodNamingConvention
-class CompatibilityWithStandardTest < Minitest::Test
-  def test_equal_by_value
-    m1 = FastMatrix::Matrix[[1, 2], [3, 4]]
-    m2 = ::Matrix[[1, 2], [3, 4]]
-    assert m1 == m2, 'Equals fast matrix and standard matrix'
-    skip 'Standard matrix does not recognizes fast matrix'
-    assert m2 == m1, 'Equals standard matrix and fast matrix'
-  end
+module FastMatrixTest
+  # noinspection RubyInstanceMethodNamingConvention
+  class CompatibilityWithStandardTest < Minitest::Test
+    include CompatibilityHelper
 
-  def test_no_equal_by_value
-    m1 = FastMatrix::Matrix[[1, 2], [3, 4]]
-    m2 = ::Matrix[[1, 2], [3, 4]]
-    assert m1 == m2, 'Equals fast matrix and standard matrix'
-    skip 'Standard matrix does not recognizes fast matrix'
-    assert m2 == m1, 'Equals standard matrix and fast matrix'
-  end
+    def test_equal_by_value_fast_with_standard
+      standard, fast = create_matrices([1, 2], [3, 4], [-5, -3])
+      assert fast == standard, 'Equals fast matrix and standard matrix'
+    end
 
-  def test_convert_from_fast_to_standard
-    fast = FastMatrix::Matrix[[1, 2], [3, 4], [-5, -3]]
-    standard = ::Matrix[[1, 2], [3, 4], [-5, -3]]
-    assert_equal standard, fast.convert
-  end
+    def test_equal_by_value_standard_with_fast
+      standard, fast = create_matrices([1, 2], [3, 4], [-5, -3])
+      skip 'Standard matrix does not recognizes fast matrix'
+      assert standard == fast, 'Equals standard matrix and fast matrix'
+    end
 
-  def test_convert_from_standard_to_fast
-    standard = ::Matrix[[1, 2], [-3, 4], [1, 2]]
-    fast = FastMatrix::Matrix[[1, 2], [-3, 4], [1, 2]]
-    assert_equal fast, FastMatrix::Matrix.convert(standard)
-  end
+    def test_no_equal_by_value_fast_with_standard
+      standard, fast = create_matrices([1, 2], [3, 4], [-5, -3])
+      fast[2, 1] = 666
+      assert fast != standard, 'Not equals fast matrix and standard matrix'
+    end
 
-  def test_sizes
-    standard = ::Matrix.build(20, 40){ 0 }
-    fast = FastMatrix::Matrix.build(20, 40) { 0 }
-    assert_equal standard.row_count, fast.row_count
-    assert_equal standard.row_size, fast.row_size
-    assert_equal standard.column_count, fast.column_count
-    assert_equal standard.column_size, fast.column_size
+    def test_no_equal_by_value_standard_with_fast
+      standard, fast = create_matrices([1, 2], [3, 4], [-5, -3])
+      fast[2, 1] = 666
+      assert standard != fast, 'Not equals standard matrix and fast matrix'
+    end
+
+    def test_convert_from_fast_to_standard
+      standard, fast = create_matrices([1, 2], [3, 4], [-5, -3])
+      assert_equal standard, fast.convert
+    end
+
+    def test_convert_from_standard_to_fast
+      standard, fast = create_matrices([1, 2], [3, 4], [-5, -3])
+      assert_equal fast, FastMatrix::Matrix.convert(standard)
+    end
+
+    def test_row_count
+      standard, fast = build_matrices(10, 20) { 0 }
+      assert_equal standard.row_count, fast.row_count
+    end
+
+    def test_row_size
+      standard, fast = build_matrices(10, 20) { 0 }
+      assert_equal standard.row_size, fast.row_size
+    end
+
+    def test_column_count
+      standard, fast = build_matrices(10, 20) { 0 }
+      assert_equal standard.column_count, fast.column_count
+    end
+
+    def test_column_size
+      standard, fast = build_matrices(10, 20) { 0 }
+      assert_equal standard.column_size, fast.column_size
+    end
   end
 end

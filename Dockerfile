@@ -13,6 +13,6 @@ COPY ext/ ./ext
 RUN rake compile
 
 COPY . .
-RUN rake test
+RUN rake test TESTOPTS='-v'
 
 CMD /bin/bash

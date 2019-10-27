@@ -1,8 +1,7 @@
 require 'matrix/constructors'
 
 module FastMatrix
-  class Error < StandardError;
-  end
+  class Error < StandardError; end
 
   # Matrix with fast implementations of + - * determinate in C
   class Matrix
@@ -11,11 +10,11 @@ module FastMatrix
     #
     # Returns the number of rows.
     #
-    alias_method :row_size, :row_count
+    alias row_size row_count
     #
     # Returns the number of columns.
     #
-    alias_method :column_size, :column_count
+    alias column_size column_count
 
     #
     # Create fast matrix from standard matrix
@@ -54,10 +53,9 @@ module FastMatrix
       ::Matrix.build(row_size, column_size) { |i, j| self[i, j] }
     end
 
-
-    # FIXME for compare with standard matrix
+    # FIXME: for compare with standard matrix
     def ==(other)
-      # TODO check class and use fast compare from C if possibly
+      # TODO: check class and use fast compare from C if possibly
       return false unless %i[row_size column_size \[\]].all? { |x| other.respond_to? x }
       return false unless self.row_size == other.row_size && self.column_size == other.column_size
 
