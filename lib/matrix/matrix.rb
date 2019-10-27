@@ -1,8 +1,6 @@
 require 'matrix/constructors'
 
 module FastMatrix
-  class Error < StandardError; end
-
   # Matrix with fast implementations of + - * determinate in C
   class Matrix
 

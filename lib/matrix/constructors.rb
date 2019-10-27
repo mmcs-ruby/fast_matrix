@@ -1,7 +1,7 @@
 require 'fast_matrix/fast_matrix'
+require 'errors'
 
 module FastMatrix
-  class NotSupportedError < NotImplementedError; end
   #
   # Constructors as in the standard matrix
   #
@@ -198,7 +198,7 @@ module FastMatrix
     #   y = Matrix[[1, 2], [3, 4]]
     #   Matrix.combine(x, y) {|a, b| a - b} # => Matrix[[5, 4], [1, 0]]
     # TODO: optimize in C
-    def Matrix.combine(*matrices)
+    def self.combine(*matrices)
       return Matrix.empty if matrices.empty?
 
       result = convert(matrices.first)
@@ -211,41 +211,43 @@ module FastMatrix
       result
     end
 
-    private
+    class << Matrix
+      private
 
-    def self.check_empty_matrix(row_count, column_count)
-      empty if row_count.zero? || column_count.zero?
-    end
-
-    def self.check_negative_sizes(row_count, column_count)
-      raise IndexError if column_count.negative? || row_count.negative?
-    end
-
-    def self.check_dimensions(row_count, column_count)
-      check_empty_matrix(row_count, column_count)
-      check_negative_sizes(row_count, column_count)
-    end
-
-    def self.check_flag_copy(copy)
-      unless copy
-        raise NotSupportedError, "Can't create matrix without copy elements"
+      def check_empty_matrix(row_count, column_count)
+        empty if row_count.zero? || column_count.zero?
       end
-    end
 
-    # generalization between ::rows and ::columns
-    def self.lines(lines, main_is_rows)
-      sizes = [lines.size, (lines[0] || []).size]
-      offset = main_is_rows ? 0 : -1
-      matrix = build(sizes[offset], sizes[1 + offset])
-      lines.each_with_index do |second_dim, main_index|
-        raise IndexError if second_dim.size != sizes[1]
+      def check_negative_sizes(row_count, column_count)
+        raise IndexError if column_count.negative? || row_count.negative?
+      end
 
-        second_dim.each_with_index do |elem, second_index|
-          indices = [main_index, second_index]
-          matrix[indices[offset], indices[1 + offset]] = elem
+      def check_dimensions(row_count, column_count)
+        check_empty_matrix(row_count, column_count)
+        check_negative_sizes(row_count, column_count)
+      end
+
+      def check_flag_copy(copy)
+        unless copy
+          raise NotSupportedError, "Can't create matrix without copy elements"
         end
       end
-      matrix
+
+      # generalization between ::rows and ::columns
+      def lines(lines, main_is_rows)
+        sizes = [lines.size, (lines[0] || []).size]
+        offset = main_is_rows ? 0 : -1
+        matrix = build(sizes[offset], sizes[1 + offset])
+        lines.each_with_index do |second_dim, main_index|
+          raise IndexError if second_dim.size != sizes[1]
+
+          second_dim.each_with_index do |elem, second_index|
+            indices = [main_index, second_index]
+            matrix[indices[offset], indices[1 + offset]] = elem
+          end
+        end
+        matrix
+      end
     end
   end
 end
