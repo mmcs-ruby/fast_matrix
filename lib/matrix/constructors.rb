@@ -1,4 +1,4 @@
-require "fast_matrix/version"
+require 'fast_matrix/fast_matrix'
 
 module FastMatrix
   class Matrix
@@ -18,7 +18,8 @@ module FastMatrix
       matrix = self.new(row_count, column_count)
       matrix.each_with_index! { |_, i, j| block.call(i, j) }
     end
-      #
+
+    #
     # Creates a matrix where each argument is a row.
     #   Matrix[ [25, 93], [-1, 66] ]
     #      =>  25 93
@@ -104,15 +105,6 @@ module FastMatrix
       matrix = Matrix.new(n, n)
       matrix.each_with_index! { |_, _, _| 0 }
       matrix
-    end
-  end
-
-  class Vector
-
-    def self.[](*elems)
-      vector = Vector.new(elems.size)
-      vector.each_with_index! { |_, idx| elems[idx] }
-      vector
     end
   end
 end

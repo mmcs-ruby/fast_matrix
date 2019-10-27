@@ -4,8 +4,8 @@ class FastVectorTest < Minitest::Test
   def test_sum
     v1 = FastMatrix::Vector.new(2)
     v2 = FastMatrix::Vector.new(2)
-    v  = FastMatrix::Vector.new(2)
-    
+    v = FastMatrix::Vector.new(2)
+
     v1[0] = 1
     v1[1] = 3
     v2[0] = 4
@@ -17,14 +17,14 @@ class FastVectorTest < Minitest::Test
     v1 += v2
     assert_equal v, v1
   end
-  
+
   def test_clone
     m1 = FastMatrix::Vector[1, 3, -5, 6, 6, 7]
     m2 = m1.clone
 
     assert_equal m1, m2
   end
-  
+
   def test_multiply_vm
     v = FastMatrix::Vector[3, -1]
     m = FastMatrix::Matrix[[2, 3, 1]]
@@ -44,7 +44,7 @@ class FastVectorTest < Minitest::Test
     v1 = FastMatrix::Vector[2, 3, -1, 4, 7]
     v2 = FastMatrix::Vector[2]
     r = FastMatrix::Vector[4, 6, -2, 8, 14]
-    
+
     assert_equal r, v1 * v2
   end
 end

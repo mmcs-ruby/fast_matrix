@@ -59,7 +59,7 @@ class FastMatrixTest < Minitest::Test
     m = FastMatrix::Matrix[[1, 2], [3, 4], [7, 0], [-3, 1]]
     v = FastMatrix::Vector[5, 10]
     r = FastMatrix::Vector[25, 55, 35, -5]
-    
+
     assert_equal r, m * v
   end
 
@@ -76,7 +76,7 @@ class FastMatrixTest < Minitest::Test
 
     assert_equal m1, m2.transpose
   end
-  
+
   def test_sum
     m1 = FastMatrix::Matrix[[1, -2], [3, 4], [7, 0]]
     m2 = FastMatrix::Matrix[[4, 0], [-3, 4], [2, 2]]
