@@ -15,6 +15,19 @@ module FastMatrix
     # Returns the number of columns.
     #
     alias column_size column_count
+    #
+    # Returns element (+i+,+j+) of the matrix.  That is: row +i+, column +j+.
+    #
+    alias element []
+    alias component []
+
+    def to_s
+      convert.to_s
+    end
+
+    def inspect
+      convert.inspect
+    end
 
     #
     # Create fast matrix from standard matrix

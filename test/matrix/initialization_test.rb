@@ -3,14 +3,20 @@ require 'test_helper'
 module FastMatrixTest
   # noinspection RubyInstanceMethodNamingConvention
   class InitializationTest < Minitest::Test
+    include FastMatrix
+
     def test_init
-      m = FastMatrix::Matrix.new(2, 4)
+      m = Matrix.new(2, 4)
       assert_equal 2, m.row_count
       assert_equal 4, m.column_count
     end
 
+    def test_init_incorrect_dimensions
+      assert_raises(IndexError) { Matrix.new(-2, 4) }
+    end
+
     def test_init_from_brackets
-      m = FastMatrix::Matrix[[1, 2], [3, 4], [5, 6]]
+      m = Matrix[[1, 2], [3, 4], [5, 6]]
       assert_equal 3, m.row_count
       assert_equal 2, m.column_count
       assert_equal 1, m[0, 0]
@@ -22,19 +28,115 @@ module FastMatrixTest
     end
 
     def test_init_column_vector
-      m = FastMatrix::Matrix.column_vector([0, 1, 2, 3, 4])
+      m = Matrix.column_vector([0, 1, 2, 3, 4])
       (0..4).each { |i| assert_equal i, m[i, 0] }
     end
 
+    def test_init_column_vector_empty
+      assert_raises(NotSupportedError) do
+        Matrix.column_vector([])
+      end
+    end
+
     def test_init_row_vector
-      m = FastMatrix::Matrix.row_vector([0, 1, 2, 3, 4])
+      m = Matrix.row_vector([0, 1, 2, 3, 4])
       (0..4).each { |j| assert_equal j, m[0, j] }
     end
 
+    def test_init_row_vector_empty
+      assert_raises(NotSupportedError) do
+        Matrix.row_vector([])
+      end
+    end
+
     def test_build
-      actual = FastMatrix::Matrix.build(2, 4) { |row, col| col - row }
-      expected = FastMatrix::Matrix[[0, 1, 2, 3], [-1, 0, 1, 2]]
+      actual = Matrix.build(2, 4) { |row, col| col - row }
+      expected = Matrix[[0, 1, 2, 3], [-1, 0, 1, 2]]
       assert_equal expected, actual
+    end
+
+    def test_build_incorrect_dimensions
+      assert_raises(IndexError) { Matrix.build(-2, 4) }
+    end
+
+    def test_build_empty
+      assert_raises(NotSupportedError) { Matrix.build(0, 4) }
+    end
+
+    def test_columns
+      actual = Matrix.columns([[25, 93, 34], [-1, 66, 78]])
+      expected = Matrix[[25, -1], [93, 66], [34, 78]]
+      assert_equal expected, actual
+    end
+
+    def test_rows
+      actual = Matrix.rows([[25, 93, 34], [-1, 66, 78]])
+      expected = Matrix[[25, 93, 34], [-1, 66, 78]]
+      assert_equal expected, actual
+    end
+
+    def test_rows_no_copy
+      assert_raises(NotSupportedError) do
+        Matrix.rows([[1, 2, 3]], false)
+      end
+    end
+
+    def test_empty
+      assert_raises(NotSupportedError) { Matrix.empty }
+    end
+
+    def test_diagonal
+      actual = Matrix.diagonal(9, 5, -3)
+      expected = Matrix[[9, 0, 0], [0, 5, 0], [0, 0, -3]]
+      assert_equal expected, actual
+    end
+
+    def test_vstack_2
+      x = Matrix[[1, 2], [3, 4]]
+      y = Matrix[[5, 6], [7, 8]]
+      assert_equal Matrix[[1, 2], [3, 4], [5, 6], [7, 8]], Matrix.vstack(x, y)
+    end
+
+    def test_vstack_3
+      x = Matrix[[1, 2],
+                 [3, 4]]
+      y = Matrix[[5, 6],
+                 [7, 8]]
+      z = Matrix[[8, 7],
+                 [6, 5],
+                 [4, 3]]
+      assert_equal Matrix[[1, 2],
+                          [3, 4],
+                          [5, 6],
+                          [7, 8],
+                          [8, 7],
+                          [6, 5],
+                          [4, 3]], Matrix.vstack(x, y, z)
+    end
+
+    def test_hstack_2
+      x = Matrix[[1, 2], [3, 4]]
+      y = Matrix[[5, 6], [7, 8]]
+      assert_equal Matrix[[1, 2, 5, 6], [3, 4, 7, 8]], Matrix.hstack(x, y)
+    end
+
+    def test_hstack_3
+      x = Matrix[[1, 2],
+                 [3, 4]]
+      y = Matrix[[5, 6],
+                 [7, 8]]
+      z = Matrix[[8, 7, 6],
+                 [5, 4, 3]]
+      assert_equal Matrix[[1, 2, 5, 6, 8, 7, 6],
+                          [3, 4, 7, 8, 5, 4, 3]],
+                   Matrix.hstack(x, y, z)
+    end
+
+    def test_combine
+      x = Matrix[[6, 6], [4, 4]]
+      y = Matrix[[1, 2], [3, 4]]
+      z = Matrix[[5, -4], [-2, -42]]
+      assert_equal Matrix[[0, 8], [3, 42]], Matrix.combine(x, y, z) {|a, b| a - b}
     end
   end
 end

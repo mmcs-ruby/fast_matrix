@@ -3,13 +3,15 @@ require 'test_helper'
 module FastVectorTest
   # noinspection RubyInstanceMethodNamingConvention
   class InitializationTest < Minitest::Test
+    include FastMatrix
+
     def test_init
-      v = FastMatrix::Vector.new(5)
+      v = Vector.new(5)
       assert_equal 5, v.size
     end
 
     def test_init_from_brackets
-      v = FastMatrix::Vector[2, 3, 5, 1, -1]
+      v = Vector[2, 3, 5, 1, -1]
       assert_equal 5, v.size
       assert_equal 2, v[0]
       assert_equal 3, v[1]
