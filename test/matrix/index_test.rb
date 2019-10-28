@@ -12,33 +12,28 @@ module FastMatrixTest
     end
 
     def test_get_out_of_range_row
-      skip 'Issue#8'
       m = Matrix[[11, 12, 13], [21, 22, 23]]
       assert_nil m[2, 0]
     end
 
     def test_get_out_of_range_column
-      skip 'Issue#8'
       m = Matrix[[11, 12, 13], [21, 22, 23]]
       assert_nil m[0, 3]
     end
 
     def test_get_neg
-      skip 'Issue#8'
       m = Matrix[[11, 12, 13], [21, 22, 23]]
       assert_equal 13, m[-2, -1]
     end
 
     def test_get_out_of_range_row_neg
-      skip 'Issue#8'
       m = Matrix[[11, 12, 13], [21, 22, 23]]
       assert_nil m[-3, 0]
     end
 
     def test_get_out_of_range_column_neg
-      skip 'Issue#8'
       m = Matrix[[11, 12, 13], [21, 22, 23]]
-      assert_nil m[0, -2]
+      assert_nil m[0, -4]
     end
 
     def test_set
@@ -49,7 +44,6 @@ module FastMatrixTest
     end
 
     def test_set_neg
-      skip 'Issue#8'
       m = Matrix.zero(2)
       expected = 555
       m[-2, -2] = expected

@@ -71,6 +71,9 @@ VALUE matrix_set(VALUE self, VALUE row, VALUE column, VALUE v)
 
 	struct matrix* data;
 	TypedData_Get_Struct(self, struct matrix, &matrix_type, data);
+    
+    m = (m < 0) ? data->m + m : m;
+    n = (n < 0) ? data->n + n : n;
 
     raise_check_range(m, 0, data->m);
     raise_check_range(n, 0, data->n);
@@ -87,9 +90,12 @@ VALUE matrix_get(VALUE self, VALUE row, VALUE column)
 
 	struct matrix* data;
 	TypedData_Get_Struct(self, struct matrix, &matrix_type, data);
-
-    raise_check_range(m, 0, data->m);
-    raise_check_range(n, 0, data->n);
+    
+    m = (m < 0) ? data->m + m : m;
+    n = (n < 0) ? data->n + n : n;
+    
+    if(m < 0 || n < 0 || n >= data->n || m >= data->m)
+        return Qnil;
 
     return DBL2NUM(data->data[m + data->m * n]);
 }

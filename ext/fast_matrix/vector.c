@@ -69,6 +69,7 @@ VALUE vector_set(VALUE self, VALUE idx, VALUE v)
 	struct vector* data;
 	TypedData_Get_Struct(self, struct vector, &vector_type, data);
 
+    i = (i < 0) ? data->n + i : i;
     raise_check_range(i, 0, data->n);
 
     data->data[i] = x;
@@ -83,7 +84,10 @@ VALUE vector_get(VALUE self, VALUE idx)
 	struct vector* data;
 	TypedData_Get_Struct(self, struct vector, &vector_type, data);
 
-    raise_check_range(i, 0, data->n);
+    i = (i < 0) ? data->n + i : i;
+    
+    if(i < 0 || i >= data->n)
+        return Qnil;
 
     return DBL2NUM(data->data[i]);
 }

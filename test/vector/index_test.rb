@@ -11,20 +11,17 @@ module FastVectorTest
     end
 
     def test_get_neg
-      skip 'Issue#8'
       expected = 974.34
       v = Vector[1, expected, 3, 4]
       assert_equal expected, v[-3]
     end
 
     def test_get_out_of_range
-      skip 'Issue#8'
       v = Vector.new(2)
       assert_nil v[2]
     end
 
     def test_get_out_of_range_neg
-      skip 'Issue#8'
       v = Vector.new(2)
       assert_nil v[-3]
     end
@@ -37,7 +34,6 @@ module FastVectorTest
     end
 
     def test_set_neg
-      skip 'Issue#8'
       v = Vector.new(4)
       expected = 974.34
       v[-3] = expected
