@@ -249,7 +249,7 @@ VALUE vector_multiply(VALUE self, VALUE v)
         return vector_multiply_vn(self, v);
     if(RBASIC_CLASS(v) == cMatrix)
         return vector_multiply_vm(self, v);
-    if(RBASIC_CLASS(v) == cVector);
+    if(RBASIC_CLASS(v) == cVector)
         return vector_multiply_vv(self, v);
     rb_raise(fm_eTypeError, "Invalid klass for multiply");
 }
