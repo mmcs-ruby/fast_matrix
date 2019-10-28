@@ -1,4 +1,5 @@
 #include "c_array_operations.h"
+#include "math.h"
 
 void fill_d_array(int len, double* a, double v)
 {
@@ -30,10 +31,36 @@ void add_d_arrays_to_first(int len, double* sum, const double* added)
         sum[i] += added[i];
 }
 
-bool equal_d_arrays(int len, double* A, double* B)
+void sub_d_arrays_to_result(int len, const double* dec, const double* sub, double* dif)
+{
+    for(int i = 0; i < len; ++i)
+        dif[i] = dec[i] - sub[i];
+}
+
+void sub_d_arrays_to_first(int len, double* dif, const double* sub)
+{
+    for(int i = 0; i < len; ++i)
+        dif[i] -= sub[i];
+}
+
+bool equal_d_arrays(int len, const double* A, const double* B)
 {
     for(int i = 0; i < len; ++i)
         if(A[i] != B[i])
+            return false;
+    return true;
+}
+
+void abs_d_array(int len, const double* A, double* B)
+{
+    for(int i = 0; i < len; ++i)
+        B[i] = fabs(A[i]);
+}
+
+bool greater_or_equal_d_array(int len, const double* A, const double* B)
+{
+    for(int i = 0; i < len; ++i)
+        if(A[i] < B[i])
             return false;
     return true;
 }
