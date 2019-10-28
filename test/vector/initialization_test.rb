@@ -10,6 +10,14 @@ module FastVectorTest
       assert_equal 5, v.size
     end
 
+    def test_init_invalid_dimension
+      assert_raises(IndexError) { Vector.new(-5) }
+    end
+
+    def test_init_empty
+      assert_raises(IndexError) { Vector.new(0) }
+    end
+
     def test_init_from_brackets
       v = Vector[2, 3, 5, 1, -1]
       assert_equal 5, v.size
