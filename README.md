@@ -24,9 +24,23 @@ Or install it yourself as:
 
 TODO: Write usage instructions here
 
+### Differences with the standard matrix
+* Supported only double values
+* Can't be empty
+* Some faster
+
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+Fast matrix is native extension in C, so, for development you need Linux (maybe, MacOS) or Docker.
+
+After checking out the repo, run `gem install bundler -v 2.0.2`, `bundle install` and `bundler exec rake` or use `Dockerfile`.
+
+Commands:
+  + `bundler exec rake compile` - compile C part of gem;
+  + `bundler exec rake test` - run tests;
+  + `bundler exec rake test TESTOPTS='-v'` - run tests with more information (description skipped tests);
+  + `bundler exec rake` - compile and run tests.
+
 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 

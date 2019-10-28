@@ -10,9 +10,9 @@ RUN bundle install
 
 COPY Rakefile ./
 COPY ext/ ./ext
-RUN rake compile
+RUN bundler exec rake compile
 
 COPY . .
-RUN rake test TESTOPTS='-v'
+RUN bundler exec rake test TESTOPTS='-v'
 
 CMD /bin/bash
