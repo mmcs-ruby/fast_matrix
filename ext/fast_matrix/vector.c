@@ -34,9 +34,9 @@ size_t vector_size(const void* data)
 
 VALUE vector_alloc(VALUE self)
 {
-	struct vector* mtx = malloc(sizeof(struct vector));
-
-	return TypedData_Wrap_Struct(self, &vector_type, mtx);
+	struct vector* vct = malloc(sizeof(struct vector));
+    vct->data = NULL;
+	return TypedData_Wrap_Struct(self, &vector_type, vct);
 }
 
 void c_vector_init(struct vector* vect, int n)

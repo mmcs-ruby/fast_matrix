@@ -35,7 +35,7 @@ size_t matrix_size(const void* data)
 VALUE matrix_alloc(VALUE self)
 {
 	struct matrix* mtx = malloc(sizeof(struct matrix));
-
+    mtx->data = NULL;
 	return TypedData_Wrap_Struct(self, &matrix_type, mtx);
 }
 
