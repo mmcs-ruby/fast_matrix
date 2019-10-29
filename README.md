@@ -1,4 +1,6 @@
 [![Build Status](https://travis-ci.org/mmcs-ruby/fast_matrix.svg?branch=master)](https://travis-ci.org/mmcs-ruby/fast_matrix)
+[![Maintainability](https://api.codeclimate.com/v1/badges/fd171bae2ca444aaca29/maintainability)](https://codeclimate.com/github/mmcs-ruby/fast_matrix/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/fd171bae2ca444aaca29/test_coverage)](https://codeclimate.com/github/mmcs-ruby/fast_matrix/test_coverage)
 
 # FastMatrix
 
