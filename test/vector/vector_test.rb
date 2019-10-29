@@ -12,6 +12,33 @@ module FastVectorTest
       refute_same original, clone
     end
 
+    def test_same
+      v = Vector[1, 2]
+      assert_same v, v
+    end
+
+    def test_not_same
+      refute_same Vector[1, 2], Vector[1, 2]
+    end
+
+    def test_eql
+      v1 = Vector[1, 2, 3, 4, 5, 6]
+      v2 = Vector[1, 2, 3, 4, 5, 6]
+      assert v1.eql? v2
+    end
+
+    def test_not_eql_value
+      v1 = Vector[1, 2, 3, 4, 5, 6]
+      v2 = Vector[1, 2, 3, 5, 5, 6]
+      refute v1.eql? v2
+    end
+
+    def test_not_eql_sizes
+      v1 = Vector[1, 2, 3, 4, 5, 6]
+      v2 = Vector[1, 2, 3]
+      refute v1.eql? v2
+    end
+
     def test_equal_by_value
       v1 = Vector[1, 2, 3, 4]
       v2 = Vector[1, 2, 3, 4]

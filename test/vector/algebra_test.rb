@@ -50,5 +50,17 @@ module FastVectorTest
 
       assert_equal expected, v1 * v2
     end
+
+    def test_eql_equal
+      m = FastMatrix::Vector[1, 2, 5]
+      n = FastMatrix::Vector[1, 2, 5]
+      assert m.eql?(n)
+    end
+
+    def test_eql_not_equal
+      m = FastMatrix::Vector[1, 2, 5]
+      n = FastMatrix::Vector[1, 4, 5]
+      refute m.eql?(n)
+    end
   end
 end

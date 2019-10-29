@@ -271,7 +271,7 @@ void init_fm_vector()
 	rb_define_method(cVector, "size", c_vector_size, 0);
 	rb_define_method(cVector, "+", vector_add_with, 1);
 	rb_define_method(cVector, "+=", vector_add_from, 1);
-	rb_define_method(cVector, "==", vector_equal, 1);
+	rb_define_method(cVector, "eql?", vector_equal, 1);
 	rb_define_method(cVector, "clone", vector_copy, 0);
 	rb_define_method(cVector, "*", vector_multiply, 1);
 }
