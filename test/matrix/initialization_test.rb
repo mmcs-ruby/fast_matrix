@@ -85,6 +85,10 @@ module FastMatrixTest
       assert_raises(NotSupportedError) { Matrix.empty }
     end
 
+    def test_fill
+      assert_equal Matrix[[42, 42, 42, 42], [42, 42, 42, 42]], Matrix.fill(42, 2, 4)
+    end
+
     def test_zero
       assert_equal Matrix[[0, 0, 0], [0, 0, 0]], Matrix.zero(2, 3)
     end

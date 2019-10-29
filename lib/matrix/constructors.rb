@@ -120,15 +120,21 @@ module FastMatrix
       alias I identity
     end
 
+    ##
+    # Creates a filled matrix
+    # Matrix.fill(42, 2, 4)
+    #     =>  42 42 42 42
+    #         42 42 42 42
+    ##
     def self.fill(value, row_count, column_count = row_count)
       create_with_check(row_count, column_count).fill!(value)
     end
 
     #
-    # Creates a zero matrix +n+ by +n+.
-    #   Matrix.zero(2)
-    #     => 0 0
-    #        0 0
+    # Creates a zero matrix +row_count+ by +column_count+.
+    #   Matrix.zero(2, 3)
+    #     => 0 0 0
+    #        0 0 0
     #
     def self.zero(row_count, column_count = row_count)
       fill(0, row_count, column_count)
