@@ -39,22 +39,22 @@ module FastMatrixTest
     end
 
     def test_row_count
-      standard, fast = build_matrices(10, 20) { 0 }
+      standard, fast = zero_matrices(10, 20)
       assert_equal standard.row_count, fast.row_count
     end
 
     def test_row_size
-      standard, fast = build_matrices(10, 20) { 0 }
+      standard, fast = zero_matrices(10, 20)
       assert_equal standard.row_size, fast.row_size
     end
 
     def test_column_count
-      standard, fast = build_matrices(10, 20) { 0 }
+      standard, fast = zero_matrices(10, 20)
       assert_equal standard.column_count, fast.column_count
     end
 
     def test_column_size
-      standard, fast = build_matrices(10, 20) { 0 }
+      standard, fast = zero_matrices(10, 20)
       assert_equal standard.column_size, fast.column_size
     end
   end
