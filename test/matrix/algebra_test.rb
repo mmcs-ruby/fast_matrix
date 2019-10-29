@@ -65,5 +65,24 @@ module FastMatrixTest
 
       assert_equal expected, m
     end
+
+    def test_determinant_1x1
+      m = FastMatrix::Matrix[[5]]
+      assert_equal 5, m.determinant
+    end
+
+    def test_determinant_2x2
+      m = FastMatrix::Matrix[[1, 2], [3, 4]]
+      assert_equal -2, m.determinant
+    end
+
+    def test_determinant_4x4
+      m = FastMatrix::Matrix[
+        [1, 2, 6, 1], 
+        [3, 4, 5, 0],
+        [0, 1,-6, 1], 
+        [-5,4, -5, 10]]
+      assert_equal -84, m.determinant
+    end
   end
 end
