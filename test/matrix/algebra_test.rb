@@ -30,7 +30,6 @@ module FastMatrixTest
     end
 
     def test_multiply_mn_commutative
-      skip 'Issue#7'
       m = Matrix[[1, 2], [3, 4], [7, 0], [-3, 1]]
       assert_equal m * 5, 5 * m
     end

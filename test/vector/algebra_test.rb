@@ -38,7 +38,6 @@ module FastVectorTest
     end
 
     def test_multiply_vn_commutative
-      skip 'Issue#7'
       v = Vector[3, 5, 10, -2, 0]
 
       assert_equal v * 5, 5 * v
