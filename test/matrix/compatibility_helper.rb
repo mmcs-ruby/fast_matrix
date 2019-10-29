@@ -14,5 +14,11 @@ module FastMatrixTest
       fast = FastMatrix::Matrix.build(row_count, column_count, &block)
       [standard, fast]
     end
+
+    def zero_matrices(row_count, column_count = row_count)
+      standard = ::Matrix.zero(row_count, column_count)
+      fast = FastMatrix::Matrix.zero(row_count, column_count)
+      [standard, fast]
+    end
   end
 end

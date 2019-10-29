@@ -29,7 +29,7 @@ module FastMatrixTest
 
     def test_init_column_vector
       m = Matrix.column_vector([0, 1, 2, 3, 4])
-      (0..4).each { |i| assert_equal i, m[i, 0] }
+      assert_equal Matrix[[0], [1], [2], [3], [4]], m
     end
 
     def test_init_column_vector_empty
@@ -40,7 +40,7 @@ module FastMatrixTest
 
     def test_init_row_vector
       m = Matrix.row_vector([0, 1, 2, 3, 4])
-      (0..4).each { |j| assert_equal j, m[0, j] }
+      assert_equal Matrix[[0, 1, 2, 3, 4]], m
     end
 
     def test_init_row_vector_empty
@@ -83,6 +83,10 @@ module FastMatrixTest
 
     def test_empty
       assert_raises(NotSupportedError) { Matrix.empty }
+    end
+
+    def test_zero
+      assert_equal Matrix[[0, 0, 0], [0, 0, 0]], Matrix.zero(2, 3)
     end
 
     def test_diagonal
