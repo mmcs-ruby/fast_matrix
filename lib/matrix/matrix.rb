@@ -66,7 +66,7 @@ module FastMatrix
 
     # FIXME: for compare with standard matrix
     def ==(other)
-      # TODO: check class and use fast compare from C if possibly
+      return eql?(other) if other.class == Matrix
       return false unless %i[row_size column_size \[\]].all? { |x| other.respond_to? x }
       return false unless self.row_size == other.row_size && self.column_size == other.column_size
 

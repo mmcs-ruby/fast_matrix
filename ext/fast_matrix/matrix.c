@@ -523,6 +523,51 @@ VALUE matrix_sub_with(VALUE self, VALUE value)
     return result;
 }
 
+double determinant(int n, const double* A)
+{
+    double* M = malloc(n * n * sizeof(double));
+    double det = 1;
+    copy_d_array(n * n, A, M);
+
+    for(int i = 0; i < n; ++i)
+    {
+        const double* line_p = M + i + i * n;
+        double current = *line_p; 
+        det *= current;
+
+        if(current == 0)
+        {
+            free(M);
+            return 0;
+        }
+
+        for(int j = i + 1; j < n; ++j)
+        {
+            double* t_line = M + i + j * n;
+            double head = *t_line;
+            for(int k = 1; k < n - i; ++k)
+                t_line[k] -= line_p[k] * head / current;
+        }
+    }
+
+    free(M);
+    return det;
+}
+
+VALUE matrix_determinant(VALUE self)
+{
+    struct matrix* A;
+    TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
+
+    
+    int m = A->m;
+    int n = A->n;
+    if(m != n)
+        rb_raise(fm_eIndexError, "Not a square matrix");
+
+    return DBL2NUM(determinant(n, A->data));
+}
+
 VALUE matrix_sub_from(VALUE self, VALUE value)
 {
 	struct matrix* A;
@@ -550,6 +595,24 @@ VALUE matrix_fill(VALUE self, VALUE value)
     fill_d_array(A->m * A->n, A->data, d);
 
     return self;
+}
+
+VALUE matrix_equal(VALUE self, VALUE value)
+{
+	struct matrix* A;
+    struct matrix* B;
+	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
+	TypedData_Get_Struct(value, struct matrix, &matrix_type, B);
+
+    if(A->n != B->n || A->m != B->m)
+		return Qfalse;
+
+    int n = A->n;
+    int m = B->m;
+
+    if(equal_d_arrays(n * m, A->data, B->data))
+		return Qtrue;
+	return Qfalse;
 }
 
 VALUE matrix_abs(VALUE self)
@@ -610,4 +673,6 @@ void init_fm_matrix()
     rb_define_method(cMatrix, "strassen", strassen, 1);
     rb_define_method(cMatrix, "abs", matrix_abs, 0);
     rb_define_method(cMatrix, ">=", matrix_greater_or_equal, 1);
+    rb_define_method(cMatrix, "determinant", matrix_determinant, 0);
+    rb_define_method(cMatrix, "eql?", matrix_equal, 1);
 }

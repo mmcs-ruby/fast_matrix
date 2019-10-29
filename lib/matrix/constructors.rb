@@ -6,7 +6,6 @@ module FastMatrix
   # Constructors as in the standard matrix
   #
   class Matrix
-
     #
     # Creates a matrix of size +row_count+ x +column_count+.
     # It fills the values by calling the given block,
@@ -19,10 +18,10 @@ module FastMatrix
     #     => a 3x3 matrix with random elements
     #
     def self.build(row_count, column_count = row_count, &block)
-      check_dimensions(row_count, column_count)
-      matrix = self.new(row_count, column_count)
-      matrix.each_with_index! { |_, i, j| block.call(i, j) } if block_given?
-      matrix
+      matrix = create_with_check(row_count, column_count)
+      raise NotImplementedError, 'Issue#17' unless block_given?
+
+      matrix.each_with_index! { |_, i, j| block.call(i, j) }
     end
 
     #
@@ -68,7 +67,7 @@ module FastMatrix
     #        6
     #
     def self.column_vector(column)
-      matrix = Matrix.build(column.size, 1)
+      matrix = create_with_check(column.size, 1)
       column.each_with_index { |elem, i| matrix[i, 0] = elem }
       matrix
     end
@@ -80,7 +79,7 @@ module FastMatrix
     #     => 4 5 6
     #
     def self.row_vector(row)
-      matrix = Matrix.build(1, row.size)
+      matrix = create_with_check(1, row.size)
       row.each_with_index { |elem, j| matrix[0, j] = elem }
       matrix
     end
@@ -93,8 +92,7 @@ module FastMatrix
     #         0  0 -3
     #
     def self.diagonal(*values)
-      matrix = Matrix.build(values.size, values.size) { |i, j| i == j ? values[i] : 0 }
-      matrix
+      build(values.size, values.size) { |i, j| i == j ? values[i] : 0 }
     end
 
     #
@@ -105,7 +103,7 @@ module FastMatrix
     #        0 5
     #
     def self.scalar(n, value)
-      Matrix.build(n, n) { |i, j| i == j ? value : 0 }
+      build(n, n) { |i, j| i == j ? value : 0 }
     end
 
     #
@@ -122,14 +120,24 @@ module FastMatrix
       alias I identity
     end
 
+    ##
+    # Creates a filled matrix
+    # Matrix.fill(42, 2, 4)
+    #     =>  42 42 42 42
+    #         42 42 42 42
+    ##
+    def self.fill(value, row_count, column_count = row_count)
+      create_with_check(row_count, column_count).fill!(value)
+    end
+
     #
-    # Creates a zero matrix +n+ by +n+.
-    #   Matrix.zero(2)
-    #     => 0 0
-    #        0 0
+    # Creates a zero matrix +row_count+ by +column_count+.
+    #   Matrix.zero(2, 3)
+    #     => 0 0 0
+    #        0 0 0
     #
-    def self.zero(n)
-      Matrix.build(n, n) { 0 }
+    def self.zero(row_count, column_count = row_count)
+      fill(0, row_count, column_count)
     end
 
     #
@@ -199,7 +207,7 @@ module FastMatrix
     #   Matrix.combine(x, y) {|a, b| a - b} # => Matrix[[5, 4], [1, 0]]
     # TODO: optimize in C
     def self.combine(*matrices)
-      return Matrix.empty if matrices.empty?
+      return empty if matrices.empty?
 
       result = convert(matrices.first)
       matrices[1..matrices.size].each do |m|
@@ -213,6 +221,11 @@ module FastMatrix
 
     class << Matrix
       private
+
+      def create_with_check(row_count, column_count)
+        check_dimensions(row_count, column_count)
+        new(row_count, column_count)
+      end
 
       def check_empty_matrix(row_count, column_count)
         empty if row_count.zero? || column_count.zero?
@@ -237,7 +250,7 @@ module FastMatrix
       def lines(lines, main_is_rows)
         sizes = [lines.size, (lines[0] || []).size]
         offset = main_is_rows ? 0 : -1
-        matrix = build(sizes[offset], sizes[1 + offset])
+        matrix = create_with_check(sizes[offset], sizes[1 + offset])
         lines.each_with_index do |second_dim, main_index|
           raise IndexError if second_dim.size != sizes[1]
 
