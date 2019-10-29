@@ -1,8 +1,8 @@
-require 'matrix/compatibility_helper'
+require 'compatibility/compatibility_helper'
 
-module FastMatrixTest
+module CompatibilityTest
   # noinspection RubyInstanceMethodNamingConvention
-  class CompatibilityWithStandardTest < Minitest::Test
+  class CompatibilityMatricesTest < Minitest::Test
     include CompatibilityHelper
 
     def test_equal_by_value_fast_with_standard
@@ -12,7 +12,7 @@ module FastMatrixTest
 
     def test_equal_by_value_standard_with_fast
       standard, fast = create_matrices([1, 2], [3, 4], [-5, -3])
-      skip 'Standard matrix does not recognizes fast matrix'
+      skip 'Issue#9'
       assert standard == fast, 'Equals standard matrix and fast matrix'
     end
 
@@ -59,3 +59,4 @@ module FastMatrixTest
     end
   end
 end
+
