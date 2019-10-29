@@ -21,3 +21,4 @@ deploy:
   on:
     tags: true
     repo: mmcs-ruby/fast_matrix
+    branch: master
