@@ -597,6 +597,24 @@ VALUE matrix_fill(VALUE self, VALUE value)
     return self;
 }
 
+VALUE matrix_equal(VALUE self, VALUE value)
+{
+	struct matrix* A;
+    struct matrix* B;
+	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
+	TypedData_Get_Struct(value, struct matrix, &matrix_type, B);
+
+    if(A->n != B->n || A->m != B->m)
+		return Qfalse;
+
+    int n = A->n;
+    int m = B->m;
+
+    if(equal_d_arrays(n * m, A->data, B->data))
+		return Qtrue;
+	return Qfalse;
+}
+
 VALUE matrix_abs(VALUE self)
 {
 	struct matrix* A;
@@ -656,4 +674,5 @@ void init_fm_matrix()
     rb_define_method(cMatrix, "abs", matrix_abs, 0);
     rb_define_method(cMatrix, ">=", matrix_greater_or_equal, 1);
     rb_define_method(cMatrix, "determinant", matrix_determinant, 0);
+    rb_define_method(cMatrix, "eql?", matrix_equal, 1);
 }

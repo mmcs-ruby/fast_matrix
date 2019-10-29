@@ -16,5 +16,17 @@ module FastMatrix
       self
     end
 
+    # FIXME: for compare with standard matrix
+    def ==(other)
+      return eql?(other) if other.class == Vector
+      return false unless %i[size \[\]].all? { |x| other.respond_to? x }
+      return false unless self.size == other.size
+
+      result = true
+      each_with_index do |elem, i|
+        result &&= elem == other[i].to_f
+      end
+      result
+    end
   end
 end

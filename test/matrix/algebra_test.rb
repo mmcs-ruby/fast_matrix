@@ -83,5 +83,17 @@ module FastMatrixTest
         [-5,4, -5, 10]]
       assert_equal -84, m.determinant
     end
+    
+    def test_eql_equal
+      m = FastMatrix::Matrix[[1, 2, 5], [3, 4, 1]]
+      n = FastMatrix::Matrix[[1, 2, 5], [3, 4, 1]]
+      assert m.eql?(n)
+    end
+
+    def test_eql_not_equal
+      m = FastMatrix::Matrix[[1, 2, 5], [3, 4, 1]]
+      n = FastMatrix::Matrix[[1, 2, 5], [3, 3, 1]]
+      refute m.eql?(n)
+    end
   end
 end
