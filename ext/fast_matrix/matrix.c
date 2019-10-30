@@ -125,8 +125,9 @@ void c_matrix_multiply(int n, int k, int m, const double* A, const double* B, do
         {
             const double* p_b = B + m * t;
             double d_a = p_a[t];
-            for(int i = 0; i < m; ++i)
-                p_c[i] += d_a * p_b[i];
+            if(d_a != 0)
+                for(int i = 0; i < m; ++i)
+                    p_c[i] += d_a * p_b[i];
         }
     }
 }
@@ -190,10 +191,13 @@ void strassen_iteration(int n, int k, int m, const double* A, const double* B, d
 
 bool check_strassen(int m, int n, int k)
 {
-    return n > 2 && m > 2 && k > 2 && (double)m * (double)n * (double)k > 100000000;
+    return n > 2 && m > 2 && k > 2 && (double)m * (double)n * (double)k > 1000000;
 }
 
-
+//    A          B
+// [x x x]    [x x x]
+// [x x x] => [x x x]
+// [x x x]    [x x x]
 void strassen_copy(int m, int n, const double* A, double* B, int s_a, int s_b)
 {
     for(int i = 0; i < n; ++i)
@@ -205,6 +209,40 @@ void strassen_copy(int m, int n, const double* A, double* B, int s_a, int s_b)
     }
 }
 
+// if right = false and down = false | if right = true and down = false:       
+//        A          B               |      A           B
+//     [x x x]    [x x x]            |   [x x x]    [x x x 0]
+//     [x x x] => [x x x]            |   [x x x] => [x x x 0]
+//     [x x x]    [x x x]            |   [x x x]    [x x x 0]
+//                                   |
+// if right = false and down = true  | if right = true and down = true:       
+//        A          B               |      A           B
+//     [x x x]    [x x x]            |   [x x x]    [x x x 0]
+//     [x x x] => [x x x]            |   [x x x] => [x x x 0]
+//     [x x x]    [x x x]            |   [x x x]    [x x x 0]
+//                [0 0 0]            |              [0 0 0 0]
+void strassen_copy_with_zero(int m, int n, const double* A, double* B, int s_a, int s_b, bool right, bool down)
+{
+    double* p_B;
+    for(int i = 0; i < n; ++i)
+    {
+        const double* p_A = A + i * s_a;
+        p_B = B + i * s_b;
+        for(int j = 0; j < m; ++j)
+            p_B[j] = p_A[j];
+        if(right)
+            p_B[m] = 0;
+    }
+
+    if(down)
+    {
+        p_B = B + n * s_b;
+        for(int j = 0; j < m; ++j)
+            p_B[j] = 0;
+        if(right)
+            p_B[m] = 0;
+    }
+}
 void strassen_sum_to_first(int m, int n, double* A, const double* B, int s_a, int s_b)
 {
     for(int i = 0; i < n; ++i)
@@ -253,8 +291,6 @@ void recursive_strassen(int n, int k, int m, const double* A, const double* B, d
     double* P6 = P5 + m1 * n1;
     double* P7 = P6 + m1 * n1;
     fill_d_array(7 * m1 * n1, P1, 0);
-    fill_d_array(k1 * n1, termA, 0);
-    fill_d_array(m1 * k1, termB, 0);
 
     //  -----------P1-----------
     strassen_copy(k1, n1, A, termA, k, k1);
@@ -264,55 +300,47 @@ void recursive_strassen(int n, int k, int m, const double* A, const double* B, d
     strassen_sum_to_first(m2, k2, termB, B + m1 + m * k1, m1, m);
 
     recursive_strassen(n1, k1, m1, termA, termB, P1);
-    fill_d_array(k1 * n1, termA, 0);
     //  -----------P2-----------
-    strassen_copy(k1, n2, A + k * n1, termA, k, k1);
+    strassen_copy_with_zero(k1, n2, A + k * n1, termA, k, k1, false, n1 != n2);
     strassen_sum_to_first(k2, n2, termA, A + k1 + k * n1, k1, k);
     
     strassen_copy(m1, k1, B, termB, m, m1);
 
     recursive_strassen(n1, k1, m1, termA, termB, P2);
-    fill_d_array(m1 * k1, termB, 0);
     //  -----------P3-----------
     strassen_copy(k1, n1, A, termA, k, k1);
     
-    strassen_copy(m2, k1, B + m1, termB, m, m1);
+    strassen_copy_with_zero(m2, k1, B + m1, termB, m, m1, m1 != m2, false);
     strassen_sub_to_first(m2, k2, termB, B + m1 + m * k1, m1, m);
     
     recursive_strassen(n1, k1, m1, termA, termB, P3);
-    fill_d_array(k1 * n1, termA, 0);
-    fill_d_array(m1 * k1, termB, 0);
     //  -----------P4-----------
-    strassen_copy(k2, n2, A + k1 + k * n1, termA, k, k1);
-    
-    strassen_copy(m1, k2, B + m * k1, termB, m, m1);
+    strassen_copy_with_zero(k2, n2, A + k1 + k * n1, termA, k, k1, k1 != k2, n1 != n2);
+
+    strassen_copy_with_zero(m1, k2, B + m * k1, termB, m, m1, false, k1 != k2);
     strassen_sub_to_first(m1, k1, termB, B, m1, m);
     
     recursive_strassen(n1, k1, m1, termA, termB, P4);
-    fill_d_array(m1 * k1, termB, 0);
     //  -----------P5-----------
     strassen_copy(k1, n1, A, termA, k, k1);
     strassen_sum_to_first(k2, n1, termA, A + k1, k1, k);
     
-    strassen_copy(m2, k2, B + m1 + m * k1, termB, m, m1);
-    
+    strassen_copy_with_zero(m2, k2, B + m1 + m * k1, termB, m, m1, m1 != m2, k1 != k2);
+
     recursive_strassen(n1, k1, m1, termA, termB, P5);
-    fill_d_array(k1 * n1, termA, 0);
     //  -----------P6-----------
-    strassen_copy(k1, n2, A + k * n1, termA, k, k1);
+    strassen_copy_with_zero(k1, n2, A + k * n1, termA, k, k1, false, n1 != n2);
     strassen_sub_to_first(k1, n1, termA, A, k1, k);
     
     strassen_copy(m1, k1, B, termB, m, m1);
     strassen_sum_to_first(m2, k1, termB, B + m1, m1, m);
     
     recursive_strassen(n1, k1, m1, termA, termB, P6);
-    fill_d_array(k1 * n1, termA, 0);
-    fill_d_array(m1 * k1, termB, 0);
     //  -----------P7-----------
-    strassen_copy(k2, n1, A + k1, termA, k, k1);
+    strassen_copy_with_zero(k2, n1, A + k1, termA, k, k1, k1 != k2, false);
     strassen_sub_to_first(k2, n2, termA, A + k1 + k * n1, k1, k);
     
-    strassen_copy(m1, k2, B + k1 * m, termB, m, m1);
+    strassen_copy_with_zero(m1, k2, B + k1 * m, termB, m, m1, false, k1 != k2);
     strassen_sum_to_first(m2, k2, termB, B + m1 + m * k1, m1, m);
     
     recursive_strassen(n1, k1, m1, termA, termB, P7);
@@ -412,7 +440,7 @@ VALUE matrix_multiply(VALUE self, VALUE v)
         || RB_TYPE_P(v, T_BIGNUM))
         return matrix_multiply_mn(self, v);
     if(RBASIC_CLASS(v) == cMatrix)
-        return matrix_multiply_mm(self, v);
+        return strassen(self, v);
     if(RBASIC_CLASS(v) == cVector);
         return matrix_multiply_mv(self, v);
     rb_raise(fm_eTypeError, "Invalid klass for multiply");
@@ -670,7 +698,7 @@ void init_fm_matrix()
 	rb_define_method(cMatrix, "-", matrix_sub_with, 1);
 	rb_define_method(cMatrix, "-=", matrix_sub_from, 1);
 	rb_define_method(cMatrix, "fill!", matrix_fill, 1);
-    rb_define_method(cMatrix, "strassen", strassen, 1);
+    //rb_define_method(cMatrix, "strassen", strassen, 1);
     rb_define_method(cMatrix, "abs", matrix_abs, 0);
     rb_define_method(cMatrix, ">=", matrix_greater_or_equal, 1);
     rb_define_method(cMatrix, "determinant", matrix_determinant, 0);
