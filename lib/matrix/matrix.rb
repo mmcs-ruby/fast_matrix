@@ -33,14 +33,6 @@ module FastMatrix
       }.join(", ")+"]"
     end
 
-    def to_str
-      to_s
-    end
-
-    def inspect
-      to_s
-    end
-
     #
     # Create fast matrix from standard matrix
     #
@@ -90,6 +82,9 @@ module FastMatrix
       end
       result
     end
+
+    alias to_str to_s
+    alias inspect to_str
 
     private
 
