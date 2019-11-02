@@ -19,25 +19,12 @@ module FastMatrix
     alias element []
     alias component []
 
-
-    def get_rows
-      rows = []
-      (0...row_count).each do |i|
-        row = []
-        (0...column_count).each do |j|
-          row.push(element(i, j))
-        end
-        rows.push(row)
-      end
-      rows
-    end
-
     def collect
-      rows = []
-      get_rows.each do |i|
-        rows.push(yield i)
+      collected_rows = []
+      rows.each do |i|
+        collected_rows.push(yield i)
       end
-      rows
+      collected_rows
     end
 
     def to_s
@@ -102,6 +89,20 @@ module FastMatrix
         result &&= elem == other[i, j].to_f
       end
       result
+    end
+
+    private
+
+    def rows
+      rows = []
+      (0...row_count).each do |i|
+        row = []
+        (0...column_count).each do |j|
+          row.push(element(i, j))
+        end
+        rows.push(row)
+      end
+      rows
     end
   end
 end
