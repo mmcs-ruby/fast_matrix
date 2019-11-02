@@ -46,6 +46,9 @@ module FastMatrix
       }.join(", ")+"]"
     end
 
+    def to_str
+      to_s
+    end
 
     def inspect
       to_s
