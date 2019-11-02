@@ -4,7 +4,7 @@
 
 # FastMatrix
 
-Ruby wrapper around C matrices implementation written as exercise by two MMCS students.
+Ruby wrapper around C matrices implementation written as exercise by MMCS students.
 
 ## Installation
 
@@ -22,14 +22,9 @@ Or install it yourself as:
 
     $ gem install fast_matrix
 
-## Usage
+## Usage and documentation
 
-TODO: Write usage instructions here
-
-### Differences with the standard matrix
-* Supported only double values
-* Can't be empty
-* Some faster
+See our [GitHub Wiki](https://github.com/mmcs-ruby/fast_matrix/wiki).
 
 ## Development
 

@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = %q{Ruby wrapper around C matrices implementation}
   spec.description   = %q{Ruby wrapper around C matrices implementation}
-  spec.homepage      = "https://github.com/mmcs-ruby/fast_matrix"
+  spec.homepage      = "https://github.com/mmcs-ruby/fast_matrix/wiki"
   spec.license       = "MIT"
 
    spec.metadata["homepage_uri"] = spec.homepage
