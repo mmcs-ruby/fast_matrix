@@ -102,6 +102,7 @@ VALUE c_vector_size(VALUE self)
 
 VALUE vector_add_with(VALUE self, VALUE value)
 {
+    raise_check_rbasic(value, cVector, "vector");
 	struct vector* A;
     struct vector* B;
 	TypedData_Get_Struct(self, struct vector, &vector_type, A);
@@ -124,6 +125,7 @@ VALUE vector_add_with(VALUE self, VALUE value)
 
 VALUE vector_add_from(VALUE self, VALUE value)
 {
+    raise_check_rbasic(value, cVector, "vector");
 	struct vector* A;
     struct vector* B;
 	TypedData_Get_Struct(self, struct vector, &vector_type, A);
@@ -139,8 +141,51 @@ VALUE vector_add_from(VALUE self, VALUE value)
     return self;
 }
 
+VALUE vector_sub_with(VALUE self, VALUE value)
+{
+    raise_check_rbasic(value, cVector, "vector");
+	struct vector* A;
+    struct vector* B;
+	TypedData_Get_Struct(self, struct vector, &vector_type, A);
+	TypedData_Get_Struct(value, struct vector, &vector_type, B);
+
+    if(A->n != B->n)
+        rb_raise(fm_eIndexError, "Different sizes matrices");
+
+    int n = A->n;
+
+    struct vector* C;
+    VALUE result = TypedData_Make_Struct(cVector, struct vector, &vector_type, C);
+
+    c_vector_init(C, n);
+    sub_d_arrays_to_result(n, A->data, B->data, C->data);
+
+    return result;
+}
+
+
+VALUE vector_sub_from(VALUE self, VALUE value)
+{
+    raise_check_rbasic(value, cVector, "vector");
+	struct vector* A;
+    struct vector* B;
+	TypedData_Get_Struct(self, struct vector, &vector_type, A);
+	TypedData_Get_Struct(value, struct vector, &vector_type, B);
+
+    if(A->n != B->n)
+        rb_raise(fm_eIndexError, "Different sizes matrices");
+
+    int n = A->n;
+
+    sub_d_arrays_to_first(n, A->data, B->data);
+
+    return self;
+}
+
 VALUE vector_equal(VALUE self, VALUE value)
 {
+    if(RBASIC_CLASS(value) != cVector)
+        return Qfalse;
 	struct vector* A;
     struct vector* B;
 	TypedData_Get_Struct(self, struct vector, &vector_type, A);
@@ -271,6 +316,8 @@ void init_fm_vector()
 	rb_define_method(cVector, "size", c_vector_size, 0);
 	rb_define_method(cVector, "+", vector_add_with, 1);
 	rb_define_method(cVector, "+=", vector_add_from, 1);
+	rb_define_method(cVector, "-", vector_sub_with, 1);
+	rb_define_method(cVector, "-=", vector_sub_from, 1);
 	rb_define_method(cVector, "eql?", vector_equal, 1);
 	rb_define_method(cVector, "clone", vector_copy, 0);
 	rb_define_method(cVector, "*", vector_multiply, 1);

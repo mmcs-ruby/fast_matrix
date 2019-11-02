@@ -12,6 +12,8 @@ double raise_rb_value_to_double(VALUE v);
 int raise_rb_value_to_int(VALUE v);
 //  check if the value is in range and raise an error if not
 void raise_check_range(int v, int min, int max);
+//  check if the basic class of value is rBasic and raise an error if not
+void raise_check_rbasic(VALUE v, VALUE rBasic, const char* rbasic_name);
 
 void init_fm_errors();
 

@@ -28,6 +28,12 @@ void raise_check_range(int v, int min, int max)
         rb_raise(fm_eIndexError, "Index out of range");
 }
 
+void raise_check_rbasic(VALUE v, VALUE rBasic, const char* rbasic_name)
+{
+    if(RBASIC_CLASS(v) != rBasic)
+        rb_raise(fm_eTypeError, "Expected class %s", rbasic_name);
+}
+
 void init_fm_errors()
 {
     VALUE  mod = rb_define_module("FastMatrix");

@@ -57,12 +57,22 @@ module FastMatrixTest
       assert_equal expected, m1 + m2
     end
 
+    def test_sum_error
+      m = Matrix[[1, -2], [3, 4], [7, 0]]
+      assert_raises(TypeError) { m + 'not a matrix' }
+    end
+
     def test_sum_with_assigment
       m = Matrix[[1, -2], [3, 4], [7, 0]]
       m += Matrix[[4, 0], [-3, 4], [2, 2]]
       expected = Matrix[[5, -2], [0, 8], [9, 2]]
 
       assert_equal expected, m
+    end
+
+    def test_sub_error
+      m = Matrix[[1, -2], [3, 4], [7, 0]]
+      assert_raises(TypeError) { m - 'not a matrix' }
     end
 
     def test_determinant_1x1
