@@ -243,6 +243,7 @@ void strassen_copy_with_zero(int m, int n, const double* A, double* B, int s_a, 
             p_B[m] = 0;
     }
 }
+
 void strassen_sum_to_first(int m, int n, double* A, const double* B, int s_a, int s_b)
 {
     for(int i = 0; i < n; ++i)
@@ -490,6 +491,7 @@ VALUE transpose(VALUE self)
 
 VALUE matrix_add_with(VALUE self, VALUE value)
 {
+    raise_check_rbasic(value, cMatrix, "matrix");
 	struct matrix* A;
     struct matrix* B;
 	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
@@ -512,6 +514,7 @@ VALUE matrix_add_with(VALUE self, VALUE value)
 
 VALUE matrix_add_from(VALUE self, VALUE value)
 {
+    raise_check_rbasic(value, cMatrix, "matrix");
 	struct matrix* A;
     struct matrix* B;
 	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
@@ -528,9 +531,9 @@ VALUE matrix_add_from(VALUE self, VALUE value)
     return self;
 }
 
-
 VALUE matrix_sub_with(VALUE self, VALUE value)
 {
+    raise_check_rbasic(value, cMatrix, "matrix");
 	struct matrix* A;
     struct matrix* B;
 	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
@@ -549,6 +552,25 @@ VALUE matrix_sub_with(VALUE self, VALUE value)
     sub_d_arrays_to_result(n * m, A->data, B->data, C->data);
 
     return result;
+}
+
+VALUE matrix_sub_from(VALUE self, VALUE value)
+{
+    raise_check_rbasic(value, cMatrix, "matrix");
+	struct matrix* A;
+    struct matrix* B;
+	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
+	TypedData_Get_Struct(value, struct matrix, &matrix_type, B);
+
+    if(A->m != B->m && A->n != B->n)
+        rb_raise(fm_eIndexError, "Different sizes matrices");
+
+    int m = B->m;
+    int n = A->n;
+
+    sub_d_arrays_to_first(n * m, A->data, B->data);
+
+    return self;
 }
 
 double determinant(int n, const double* A)
@@ -587,31 +609,12 @@ VALUE matrix_determinant(VALUE self)
     struct matrix* A;
     TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
 
-    
     int m = A->m;
     int n = A->n;
     if(m != n)
         rb_raise(fm_eIndexError, "Not a square matrix");
 
     return DBL2NUM(determinant(n, A->data));
-}
-
-VALUE matrix_sub_from(VALUE self, VALUE value)
-{
-	struct matrix* A;
-    struct matrix* B;
-	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
-	TypedData_Get_Struct(value, struct matrix, &matrix_type, B);
-
-    if(A->m != B->m && A->n != B->n)
-        rb_raise(fm_eIndexError, "Different sizes matrices");
-
-    int m = B->m;
-    int n = A->n;
-
-    sub_d_arrays_to_first(n * m, A->data, B->data);
-
-    return self;
 }
 
 VALUE matrix_fill(VALUE self, VALUE value)
@@ -627,13 +630,15 @@ VALUE matrix_fill(VALUE self, VALUE value)
 
 VALUE matrix_equal(VALUE self, VALUE value)
 {
+    if(RBASIC_CLASS(value) != cMatrix)
+        return Qfalse;
 	struct matrix* A;
     struct matrix* B;
 	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
 	TypedData_Get_Struct(value, struct matrix, &matrix_type, B);
 
     if(A->n != B->n || A->m != B->m)
-		return Qfalse;
+        return Qfalse;
 
     int n = A->n;
     int m = B->m;
@@ -662,6 +667,8 @@ VALUE matrix_abs(VALUE self)
 
 VALUE matrix_greater_or_equal(VALUE self, VALUE value)
 {
+    if(RBASIC_CLASS(value) != cMatrix)
+        rb_raise(fm_eTypeError, "Expected class matrix");
 	struct matrix* A;
     struct matrix* B;
 	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);

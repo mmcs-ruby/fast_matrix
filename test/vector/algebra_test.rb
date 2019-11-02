@@ -14,6 +14,11 @@ module FastVectorTest
       assert_equal expected, v1 + v2
     end
 
+    def test_sum_error
+      v = Vector[1, 3]
+      assert_raises(TypeError) { v + 'not a vector' }
+    end
+
     def test_sum_with_assignment
       v1 = Vector[1, 3]
       v1 += Vector[4, 3]
@@ -28,6 +33,19 @@ module FastVectorTest
       expected = Matrix[[6, 9, 3], [-2, -3, -1]]
 
       assert_equal expected, v * m
+    end
+
+    def test_sub
+      v1 = Vector[1, 3]
+      v2 = Vector[4, 3]
+      expected = Vector[-3, 0]
+
+      assert_equal expected, v1 - v2
+    end
+
+    def test_sum_error
+      v = Vector[1, 3]
+      assert_raises(TypeError) { v - 'not a vector' }
     end
 
     def test_multiply_vn
