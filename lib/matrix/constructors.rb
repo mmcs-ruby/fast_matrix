@@ -96,17 +96,6 @@ module FastMatrix
     end
 
     #
-    # Creates an +n+ by +n+ diagonal matrix where each diagonal element is
-    # +value+.
-    #   Matrix.scalar(2, 5)
-    #     => 5 0
-    #        0 5
-    #
-    def self.scalar(n, value)
-      build(n, n) { |i, j| i == j ? value : 0 }
-    end
-
-    #
     # Creates an +n+ by +n+ identity matrix.
     #   Matrix.identity(2)
     #     => 1 0
@@ -145,58 +134,6 @@ module FastMatrix
     #
     def self.empty(_ = 0, _ = 0)
       raise NotSupportedError, 'Empty matrices does not supported'
-    end
-
-    #
-    # Create a matrix by stacking matrices vertically
-    #
-    #   x = Matrix[[1, 2], [3, 4]]
-    #   y = Matrix[[5, 6], [7, 8]]
-    #   Matrix.vstack(x, y) # => Matrix[[1, 2], [3, 4], [5, 6], [7, 8]]
-    # TODO: optimize (maybe in C)
-    def self.vstack(x, *matrices)
-      column_count = x.column_count
-      row_count = x.row_count
-      matrices.each do |matrix|
-        raise IndexError unless matrix.column_count == column_count
-
-        row_count += matrix.row_count
-      end
-      result = new(row_count, column_count)
-      m_i = 0
-      [x, *matrices].each do |matrix|
-        matrix.each_with_index do |elem, i, j|
-          result[m_i + i, j] = elem
-        end
-        m_i += matrix.row_count
-      end
-      result
-    end
-
-    #
-    # Create a matrix by stacking matrices horizontally
-    #
-    #   x = Matrix[[1, 2], [3, 4]]
-    #   y = Matrix[[5, 6], [7, 8]]
-    #   Matrix.hstack(x, y) # => Matrix[[1, 2, 5, 6], [3, 4, 7, 8]]
-    #
-    def self.hstack(x, *matrices)
-      column_count = x.column_count
-      row_count = x.row_count
-      matrices.each do |matrix|
-        raise IndexError unless matrix.row_count == row_count
-
-        column_count += matrix.column_count
-      end
-      result = new(row_count, column_count)
-      m_j = 0
-      [x, *matrices].each do |matrix|
-        matrix.each_with_index do |elem, i, j|
-          result[i, m_j + j] = elem
-        end
-        m_j += matrix.column_count
-      end
-      result
     end
 
     #
