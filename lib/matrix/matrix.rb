@@ -27,6 +27,15 @@ module FastMatrix
       collected_rows
     end
 
+    def collect!
+      rows.each_with_index do |row, i|
+        row.each_with_index do |col, j|
+          self[i, j] = yield(col)
+        end
+      end
+      self
+    end
+
     #
     # Overrides Object#to_s
     #
