@@ -1040,6 +1040,31 @@ VALUE first_minor(VALUE self, VALUE row, VALUE column)
     return result;
 }
 
+VALUE cofactor(VALUE self, VALUE row, VALUE column)
+{
+    int i = raise_rb_value_to_int(column);
+    int j = raise_rb_value_to_int(row);
+
+	struct matrix* A;
+	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
+
+    int m = A->m;
+    int n = A->n;
+    if(i < 0 || i >= m || j < 0 || j >= n)
+        rb_raise(fm_eIndexError, "Index out of range");
+    if(m != n)
+        rb_raise(fm_eIndexError, "Expected square matrix");
+
+    double* D = malloc(sizeof(double) * (n - 1) * (n - 1));
+    matrix_minor(n, n, A->data, D, i, j);
+
+    int coefficient = ((i + j) % 2 == 1) ? -1 : 1;
+    double det = determinant(n - 1, D);
+
+    free(D);
+    return DBL2NUM(coefficient * det);
+}
+
 void init_fm_matrix()
 {
     VALUE  mod = rb_define_module("FastMatrix");
@@ -1075,6 +1100,7 @@ void init_fm_matrix()
     rb_define_method(cMatrix, "hadamard_product", hadamard_product, 1);
     rb_define_method(cMatrix, "trace", trace, 0);
     rb_define_method(cMatrix, "first_minor", first_minor, 2);
+    rb_define_method(cMatrix, "cofactor", cofactor, 2);
     rb_define_module_function(cMatrix, "vstack", vstack, -1);
     rb_define_module_function(cMatrix, "hstack", hstack, -1);
     rb_define_module_function(cMatrix, "scalar", scalar, 2);
