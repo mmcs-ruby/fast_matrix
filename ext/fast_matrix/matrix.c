@@ -497,7 +497,7 @@ VALUE matrix_add_with(VALUE self, VALUE value)
 	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
 	TypedData_Get_Struct(value, struct matrix, &matrix_type, B);
 
-    if(A->m != B->m && A->n != B->n)
+    if(A->m != B->m || A->n != B->n)
         rb_raise(fm_eIndexError, "Different sizes matrices");
 
     int m = B->m;
@@ -520,7 +520,7 @@ VALUE matrix_add_from(VALUE self, VALUE value)
 	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
 	TypedData_Get_Struct(value, struct matrix, &matrix_type, B);
 
-    if(A->m != B->m && A->n != B->n)
+    if(A->m != B->m || A->n != B->n)
         rb_raise(fm_eIndexError, "Different sizes matrices");
 
     int m = B->m;
@@ -539,7 +539,7 @@ VALUE matrix_sub_with(VALUE self, VALUE value)
 	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
 	TypedData_Get_Struct(value, struct matrix, &matrix_type, B);
 
-    if(A->m != B->m && A->n != B->n)
+    if(A->m != B->m || A->n != B->n)
         rb_raise(fm_eIndexError, "Different sizes matrices");
 
     int m = B->m;
@@ -562,7 +562,7 @@ VALUE matrix_sub_from(VALUE self, VALUE value)
 	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
 	TypedData_Get_Struct(value, struct matrix, &matrix_type, B);
 
-    if(A->m != B->m && A->n != B->n)
+    if(A->m != B->m || A->n != B->n)
         rb_raise(fm_eIndexError, "Different sizes matrices");
 
     int m = B->m;
@@ -674,7 +674,7 @@ VALUE matrix_greater_or_equal(VALUE self, VALUE value)
 	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
 	TypedData_Get_Struct(value, struct matrix, &matrix_type, B);
 
-    if(A->m != B->m && A->n != B->n)
+    if(A->m != B->m || A->n != B->n)
         rb_raise(fm_eIndexError, "Different sizes matrices");
 
     int m = B->m;
@@ -966,6 +966,29 @@ VALUE diagonal(VALUE self)
     return Qfalse;
 }
 
+VALUE hadamard_product(VALUE self, VALUE other)
+{
+    raise_check_rbasic(other, cMatrix, "matrix");
+	struct matrix* A;
+    struct matrix* B;
+	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
+	TypedData_Get_Struct(other, struct matrix, &matrix_type, B);
+
+    if(A->m != B->m || A->n != B->n)
+        rb_raise(fm_eIndexError, "Different sizes matrices");
+
+    int m = B->m;
+    int n = A->n;
+
+    struct matrix* C;
+    VALUE result = TypedData_Make_Struct(cMatrix, struct matrix, &matrix_type, C);
+
+    c_matrix_init(C, m, n);
+    multiply_elems_d_array_to_result(n * m, A->data, B->data, C->data);
+
+    return result;
+}
+
 void init_fm_matrix()
 {
     VALUE  mod = rb_define_module("FastMatrix");
@@ -998,6 +1021,7 @@ void init_fm_matrix()
     rb_define_method(cMatrix, "column", column_vector, 1);
     rb_define_method(cMatrix, "row", row_vector, 1);
     rb_define_method(cMatrix, "diagonal?", diagonal, 0);
+    rb_define_method(cMatrix, "hadamard_product", hadamard_product, 1);
     rb_define_module_function(cMatrix, "vstack", vstack, -1);
     rb_define_module_function(cMatrix, "hstack", hstack, -1);
     rb_define_module_function(cMatrix, "scalar", scalar, 2);

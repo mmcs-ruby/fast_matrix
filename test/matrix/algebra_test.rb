@@ -120,5 +120,18 @@ module FastMatrixTest
       m = FastMatrix::Matrix[[1, 0, 0], [0, 4, 0], [0, 0, 7], [0, 0, 0]]
       assert_raises(IndexError) { m.diagonal?}
     end
+
+    def test_hadamard_product
+      m1 = Matrix[[1, 3, 0], [-2, 2, 1]]
+      m2 = Matrix[[1, 2, 1], [0, 4, 010]]
+      m = Matrix[[1, 6, 0, 0, 8, 8]]
+      assert m, m1.hadamard_product(m2)
+    end
+
+    def test_hadamard_product_error
+      m1 = Matrix[[1, 3, 0], [-2, 2, 1]]
+      m2 = Matrix[[1, 2], [0, 4]]
+      assert_raises(IndexError) { m1.hadamard_product(m2)}
+    end
   end
 end
