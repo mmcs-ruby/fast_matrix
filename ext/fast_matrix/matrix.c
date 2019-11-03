@@ -874,6 +874,27 @@ VALUE symmetric(VALUE self)
     return Qfalse;
 }
 
+VALUE minus(VALUE self)
+{
+	struct matrix* A;
+	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
+
+    int n = A->n;
+    int m = A->m;
+
+    struct matrix* C;
+    VALUE result = TypedData_Make_Struct(cMatrix, struct matrix, &matrix_type, C);
+    c_matrix_init(C, m, n);
+    multiply_d_array_to_result(n * m, A->data, -1, C->data);
+
+    return result;
+}
+
+VALUE plus(VALUE self)
+{
+    return self;
+}
+
 void init_fm_matrix()
 {
     VALUE  mod = rb_define_module("FastMatrix");
@@ -901,6 +922,8 @@ void init_fm_matrix()
     rb_define_method(cMatrix, "eql?", matrix_equal, 1);
     rb_define_method(cMatrix, "antisymmetric?", antisymmetric, 0);
     rb_define_method(cMatrix, "symmetric?", symmetric, 0);
+    rb_define_method(cMatrix, "-@", minus, 0);
+    rb_define_method(cMatrix, "+@", plus, 0);
     rb_define_module_function(cMatrix, "vstack", vstack, -1);
     rb_define_module_function(cMatrix, "hstack", hstack, -1);
     rb_define_module_function(cMatrix, "scalar", scalar, 2);

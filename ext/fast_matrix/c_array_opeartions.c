@@ -13,6 +13,12 @@ void multiply_d_array(int len, double* a, double v)
         a[i] *= v;
 }
 
+void multiply_d_array_to_result(int len, const double* a, double v, double* res)
+{
+    for(int i = 0; i < len; ++i)
+        res[i] = a[i] * v;
+}
+
 void copy_d_array(int len, const double* input, double* output)
 {
     for(int i = 0; i < len; ++i)

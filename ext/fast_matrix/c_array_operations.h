@@ -5,6 +5,7 @@
 
 void fill_d_array(int len, double* a, double v);
 void multiply_d_array(int len, double* a, double v);
+void multiply_d_array_to_result(int len, const double* a, double v, double* res);
 void copy_d_array(int len, const double* input, double* output);
 void add_d_arrays_to_result(int len, const double* a1, const double* a2, double* result);
 void add_d_arrays_to_first(int len, double* sum, const double* added);

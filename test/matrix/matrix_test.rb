@@ -97,5 +97,17 @@ module FastMatrixTest
       m1 = Matrix[[1, 2], [3, 4], [1, 5]]
       assert_raises (IndexError) { m1.antisymmetric? }
     end
+    
+    def test_plus
+      m1 = Matrix[[1, 2], [-3, 4], [0, 5]]
+      m2 = Matrix[[1, 2], [-3, 4], [0, 5]]
+      assert_equal m2, +m1
+    end
+    
+    def test_minus
+      m1 = Matrix[[1, 2], [-3, 4], [0, 5]]
+      m2 = Matrix[[-1, -2], [3, -4], [0, -5]]
+      assert_equal m2, -m1
+    end
   end
 end
