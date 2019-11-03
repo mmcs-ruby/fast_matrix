@@ -895,6 +895,52 @@ VALUE plus(VALUE self)
     return self;
 }
 
+VALUE row_vector(VALUE self, VALUE v)
+{
+    int idx = raise_rb_value_to_int(v);
+
+	struct matrix* A;
+	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
+
+    int m = A->m;
+    int n = A->n;
+    idx = (idx < 0) ? m + idx : idx;
+    
+    if(idx < 0 || idx >= m)
+        return Qnil;
+    
+    struct vector* C;
+    VALUE result = TypedData_Make_Struct(cVector, struct vector, &vector_type, C);
+
+    c_vector_init(C, n);
+    copy_d_array(m, A->data + idx * m, C->data);
+
+    return result;
+}
+
+VALUE column_vector(VALUE self, VALUE v)
+{
+    int idx = raise_rb_value_to_int(v);
+
+	struct matrix* A;
+	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
+
+    int m = A->m;
+    int n = A->n;
+    idx = (idx < 0) ? n + idx : idx;
+    
+    if(idx < 0 || idx >= n)
+        return Qnil;
+    
+    struct vector* C;
+    VALUE result = TypedData_Make_Struct(cVector, struct vector, &vector_type, C);
+
+    c_vector_init(C, n);
+    strassen_copy(1, n, A->data + idx, C->data, m, 1);
+
+    return result;
+}
+
 void init_fm_matrix()
 {
     VALUE  mod = rb_define_module("FastMatrix");
@@ -924,6 +970,8 @@ void init_fm_matrix()
     rb_define_method(cMatrix, "symmetric?", symmetric, 0);
     rb_define_method(cMatrix, "-@", minus, 0);
     rb_define_method(cMatrix, "+@", plus, 0);
+    rb_define_method(cMatrix, "column", column_vector, 1);
+    rb_define_method(cMatrix, "row", row_vector, 1);
     rb_define_module_function(cMatrix, "vstack", vstack, -1);
     rb_define_module_function(cMatrix, "hstack", hstack, -1);
     rb_define_module_function(cMatrix, "scalar", scalar, 2);

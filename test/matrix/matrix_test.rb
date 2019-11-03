@@ -109,5 +109,39 @@ module FastMatrixTest
       m2 = Matrix[[-1, -2], [3, -4], [0, -5]]
       assert_equal m2, -m1
     end
+
+    def test_column
+      m = Matrix[[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+      v = Vector[3, 6, 9]
+      assert_equal v, m.column(2)
+    end
+
+    def test_column_neg_idx
+      m = Matrix[[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+      v = Vector[2, 5, 8]
+      assert_equal v, m.column(-2)
+    end
+
+    def test_column_overflow
+      m = Matrix[[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+      assert_nil m.column(4)
+    end
+
+    def test_row
+      m = Matrix[[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+      v = Vector[7, 8, 9]
+      assert_equal v, m.row(2)
+    end
+
+    def test_row_neg_idx
+      m = Matrix[[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+      v = Vector[4, 5, 6]
+      assert_equal v, m.row(-2)
+    end
+
+    def test_row_overflow
+      m = Matrix[[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+      assert_nil m.row(4)
+    end
   end
 end
