@@ -24,13 +24,29 @@ module FastMatrix
     def to_s
       "#{self.class}[#{to_ary.join(', ')}]"
     end
-    
+    alias to_str to_s
+    alias inspect to_str
+
+    #
+    # Iterate over the elements of this vector
+    #
+    def each
+      raise NotSupportedError unless block_given?
+
+      (0...size).each do |i|
+        yield self[i]
+      end
+      self
+    end
+
     def each_with_index
       (0...size).each do |i|
         yield self[i], i
       end
+      self
     end
 
+    # don't use (Issue#1)
     def each_with_index!
       (0...size).each do |i|
         self[i] = yield self[i], i
@@ -50,8 +66,5 @@ module FastMatrix
       end
       result
     end
-
-    alias to_str to_s
-    alias inspect to_str
   end
 end

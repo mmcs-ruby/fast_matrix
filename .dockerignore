@@ -10,4 +10,3 @@
 *.gem
 Gemfile.lock
 *.so
-*.md

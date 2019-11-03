@@ -27,11 +27,17 @@ module FastMatrix
       collected_rows
     end
 
+    #
+    # Overrides Object#to_s
+    #
     def to_s
-      "#{self.class}[" + collect{|row|
-        "[" + row.join(", ") +"]"
-      }.join(", ")+"]"
+      "#{self.class}[#{collect do |row|
+        '[' + row.join(', ') + ']'
+      end.join(', ')}]"
     end
+
+    alias to_str to_s
+    alias inspect to_str
 
     #
     # Create fast matrix from standard matrix
@@ -46,14 +52,42 @@ module FastMatrix
       fast_matrix
     end
 
+    #
+    # Yields all elements of the matrix, starting with those of the first row
+    #
+    #   Matrix[ [1,2], [3,4] ].each { |e| puts e }
+    #     # => prints the numbers 1 to 4
+    def each(&block)
+      raise NotSupportedError unless block_given?
+
+      each_with_index { |elem, _, _| block.call(elem) }
+      self
+    end
+
+    #
+    # Same as #each, but the row index and column index in addition to the element
+    #
+    #   Matrix[ [1,2], [3,4] ].each_with_index do |e, row, col|
+    #     puts "#{e} at #{row}, #{col}"
+    #   end
+    #     # => Prints:
+    #     #    1 at 0, 0
+    #     #    2 at 0, 1
+    #     #    3 at 1, 0
+    #     #    4 at 1, 1
+    #
     def each_with_index
+      raise NotSupportedError unless block_given?
+
       (0...row_count).each do |i|
         (0...column_count).each do |j|
           yield self[i, j], i, j
         end
       end
+      self
     end
 
+    # don't use (Issue#1)
     def each_with_index!
       (0...row_count).each do |i|
         (0...column_count).each do |j|
@@ -82,9 +116,6 @@ module FastMatrix
       end
       result
     end
-
-    alias to_str to_s
-    alias inspect to_str
 
     private
 
