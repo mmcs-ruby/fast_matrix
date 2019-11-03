@@ -497,7 +497,7 @@ VALUE matrix_add_with(VALUE self, VALUE value)
 	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
 	TypedData_Get_Struct(value, struct matrix, &matrix_type, B);
 
-    if(A->m != B->m && A->n != B->n)
+    if(A->m != B->m || A->n != B->n)
         rb_raise(fm_eIndexError, "Different sizes matrices");
 
     int m = B->m;
@@ -520,7 +520,7 @@ VALUE matrix_add_from(VALUE self, VALUE value)
 	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
 	TypedData_Get_Struct(value, struct matrix, &matrix_type, B);
 
-    if(A->m != B->m && A->n != B->n)
+    if(A->m != B->m || A->n != B->n)
         rb_raise(fm_eIndexError, "Different sizes matrices");
 
     int m = B->m;
@@ -539,7 +539,7 @@ VALUE matrix_sub_with(VALUE self, VALUE value)
 	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
 	TypedData_Get_Struct(value, struct matrix, &matrix_type, B);
 
-    if(A->m != B->m && A->n != B->n)
+    if(A->m != B->m || A->n != B->n)
         rb_raise(fm_eIndexError, "Different sizes matrices");
 
     int m = B->m;
@@ -562,7 +562,7 @@ VALUE matrix_sub_from(VALUE self, VALUE value)
 	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
 	TypedData_Get_Struct(value, struct matrix, &matrix_type, B);
 
-    if(A->m != B->m && A->n != B->n)
+    if(A->m != B->m || A->n != B->n)
         rb_raise(fm_eIndexError, "Different sizes matrices");
 
     int m = B->m;
@@ -674,7 +674,7 @@ VALUE matrix_greater_or_equal(VALUE self, VALUE value)
 	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
 	TypedData_Get_Struct(value, struct matrix, &matrix_type, B);
 
-    if(A->m != B->m && A->n != B->n)
+    if(A->m != B->m || A->n != B->n)
         rb_raise(fm_eIndexError, "Different sizes matrices");
 
     int m = B->m;
@@ -683,6 +683,327 @@ VALUE matrix_greater_or_equal(VALUE self, VALUE value)
     if(greater_or_equal_d_array(n * m, A->data, B->data))
         return Qtrue;
     return Qfalse;
+}
+
+struct matrix** convert_matrix_array(int argc, VALUE *argv, struct matrix*** mtrs)
+{
+    for(int i = 0; i < argc; ++i)
+        raise_check_rbasic(argv[i], cMatrix, "matrix");
+    
+    *mtrs = (struct matrix**)malloc(argc * sizeof(struct matrix*));
+
+    for(int i = 0; i < argc; ++i)
+	    TypedData_Get_Struct(argv[i], struct matrix, &matrix_type, (*mtrs)[i]);
+}
+
+bool matrix_equal_by_m(int argc, struct matrix** mtrs)
+{
+    int m = mtrs[0]->m;
+    for(int i = 1; i < argc; ++i)
+        if(m != mtrs[i]->m)
+            return false;
+    return true;
+}
+
+bool matrix_equal_by_n(int argc, struct matrix** mtrs)
+{
+    int n = mtrs[0]->n;
+    for(int i = 1; i < argc; ++i)
+        if(n != mtrs[i]->n)
+            return false;
+    return true;
+}
+
+int matrix_sum_by_m(int argc, struct matrix** mtrs)
+{
+    int sum = 0;
+    for(int i = 0; i < argc; ++i)
+        sum += mtrs[i]->m;
+    return sum;
+}
+
+int matrix_sum_by_n(int argc, struct matrix** mtrs)
+{
+    int sum = 0;
+    for(int i = 0; i < argc; ++i)
+        sum += mtrs[i]->n;
+    return sum;
+}
+
+void matrix_vstack(int argc, struct matrix** mtrs, double* C)
+{
+    for(int i = 0; i < argc; ++i)
+    {
+        struct matrix* M = mtrs[i];
+        int len = M->m * M->n;
+        copy_d_array(len, M->data, C);
+        C += len;
+    }
+}
+
+void matrix_hstack(int argc, struct matrix** mtrs, double* C, int m)
+{
+    for(int i = 0; i < argc; ++i)
+    {
+        struct matrix* M = mtrs[i];
+        //  a little misuse of the method
+        strassen_copy(M->m, M->n, M->data, C, M->m, m);
+        C += M->m;
+    }
+}
+
+VALUE vstack(int argc, VALUE *argv, VALUE obj)
+{
+    if(argc == 0)
+        rb_raise(fm_eIndexError, "No arguments");
+    
+    struct matrix** mtrs;
+    convert_matrix_array(argc, argv, &mtrs);
+
+    if(!matrix_equal_by_m(argc, mtrs))
+    {
+        free(mtrs);
+        rb_raise(fm_eIndexError, "Rows of different size");
+    }
+
+    int m = mtrs[0]->m;
+    int n = matrix_sum_by_n(argc, mtrs);
+
+    struct matrix* C;
+    VALUE result = TypedData_Make_Struct(cMatrix, struct matrix, &matrix_type, C);
+
+    c_matrix_init(C, m, n);
+    matrix_vstack(argc, mtrs, C->data);
+
+    free(mtrs);
+    return result;
+}
+
+VALUE hstack(int argc, VALUE *argv, VALUE obj)
+{
+    if(argc == 0)
+        rb_raise(fm_eIndexError, "No arguments");
+    
+    struct matrix** mtrs;
+    convert_matrix_array(argc, argv, &mtrs);
+
+    if(!matrix_equal_by_n(argc, mtrs))
+    {
+        free(mtrs);
+        rb_raise(fm_eIndexError, "Columns of different size");
+    }
+
+    int m = matrix_sum_by_m(argc, mtrs);
+    int n = mtrs[0]->n;
+
+    struct matrix* C;
+    VALUE result = TypedData_Make_Struct(cMatrix, struct matrix, &matrix_type, C);
+
+    c_matrix_init(C, m, n);
+    matrix_hstack(argc, mtrs, C->data, m);
+
+    free(mtrs);
+    return result;
+}
+
+void matrix_scalar(int n, double* C, double v)
+{
+    int ptr = 0;
+    
+    for(int i = 0; i < n * n; ++i)
+    {
+        if(i == ptr)
+        {
+            ptr += n + 1;
+            C[i] = v;
+        }else
+            C[i] = 0;
+    }
+}
+
+VALUE scalar(VALUE obj, VALUE size, VALUE value)
+{
+    int n = raise_rb_value_to_int(size);
+    double v = raise_rb_value_to_double(value);
+
+    struct matrix* C;
+    VALUE result = TypedData_Make_Struct(cMatrix, struct matrix, &matrix_type, C);
+    c_matrix_init(C, n, n);
+    matrix_scalar(n, C->data, v);
+
+    return result;
+}
+
+bool matrix_symmetric(int n, const double* C)
+{
+    for(int i = 0; i < n; ++i)
+        for(int j = i; j < n; ++j)
+            if(C[i + j * n] != C[j + i * n])
+                return false;
+    return true;
+}
+
+bool matrix_antisymmetric(int n, const double* C)
+{
+    for(int i = 0; i < n; ++i)
+        for(int j = i; j < n; ++j)
+            if(C[i + j * n] != -C[j + i * n])
+                return false;
+    return true;
+}
+
+VALUE antisymmetric(VALUE self)
+{
+	struct matrix* A;
+	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
+    if(A->n != A->m)
+        rb_raise(fm_eIndexError, "Expected square matrix");
+    if(matrix_antisymmetric(A->n, A->data))
+        return Qtrue;
+    return Qfalse;
+}
+
+VALUE symmetric(VALUE self)
+{
+	struct matrix* A;
+	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
+    if(A->n != A->m)
+        rb_raise(fm_eIndexError, "Expected square matrix");
+    if(matrix_symmetric(A->n, A->data))
+        return Qtrue;
+    return Qfalse;
+}
+
+VALUE minus(VALUE self)
+{
+	struct matrix* A;
+	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
+
+    int n = A->n;
+    int m = A->m;
+
+    struct matrix* C;
+    VALUE result = TypedData_Make_Struct(cMatrix, struct matrix, &matrix_type, C);
+    c_matrix_init(C, m, n);
+    multiply_d_array_to_result(n * m, A->data, -1, C->data);
+
+    return result;
+}
+
+VALUE plus(VALUE self)
+{
+    return self;
+}
+
+VALUE row_vector(VALUE self, VALUE v)
+{
+    int idx = raise_rb_value_to_int(v);
+
+	struct matrix* A;
+	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
+
+    int m = A->m;
+    int n = A->n;
+    idx = (idx < 0) ? m + idx : idx;
+    
+    if(idx < 0 || idx >= m)
+        return Qnil;
+    
+    struct vector* C;
+    VALUE result = TypedData_Make_Struct(cVector, struct vector, &vector_type, C);
+
+    c_vector_init(C, n);
+    copy_d_array(m, A->data + idx * m, C->data);
+
+    return result;
+}
+
+VALUE column_vector(VALUE self, VALUE v)
+{
+    int idx = raise_rb_value_to_int(v);
+
+	struct matrix* A;
+	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
+
+    int m = A->m;
+    int n = A->n;
+    idx = (idx < 0) ? n + idx : idx;
+    
+    if(idx < 0 || idx >= n)
+        return Qnil;
+    
+    struct vector* C;
+    VALUE result = TypedData_Make_Struct(cVector, struct vector, &vector_type, C);
+
+    c_vector_init(C, n);
+    strassen_copy(1, n, A->data + idx, C->data, m, 1);
+
+    return result;
+}
+
+bool matrix_diagonal(int n, const double* C)
+{
+    int ptr = 0;
+    
+    for(int i = 0; i < n * n; ++i)
+    {
+        if(i == ptr)
+            ptr += n + 1;
+        else if(C[i] != 0)
+            return false;
+    }
+    return true;
+}
+
+VALUE diagonal(VALUE self)
+{
+	struct matrix* A;
+	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
+    if(A->n != A->m)
+        rb_raise(fm_eIndexError, "Expected square matrix");
+    if(matrix_diagonal(A->n, A->data))
+        return Qtrue;
+    return Qfalse;
+}
+
+VALUE hadamard_product(VALUE self, VALUE other)
+{
+    raise_check_rbasic(other, cMatrix, "matrix");
+	struct matrix* A;
+    struct matrix* B;
+	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
+	TypedData_Get_Struct(other, struct matrix, &matrix_type, B);
+
+    if(A->m != B->m || A->n != B->n)
+        rb_raise(fm_eIndexError, "Different sizes matrices");
+
+    int m = B->m;
+    int n = A->n;
+
+    struct matrix* C;
+    VALUE result = TypedData_Make_Struct(cMatrix, struct matrix, &matrix_type, C);
+
+    c_matrix_init(C, m, n);
+    multiply_elems_d_array_to_result(n * m, A->data, B->data, C->data);
+
+    return result;
+}
+
+double matrix_trace(int n, const double* A)
+{
+    int sum = 0;
+    for(int i = 0; i < n; ++i)
+        sum += A[i + i * n];
+    return sum;
+}
+
+VALUE trace(VALUE self)
+{
+	struct matrix* A;
+	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
+    if(A->n != A->m)
+        rb_raise(fm_eIndexError, "Expected square matrix");
+    return DBL2NUM(matrix_trace(A->n, A->data));
 }
 
 void init_fm_matrix()
@@ -710,4 +1031,16 @@ void init_fm_matrix()
     rb_define_method(cMatrix, ">=", matrix_greater_or_equal, 1);
     rb_define_method(cMatrix, "determinant", matrix_determinant, 0);
     rb_define_method(cMatrix, "eql?", matrix_equal, 1);
+    rb_define_method(cMatrix, "antisymmetric?", antisymmetric, 0);
+    rb_define_method(cMatrix, "symmetric?", symmetric, 0);
+    rb_define_method(cMatrix, "-@", minus, 0);
+    rb_define_method(cMatrix, "+@", plus, 0);
+    rb_define_method(cMatrix, "column", column_vector, 1);
+    rb_define_method(cMatrix, "row", row_vector, 1);
+    rb_define_method(cMatrix, "diagonal?", diagonal, 0);
+    rb_define_method(cMatrix, "hadamard_product", hadamard_product, 1);
+    rb_define_method(cMatrix, "trace", trace, 0);
+    rb_define_module_function(cMatrix, "vstack", vstack, -1);
+    rb_define_module_function(cMatrix, "hstack", hstack, -1);
+    rb_define_module_function(cMatrix, "scalar", scalar, 2);
 }

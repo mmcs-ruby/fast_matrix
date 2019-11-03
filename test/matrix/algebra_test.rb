@@ -105,5 +105,44 @@ module FastMatrixTest
       n = FastMatrix::Matrix[[1, 2, 5], [3, 3, 1]]
       refute m.eql?(n)
     end
+
+    def test_diagonal
+      m = FastMatrix::Matrix[[1, 0, 0], [0, 4, 0], [0, 0, 7]]
+      assert m.diagonal?
+    end
+
+    def test_not_diagonal
+      m = FastMatrix::Matrix[[1, 0, 0], [0, 4, 5], [0, 0, 7]]
+      refute m.diagonal?
+    end
+
+    def test_diagonal_error
+      m = FastMatrix::Matrix[[1, 0, 0], [0, 4, 0], [0, 0, 7], [0, 0, 0]]
+      assert_raises(IndexError) { m.diagonal?}
+    end
+
+    def test_hadamard_product
+      m1 = Matrix[[1, 3, 0], [-2, 2, 1]]
+      m2 = Matrix[[1, 2, 1], [0, 4, 010]]
+      m = Matrix[[1, 6, 0, 0, 8, 8]]
+      assert m, m1.hadamard_product(m2)
+    end
+
+    def test_hadamard_product_error
+      m1 = Matrix[[1, 3, 0], [-2, 2, 1]]
+      m2 = Matrix[[1, 2], [0, 4]]
+      assert_raises(IndexError) { m1.hadamard_product(m2)}
+    end
+
+    def test_trace
+      m = Matrix[[1, 2, 3], [5, 6, 7], [7, 8, 9]]
+      assert_equal 16, m.trace
+    end
+
+    def test_trace_error
+      m = Matrix[[1, 2, 3], [5, 6, 7]]
+      assert_raises(IndexError) { m.trace}
+    end
+
   end
 end

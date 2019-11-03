@@ -55,6 +55,18 @@ module FastMatrixTest
       assert_equal expected, actual
     end
 
+    def test_scalar_3
+      m1 = Matrix.scalar(3, 5)
+      m2 = Matrix[[5, 0, 0], [0, 5, 0], [0, 0, 5]]
+      assert_equal m2, m1
+    end
+
+    def test_scalar_2
+      m1 = Matrix.scalar(2, -2)
+      m2 = Matrix[[-2, 0], [0, -2]]
+      assert_equal m2, m1
+    end
+
     def test_build_incorrect_dimensions
       assert_raises(IndexError) { Matrix.build(-2, 4) }
     end
@@ -122,6 +134,20 @@ module FastMatrixTest
                           [4, 3]], Matrix.vstack(x, y, z)
     end
 
+    def test_vstack_size_error
+      x = Matrix[[1, 2], [3, 4]]
+      y = Matrix[[1], [3]]
+      assert_raises(IndexError) { Matrix.vstack(x, y) }
+    end
+
+    def test_vstack_count_error
+      assert_raises(IndexError) { Matrix.vstack }
+    end
+    
+    def test_vstack_type_error
+      assert_raises(TypeError) { Matrix.vstack("s1", "s2", "s3") }
+    end
+
     def test_hstack_2
       x = Matrix[[1, 2], [3, 4]]
       y = Matrix[[5, 6], [7, 8]]
@@ -138,6 +164,17 @@ module FastMatrixTest
       assert_equal Matrix[[1, 2, 5, 6, 8, 7, 6],
                           [3, 4, 7, 8, 5, 4, 3]],
                    Matrix.hstack(x, y, z)
+    end
+
+    def test_hstack_size_error
+      x = Matrix[[1, 2], [3, 4]]
+      y = Matrix[[5, 6], [7, 8]]
+      z = Matrix[[5, 6], [7, 8], [9, 10]]
+      assert_raises(IndexError) { Matrix.hstack(x, y, z) }
+    end
+
+    def test_hstack_type_error
+      assert_raises(TypeError) { Matrix.hstack("s1", "s2", "s3") }
     end
 
     def test_combine
