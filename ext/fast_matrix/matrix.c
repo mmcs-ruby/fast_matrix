@@ -685,6 +685,89 @@ VALUE matrix_greater_or_equal(VALUE self, VALUE value)
     return Qfalse;
 }
 
+struct matrix** convert_matrix_array(int argc, VALUE *argv, struct matrix*** mtrs)
+{
+    for(int i = 0; i < argc; ++i)
+        raise_check_rbasic(argv[i], cMatrix, "matrix");
+    
+    *mtrs = (struct matrix**)malloc(argc * sizeof(struct matrix*));
+
+    for(int i = 0; i < argc; ++i)
+	    TypedData_Get_Struct(argv[i], struct matrix, &matrix_type, (*mtrs)[i]);
+}
+
+bool matrix_equal_by_m(int argc, struct matrix** mtrs)
+{
+    int m = mtrs[0]->m;
+    for(int i = 1; i < argc; ++i)
+        if(m != mtrs[i]->m)
+            return false;
+    return true;
+}
+
+bool matrix_equal_by_n(int argc, struct matrix** mtrs)
+{
+    int n = mtrs[0]->n;
+    for(int i = 1; i < argc; ++i)
+        if(n != mtrs[i]->n)
+            return false;
+    return true;
+}
+
+int matrix_sum_by_m(int argc, struct matrix** mtrs)
+{
+    int sum = 0;
+    for(int i = 0; i < argc; ++i)
+        sum += mtrs[i]->m;
+    return sum;
+}
+
+int matrix_sum_by_n(int argc, struct matrix** mtrs)
+{
+    int sum = 0;
+    for(int i = 0; i < argc; ++i)
+        sum += mtrs[i]->n;
+    return sum;
+}
+
+void matrix_vstack(int argc, struct matrix** mtrs, double* C)
+{
+    for(int i = 0; i < argc; ++i)
+    {
+        struct matrix* M = mtrs[i];
+        int len = M->m * M->n;
+        copy_d_array(len, M->data, C);
+        C += len;
+    }
+}
+
+VALUE vstack(int argc, VALUE *argv)
+{
+    if(argc == 0)
+        rb_raise(fm_eIndexError, "No arguments");
+    
+    struct matrix** mtrs;
+    convert_matrix_array(argc, argv, &mtrs);
+
+    if(!matrix_equal_by_m(argc, mtrs))
+    {
+        free(mtrs);
+        rb_raise(fm_eIndexError, "Rows of different size");
+    }
+
+    int m = mtrs[0]->m;
+    int n = matrix_sum_by_n(argc, mtrs);
+
+    struct matrix* C;
+    VALUE result = TypedData_Make_Struct(cMatrix, struct matrix, &matrix_type, C);
+
+    c_matrix_init(C, m, n);
+    matrix_vstack(argc, mtrs, C->data);
+
+    free(mtrs);
+    return result;
+}
+
 void init_fm_matrix()
 {
     VALUE  mod = rb_define_module("FastMatrix");
@@ -710,4 +793,5 @@ void init_fm_matrix()
     rb_define_method(cMatrix, ">=", matrix_greater_or_equal, 1);
     rb_define_method(cMatrix, "determinant", matrix_determinant, 0);
     rb_define_method(cMatrix, "eql?", matrix_equal, 1);
+    rb_define_module_function(cMatrix, "vstack", vstack, -1);
 }

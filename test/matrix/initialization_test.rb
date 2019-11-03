@@ -122,6 +122,21 @@ module FastMatrixTest
                           [4, 3]], Matrix.vstack(x, y, z)
     end
 
+    def test_vstack_size_error
+      x = Matrix[[1, 2], [3, 4]]
+      y = Matrix[[1], [3]]
+      
+      assert_raises(IndexError) { Matrix.vstack(x, y) }
+    end
+
+    def test_vstack_count_error
+      assert_raises(IndexError) { Matrix.vstack }
+    end
+    
+    def test_vstack_type_error
+      assert_raises(TypeError) { Matrix.vstack("s1", "s2", "s3") }
+    end
+
     def test_hstack_2
       x = Matrix[[1, 2], [3, 4]]
       y = Matrix[[5, 6], [7, 8]]

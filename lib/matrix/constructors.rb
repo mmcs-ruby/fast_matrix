@@ -148,32 +148,6 @@ module FastMatrix
     end
 
     #
-    # Create a matrix by stacking matrices vertically
-    #
-    #   x = Matrix[[1, 2], [3, 4]]
-    #   y = Matrix[[5, 6], [7, 8]]
-    #   Matrix.vstack(x, y) # => Matrix[[1, 2], [3, 4], [5, 6], [7, 8]]
-    # TODO: optimize (maybe in C)
-    def self.vstack(x, *matrices)
-      column_count = x.column_count
-      row_count = x.row_count
-      matrices.each do |matrix|
-        raise IndexError unless matrix.column_count == column_count
-
-        row_count += matrix.row_count
-      end
-      result = new(row_count, column_count)
-      m_i = 0
-      [x, *matrices].each do |matrix|
-        matrix.each_with_index do |elem, i, j|
-          result[m_i + i, j] = elem
-        end
-        m_i += matrix.row_count
-      end
-      result
-    end
-
-    #
     # Create a matrix by stacking matrices horizontally
     #
     #   x = Matrix[[1, 2], [3, 4]]
