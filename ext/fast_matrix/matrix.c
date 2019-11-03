@@ -741,6 +741,17 @@ void matrix_vstack(int argc, struct matrix** mtrs, double* C)
     }
 }
 
+void matrix_hstack(int argc, struct matrix** mtrs, double* C, int m)
+{
+    for(int i = 0; i < argc; ++i)
+    {
+        struct matrix* M = mtrs[i];
+        //  a little misuse of the method
+        strassen_copy(M->m, M->n, M->data, C, M->m, m);
+        C += M->m;
+    }
+}
+
 VALUE vstack(int argc, VALUE *argv)
 {
     if(argc == 0)
@@ -763,6 +774,33 @@ VALUE vstack(int argc, VALUE *argv)
 
     c_matrix_init(C, m, n);
     matrix_vstack(argc, mtrs, C->data);
+
+    free(mtrs);
+    return result;
+}
+
+VALUE hstack(int argc, VALUE *argv)
+{
+    if(argc == 0)
+        rb_raise(fm_eIndexError, "No arguments");
+    
+    struct matrix** mtrs;
+    convert_matrix_array(argc, argv, &mtrs);
+
+    if(!matrix_equal_by_n(argc, mtrs))
+    {
+        free(mtrs);
+        rb_raise(fm_eIndexError, "Columns of different size");
+    }
+
+    int m = matrix_sum_by_m(argc, mtrs);
+    int n = mtrs[0]->n;
+
+    struct matrix* C;
+    VALUE result = TypedData_Make_Struct(cMatrix, struct matrix, &matrix_type, C);
+
+    c_matrix_init(C, m, n);
+    matrix_hstack(argc, mtrs, C->data, m);
 
     free(mtrs);
     return result;
@@ -794,4 +832,5 @@ void init_fm_matrix()
     rb_define_method(cMatrix, "determinant", matrix_determinant, 0);
     rb_define_method(cMatrix, "eql?", matrix_equal, 1);
     rb_define_module_function(cMatrix, "vstack", vstack, -1);
+    rb_define_module_function(cMatrix, "hstack", hstack, -1);
 }

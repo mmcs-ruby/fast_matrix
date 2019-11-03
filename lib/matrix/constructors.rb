@@ -148,32 +148,6 @@ module FastMatrix
     end
 
     #
-    # Create a matrix by stacking matrices horizontally
-    #
-    #   x = Matrix[[1, 2], [3, 4]]
-    #   y = Matrix[[5, 6], [7, 8]]
-    #   Matrix.hstack(x, y) # => Matrix[[1, 2, 5, 6], [3, 4, 7, 8]]
-    #
-    def self.hstack(x, *matrices)
-      column_count = x.column_count
-      row_count = x.row_count
-      matrices.each do |matrix|
-        raise IndexError unless matrix.row_count == row_count
-
-        column_count += matrix.column_count
-      end
-      result = new(row_count, column_count)
-      m_j = 0
-      [x, *matrices].each do |matrix|
-        matrix.each_with_index do |elem, i, j|
-          result[i, m_j + j] = elem
-        end
-        m_j += matrix.column_count
-      end
-      result
-    end
-
-    #
     # Create a matrix by combining matrices entrywise, using the given block
     #
     #   x = Matrix[[6, 6], [4, 4]]
