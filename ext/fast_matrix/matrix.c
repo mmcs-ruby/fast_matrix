@@ -941,6 +941,31 @@ VALUE column_vector(VALUE self, VALUE v)
     return result;
 }
 
+bool matrix_diagonal(int n, const double* C)
+{
+    int ptr = 0;
+    
+    for(int i = 0; i < n * n; ++i)
+    {
+        if(i == ptr)
+            ptr += n + 1;
+        else if(C[i] != 0)
+            return false;
+    }
+    return true;
+}
+
+VALUE diagonal(VALUE self)
+{
+	struct matrix* A;
+	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
+    if(A->n != A->m)
+        rb_raise(fm_eIndexError, "Expected square matrix");
+    if(matrix_diagonal(A->n, A->data))
+        return Qtrue;
+    return Qfalse;
+}
+
 void init_fm_matrix()
 {
     VALUE  mod = rb_define_module("FastMatrix");
@@ -972,6 +997,7 @@ void init_fm_matrix()
     rb_define_method(cMatrix, "+@", plus, 0);
     rb_define_method(cMatrix, "column", column_vector, 1);
     rb_define_method(cMatrix, "row", row_vector, 1);
+    rb_define_method(cMatrix, "diagonal?", diagonal, 0);
     rb_define_module_function(cMatrix, "vstack", vstack, -1);
     rb_define_module_function(cMatrix, "hstack", hstack, -1);
     rb_define_module_function(cMatrix, "scalar", scalar, 2);

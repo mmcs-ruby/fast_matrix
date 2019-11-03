@@ -105,5 +105,20 @@ module FastMatrixTest
       n = FastMatrix::Matrix[[1, 2, 5], [3, 3, 1]]
       refute m.eql?(n)
     end
+
+    def test_diagonal
+      m = FastMatrix::Matrix[[1, 0, 0], [0, 4, 0], [0, 0, 7]]
+      assert m.diagonal?
+    end
+
+    def test_not_diagonal
+      m = FastMatrix::Matrix[[1, 0, 0], [0, 4, 5], [0, 0, 7]]
+      refute m.diagonal?
+    end
+
+    def test_diagonal_error
+      m = FastMatrix::Matrix[[1, 0, 0], [0, 4, 0], [0, 0, 7], [0, 0, 0]]
+      assert_raises(IndexError) { m.diagonal?}
+    end
   end
 end
