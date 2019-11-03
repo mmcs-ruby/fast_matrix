@@ -144,5 +144,30 @@ module FastMatrixTest
       assert_raises(IndexError) { m.trace}
     end
 
+    def test_first_minor
+      m = Matrix[[1, 2, 3], [4, 5, 6], [7, 8, 9], [0, 1, 2]]
+      r = Matrix[[1, 2], [4, 5], [0, 1]]
+      assert_equal r, m.first_minor(2, 2)
+    end
+
+    def test_first_minor_error
+      m = Matrix[[1, 2, 3], [4, 5, 6], [7, 8, 9], [0, 1, 2]]
+      assert_raises(IndexError) { m.first_minor(3, 5) }
+    end
+
+    def test_cofactor
+      m = Matrix.diagonal(9, 5, -3, 4)
+      assert_equal -108, m.cofactor(1, 1)
+    end
+
+    def test_cofactor_error_index
+      m = Matrix.diagonal(9, 5, -3, 4)
+      assert_raises(IndexError) { m.cofactor(1, 5) }
+    end
+    
+    def test_cofactor_error_matrix
+      m = Matrix[[1, 2, 3], [4, 5, 6]]
+      assert_raises(IndexError) { m.cofactor(1, 1) }
+    end
   end
 end

@@ -143,5 +143,15 @@ module FastMatrixTest
       m = Matrix[[1, 2, 3], [4, 5, 6], [7, 8, 9]]
       assert_nil m.row(4)
     end
+
+    def test_zero
+      m = Matrix[[0, 0, 0], [0, 0, 0]]
+      assert m.zero?
+    end
+
+    def test_not_zero
+      m = Matrix[[0, 0, 1], [0, 0, 0]]
+      refute m.zero?
+    end
   end
 end
