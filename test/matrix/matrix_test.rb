@@ -67,5 +67,35 @@ module FastMatrixTest
       m1 = Matrix[[1, 2], [3, 4]]
       assert_equal "FastMatrix::Matrix[[1.0, 2.0], [3.0, 4.0]]", m1.to_str
     end
+
+    def test_symmetric
+      m1 = Matrix[[1, 2, 1], [2, 4, 5], [1, 5, 3]]
+      assert m1.symmetric?
+    end
+
+    def test_not_symmetric
+      m1 = Matrix[[1, 2, 1], [3, 4, 5], [1, 5, 3]]
+      refute m1.symmetric?
+    end
+
+    def test_symmetric_error
+      m1 = Matrix[[1, 2], [3, 4], [1, 5]]
+      assert_raises (IndexError) { m1.symmetric? }
+    end
+
+    def test_antisymmetric
+      m1 = Matrix[[0, 2, 1], [-2, 0, 5], [-1, -5, 0]]
+      assert m1.antisymmetric?
+    end
+
+    def test_not_antisymmetric
+      m1 = Matrix[[0, 2, 1], [2, 0, 5], [-1, -5, 0]]
+      refute m1.antisymmetric?
+    end
+
+    def test_antisymmetric_error
+      m1 = Matrix[[1, 2], [3, 4], [1, 5]]
+      assert_raises (IndexError) { m1.antisymmetric? }
+    end
   end
 end

@@ -834,6 +834,46 @@ VALUE scalar(VALUE obj, VALUE size, VALUE value)
     return result;
 }
 
+bool matrix_symmetric(int n, const double* C)
+{
+    for(int i = 0; i < n; ++i)
+        for(int j = i; j < n; ++j)
+            if(C[i + j * n] != C[j + i * n])
+                return false;
+    return true;
+}
+
+bool matrix_antisymmetric(int n, const double* C)
+{
+    for(int i = 0; i < n; ++i)
+        for(int j = i; j < n; ++j)
+            if(C[i + j * n] != -C[j + i * n])
+                return false;
+    return true;
+}
+
+VALUE antisymmetric(VALUE self)
+{
+	struct matrix* A;
+	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
+    if(A->n != A->m)
+        rb_raise(fm_eIndexError, "Expected square matrix");
+    if(matrix_antisymmetric(A->n, A->data))
+        return Qtrue;
+    return Qfalse;
+}
+
+VALUE symmetric(VALUE self)
+{
+	struct matrix* A;
+	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
+    if(A->n != A->m)
+        rb_raise(fm_eIndexError, "Expected square matrix");
+    if(matrix_symmetric(A->n, A->data))
+        return Qtrue;
+    return Qfalse;
+}
+
 void init_fm_matrix()
 {
     VALUE  mod = rb_define_module("FastMatrix");
@@ -859,6 +899,8 @@ void init_fm_matrix()
     rb_define_method(cMatrix, ">=", matrix_greater_or_equal, 1);
     rb_define_method(cMatrix, "determinant", matrix_determinant, 0);
     rb_define_method(cMatrix, "eql?", matrix_equal, 1);
+    rb_define_method(cMatrix, "antisymmetric?", antisymmetric, 0);
+    rb_define_method(cMatrix, "symmetric?", symmetric, 0);
     rb_define_module_function(cMatrix, "vstack", vstack, -1);
     rb_define_module_function(cMatrix, "hstack", hstack, -1);
     rb_define_module_function(cMatrix, "scalar", scalar, 2);
