@@ -19,12 +19,18 @@ module FastMatrix
     alias element []
     alias component []
 
-    def to_s
-      convert.to_s
+    def collect
+      collected_rows = []
+      rows.each do |i|
+        collected_rows.push(yield i)
+      end
+      collected_rows
     end
 
-    def inspect
-      convert.inspect
+    def to_s
+      "#{self.class}[" + collect{|row|
+        "[" + row.join(", ") +"]"
+      }.join(", ")+"]"
     end
 
     #
@@ -75,6 +81,23 @@ module FastMatrix
         result &&= elem == other[i, j].to_f
       end
       result
+    end
+
+    alias to_str to_s
+    alias inspect to_str
+
+    private
+
+    def rows
+      rows = []
+      (0...row_count).each do |i|
+        row = []
+        (0...column_count).each do |j|
+          row.push(element(i, j))
+        end
+        rows.push(row)
+      end
+      rows
     end
   end
 end

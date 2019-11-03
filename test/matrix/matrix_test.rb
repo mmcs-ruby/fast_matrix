@@ -52,5 +52,20 @@ module FastMatrixTest
       assert_equal original, clone
       refute_same original, clone
     end
+
+    def test_to_s
+      m1 = Matrix[[1, 2], [3, 4]]
+      assert_equal "FastMatrix::Matrix[[1.0, 2.0], [3.0, 4.0]]", m1.to_s
+    end
+
+    def test_inspect
+      m1 = Matrix[[1, 2], [3, 4]]
+      assert_equal "FastMatrix::Matrix[[1.0, 2.0], [3.0, 4.0]]", m1.inspect
+    end
+
+    def test_to_str
+      m1 = Matrix[[1, 2], [3, 4]]
+      assert_equal "FastMatrix::Matrix[[1.0, 2.0], [3.0, 4.0]]", m1.to_str
+    end
   end
 end
