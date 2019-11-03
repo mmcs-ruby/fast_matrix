@@ -1065,6 +1065,16 @@ VALUE cofactor(VALUE self, VALUE row, VALUE column)
     return DBL2NUM(coefficient * det);
 }
 
+VALUE matrix_zero(VALUE self)
+{
+	struct matrix* A;
+	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
+    for(int i = 0; i < A->m * A->n; ++i)
+        if(A->data[i] != 0)
+            return Qfalse;
+    return Qtrue;
+}
+
 void init_fm_matrix()
 {
     VALUE  mod = rb_define_module("FastMatrix");
@@ -1101,6 +1111,7 @@ void init_fm_matrix()
     rb_define_method(cMatrix, "trace", trace, 0);
     rb_define_method(cMatrix, "first_minor", first_minor, 2);
     rb_define_method(cMatrix, "cofactor", cofactor, 2);
+    rb_define_method(cMatrix, "zero?", matrix_zero, 0);
     rb_define_module_function(cMatrix, "vstack", vstack, -1);
     rb_define_module_function(cMatrix, "hstack", hstack, -1);
     rb_define_module_function(cMatrix, "scalar", scalar, 2);
