@@ -752,7 +752,7 @@ void matrix_hstack(int argc, struct matrix** mtrs, double* C, int m)
     }
 }
 
-VALUE vstack(int argc, VALUE *argv)
+VALUE vstack(int argc, VALUE *argv, VALUE obj)
 {
     if(argc == 0)
         rb_raise(fm_eIndexError, "No arguments");
@@ -779,7 +779,7 @@ VALUE vstack(int argc, VALUE *argv)
     return result;
 }
 
-VALUE hstack(int argc, VALUE *argv)
+VALUE hstack(int argc, VALUE *argv, VALUE obj)
 {
     if(argc == 0)
         rb_raise(fm_eIndexError, "No arguments");
@@ -803,6 +803,34 @@ VALUE hstack(int argc, VALUE *argv)
     matrix_hstack(argc, mtrs, C->data, m);
 
     free(mtrs);
+    return result;
+}
+
+void matrix_scalar(int n, double* C, double v)
+{
+    int ptr = 0;
+    
+    for(int i = 0; i < n * n; ++i)
+    {
+        if(i == ptr)
+        {
+            ptr += n + 1;
+            C[i] = v;
+        }else
+            C[i] = 0;
+    }
+}
+
+VALUE scalar(VALUE obj, VALUE size, VALUE value)
+{
+    int n = raise_rb_value_to_int(size);
+    double v = raise_rb_value_to_double(value);
+
+    struct matrix* C;
+    VALUE result = TypedData_Make_Struct(cMatrix, struct matrix, &matrix_type, C);
+    c_matrix_init(C, n, n);
+    matrix_scalar(n, C->data, v);
+
     return result;
 }
 
@@ -833,4 +861,5 @@ void init_fm_matrix()
     rb_define_method(cMatrix, "eql?", matrix_equal, 1);
     rb_define_module_function(cMatrix, "vstack", vstack, -1);
     rb_define_module_function(cMatrix, "hstack", hstack, -1);
+    rb_define_module_function(cMatrix, "scalar", scalar, 2);
 }

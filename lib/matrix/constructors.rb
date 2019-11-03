@@ -96,17 +96,6 @@ module FastMatrix
     end
 
     #
-    # Creates an +n+ by +n+ diagonal matrix where each diagonal element is
-    # +value+.
-    #   Matrix.scalar(2, 5)
-    #     => 5 0
-    #        0 5
-    #
-    def self.scalar(n, value)
-      build(n, n) { |i, j| i == j ? value : 0 }
-    end
-
-    #
     # Creates an +n+ by +n+ identity matrix.
     #   Matrix.identity(2)
     #     => 1 0

@@ -55,6 +55,18 @@ module FastMatrixTest
       assert_equal expected, actual
     end
 
+    def test_scalar_3
+      m1 = Matrix.scalar(3, 5)
+      m2 = Matrix[[5, 0, 0], [0, 5, 0], [0, 0, 5]]
+      assert_equal m2, m1
+    end
+
+    def test_scalar_2
+      m1 = Matrix.scalar(2, -2)
+      m2 = Matrix[[-2, 0], [0, -2]]
+      assert_equal m2, m1
+    end
+
     def test_build_incorrect_dimensions
       assert_raises(IndexError) { Matrix.build(-2, 4) }
     end
