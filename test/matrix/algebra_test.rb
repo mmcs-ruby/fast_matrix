@@ -133,5 +133,16 @@ module FastMatrixTest
       m2 = Matrix[[1, 2], [0, 4]]
       assert_raises(IndexError) { m1.hadamard_product(m2)}
     end
+
+    def test_trace
+      m = Matrix[[1, 2, 3], [5, 6, 7], [7, 8, 9]]
+      assert_equal 16, m.trace
+    end
+
+    def test_trace_error
+      m = Matrix[[1, 2, 3], [5, 6, 7]]
+      assert_raises(IndexError) { m.trace}
+    end
+
   end
 end

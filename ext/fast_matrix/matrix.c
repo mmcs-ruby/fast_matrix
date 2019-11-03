@@ -989,6 +989,23 @@ VALUE hadamard_product(VALUE self, VALUE other)
     return result;
 }
 
+double matrix_trace(int n, const double* A)
+{
+    int sum = 0;
+    for(int i = 0; i < n; ++i)
+        sum += A[i + i * n];
+    return sum;
+}
+
+VALUE trace(VALUE self)
+{
+	struct matrix* A;
+	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
+    if(A->n != A->m)
+        rb_raise(fm_eIndexError, "Expected square matrix");
+    return DBL2NUM(matrix_trace(A->n, A->data));
+}
+
 void init_fm_matrix()
 {
     VALUE  mod = rb_define_module("FastMatrix");
@@ -1022,6 +1039,7 @@ void init_fm_matrix()
     rb_define_method(cMatrix, "row", row_vector, 1);
     rb_define_method(cMatrix, "diagonal?", diagonal, 0);
     rb_define_method(cMatrix, "hadamard_product", hadamard_product, 1);
+    rb_define_method(cMatrix, "trace", trace, 0);
     rb_define_module_function(cMatrix, "vstack", vstack, -1);
     rb_define_module_function(cMatrix, "hstack", hstack, -1);
     rb_define_module_function(cMatrix, "scalar", scalar, 2);
