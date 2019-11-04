@@ -217,5 +217,23 @@ module FastMatrixTest
       ]
       assert_equal 2, m.rank
     end
+
+    def test_round_0
+      m1 = Matrix[[1, 1.5, 1.55, 1.4], [0, -10.1, -555, 555]]
+      m2 = Matrix[[1, 2, 2, 1], [0, -10, -555, 555]]
+      assert_equal m2, m1.round
+    end
+
+    def test_round_1
+      m1 = Matrix[[1, 1.5, 1.55, 1.4], [0, -10.1, -555, 555]]
+      m2 = Matrix[[1, 1.5, 1.6, 1.4], [0, -10.1, -555, 555]]
+      assert_in_delta m2, m1.round(1), Matrix.new(2, 4).fill!(0.0001)
+    end
+
+    def test_round_neg_1
+      m1 = Matrix[[1, 1.5, 1.55, 1.4], [0, -10.1, -555, 555]]
+      m2 = Matrix[[0, 0, 0, 0], [0, -10, -560, 560]]
+      assert_in_delta m2, m1.round(-1), Matrix.new(2, 4).fill!(0.0001)
+    end
   end
 end

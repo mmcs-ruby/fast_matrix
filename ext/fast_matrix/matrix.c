@@ -1074,16 +1074,6 @@ VALUE matrix_zero(VALUE self)
     return Qfalse;
 }
 
-void swap_d_arrays(int len, double* A, double* B)
-{
-    for(int i = 0; i < len; ++i)
-    {
-        double buf = A[i];
-        A[i] = B[i];
-        B[i] = buf;
-    }
-}
-
 int matrix_rank(int m, int n, const double* C)
 {
     double* A = malloc(sizeof(double) * m * n);
@@ -1135,6 +1125,31 @@ VALUE rank(VALUE self)
     return INT2NUM(matrix_rank(A->m, A->n, A->data));
 }
 
+VALUE matrix_round(int argc, VALUE *argv, VALUE self)
+{
+    if(argc > 1)
+        rb_raise(fm_eTypeError, "Wrong number of arguments");
+    int d;
+    if(argc == 1)
+        d = raise_rb_value_to_int(argv[0]);
+    else
+        d = 0;
+
+	struct matrix* A;
+	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
+
+    int m = A->m;
+    int n = A->n;
+
+    struct matrix* R;
+    VALUE result = TypedData_Make_Struct(cMatrix, struct matrix, &matrix_type, R);
+    c_matrix_init(R, m, n);
+
+    round_d_array(m * n, A->data, R->data, d);
+
+    return result;
+}
+
 void init_fm_matrix()
 {
     VALUE  mod = rb_define_module("FastMatrix");
@@ -1173,6 +1188,7 @@ void init_fm_matrix()
     rb_define_method(cMatrix, "cofactor", cofactor, 2);
     rb_define_method(cMatrix, "zero?", matrix_zero, 0);
     rb_define_method(cMatrix, "rank", rank, 0);
+    rb_define_method(cMatrix, "round", matrix_round, -1);
     rb_define_module_function(cMatrix, "vstack", vstack, -1);
     rb_define_module_function(cMatrix, "hstack", hstack, -1);
     rb_define_module_function(cMatrix, "scalar", scalar, 2);

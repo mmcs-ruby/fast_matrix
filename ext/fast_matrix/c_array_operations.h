@@ -16,4 +16,7 @@ bool equal_d_arrays(int len, const double* A, const double* B);
 void abs_d_array(int len, const double* A, double* B);
 bool greater_or_equal_d_array(int len, const double* A, const double* B);
 bool zero_d_array(int len, const double* A);
+void swap_d_arrays(int len, double* A, double* B);
+void round_d_array(int len, const double* Input, double* Output, int acc);
+
 #endif  /*C_ARRAY_OPERATIONS*/
