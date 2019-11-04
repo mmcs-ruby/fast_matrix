@@ -153,5 +153,40 @@ module FastMatrixTest
       m = Matrix[[0, 0, 1], [0, 0, 0]]
       refute m.zero?
     end
+    
+    def test_each_all
+      m = Matrix[ [1,2], [3,4] ]
+     assert_equal m.each(:all).to_a, [1, 2, 3, 4]
+    end
+
+    def test_each_diagonal
+      m = Matrix[ [1,2], [3,4] ]
+      assert_equal m.each(:diagonal).to_a, [1, 4]
+    end
+
+    def test_each_off_diagonal
+      m = Matrix[ [1,2], [3,4] ]
+      assert_equal m.each(:off_diagonal).to_a, [2, 3]
+    end
+
+    def test_each_lower
+      m = Matrix[ [1,2], [3,4] ]
+      assert_equal m.each(:lower).to_a, [1, 3, 4]
+    end
+
+    def test_each_strict_lower
+      m = Matrix[ [1,2], [3,4] ]
+      assert_equal m.each(:strict_lower).to_a, [3]
+    end
+
+    def test_each_upper
+      m = Matrix[ [1,2], [3,4] ]
+      assert_equal m.each(:upper).to_a, [1, 2, 4]
+    end
+
+    def test_each_strict_upper
+      m = Matrix[ [1,2], [3,4] ]
+      assert_equal m.each(:strict_upper).to_a, [2]
+    end
   end
 end
