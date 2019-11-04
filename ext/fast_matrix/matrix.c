@@ -1069,10 +1069,70 @@ VALUE matrix_zero(VALUE self)
 {
 	struct matrix* A;
 	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
-    for(int i = 0; i < A->m * A->n; ++i)
-        if(A->data[i] != 0)
-            return Qfalse;
-    return Qtrue;
+    if(zero_d_array(A->m * A->n, A->data))
+            return Qtrue;
+    return Qfalse;
+}
+
+void swap_d_arrays(int len, double* A, double* B)
+{
+    for(int i = 0; i < len; ++i)
+    {
+        double buf = A[i];
+        A[i] = B[i];
+        B[i] = buf;
+    }
+}
+
+int matrix_rank(int m, int n, const double* C)
+{
+    double* A = malloc(sizeof(double) * m * n);
+    copy_d_array(m * n, C, A);
+
+    int i = 0;
+    int c_ptr = 0;
+    while(i < n && c_ptr < m)
+    {
+        double* line = A + c_ptr + i * m;
+        double val = line[0];
+        
+        if(val == 0)
+            for(int j = i + 1; j < n; ++j)
+                if(A[c_ptr + j * m] != 0)
+                {
+                    double* buf = A + c_ptr + j * m;
+                    swap_d_arrays(m - c_ptr, buf, line);
+                    val = line[0];
+                    break;
+                }
+
+        if(val == 0)
+        {
+            ++c_ptr;
+            continue;
+        }
+
+        for(int j = i + 1; j < n; ++j)
+        {
+            double* target = A + c_ptr + j * m;
+            double mul = target[0];
+            if(mul == 0)
+                continue;
+            for(int k = 1; k < m - c_ptr; ++k)
+                target[k] = val * target[k] - mul * line[k];
+        }
+        ++c_ptr;
+        ++i;
+    }
+    free(A);
+    return i;
+}
+
+VALUE rank(VALUE self)
+{
+	struct matrix* A;
+	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
+    return INT2NUM(matrix_rank(A->m, A->n, A->data));
 }
 
 void init_fm_matrix()
@@ -1112,6 +1172,7 @@ void init_fm_matrix()
     rb_define_method(cMatrix, "first_minor", first_minor, 2);
     rb_define_method(cMatrix, "cofactor", cofactor, 2);
     rb_define_method(cMatrix, "zero?", matrix_zero, 0);
+    rb_define_method(cMatrix, "rank", rank, 0);
     rb_define_module_function(cMatrix, "vstack", vstack, -1);
     rb_define_module_function(cMatrix, "hstack", hstack, -1);
     rb_define_module_function(cMatrix, "scalar", scalar, 2);

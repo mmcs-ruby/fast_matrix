@@ -76,3 +76,11 @@ bool greater_or_equal_d_array(int len, const double* A, const double* B)
             return false;
     return true;
 }
+
+bool zero_d_array(int len, const double* A)
+{
+    for(int i = 0; i < len; ++i)
+        if(A[i] != 0)
+            return false;
+    return true;
+}

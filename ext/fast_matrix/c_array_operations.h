@@ -15,5 +15,5 @@ void sub_d_arrays_to_first(int len, double* dif, const double* sub);
 bool equal_d_arrays(int len, const double* A, const double* B);
 void abs_d_array(int len, const double* A, double* B);
 bool greater_or_equal_d_array(int len, const double* A, const double* B);
-
+bool zero_d_array(int len, const double* A);
 #endif  /*C_ARRAY_OPERATIONS*/

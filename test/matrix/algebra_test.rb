@@ -164,10 +164,58 @@ module FastMatrixTest
       m = Matrix.diagonal(9, 5, -3, 4)
       assert_raises(IndexError) { m.cofactor(1, 5) }
     end
-    
+
     def test_cofactor_error_matrix
       m = Matrix[[1, 2, 3], [4, 5, 6]]
       assert_raises(IndexError) { m.cofactor(1, 1) }
+    end
+
+    def test_rank_4
+      m = Matrix[
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 5, 5],
+        [0, 0, 0, 0, 5],
+        [2, 2, 2, 2, 2]
+      ]
+      assert_equal 4, m.rank
+    end
+
+    def test_rank_3
+      m = Matrix[
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 5, 5],
+        [0, 0, 0, 5, 0],
+        [2, 2, 2, 2, 2]
+      ]
+      assert_equal 3, m.rank
+    end
+
+    def test_rank_2
+      m = Matrix[
+        [1, 2],
+        [2, 1]
+      ]
+      assert_equal 2, m.rank
+    end
+
+    def test_rank_1
+      m = Matrix[
+        [ 1,  2, -1, 0,  1],
+        [ 2,  4, -2, 0,  2],
+        [-1, -2,  1, 0, -1]
+      ]
+      assert_equal 1, m.rank
+    end
+
+    def test_rank_2x5
+      m = Matrix[
+        [1, 2],
+        [1, 2],
+        [1, 2],
+        [2, 1],
+        [1, 1],
+      ]
+      assert_equal 2, m.rank
     end
   end
 end
