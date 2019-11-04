@@ -39,6 +39,10 @@ module FastMatrix
     alias to_str to_s
     alias inspect to_str
 
+    def to_a
+      rows.collect(&:dup)
+    end
+    
     #
     # Create fast matrix from standard matrix
     #
@@ -57,12 +61,54 @@ module FastMatrix
     #
     #   Matrix[ [1,2], [3,4] ].each { |e| puts e }
     #     # => prints the numbers 1 to 4
-    def each(&block)
-      raise NotSupportedError unless block_given?
-
-      each_with_index { |elem, _, _| block.call(elem) }
-      self
-    end
+     def each(which = :all)
+        return to_enum :each, which unless block_given?
+        last = column_count - 1
+        case which
+        when :all
+          block = Proc.new
+          rows.each do |row|
+            row.each(&block)
+          end
+        when :diagonal
+          rows.each_with_index do |row, row_index|
+            yield row.fetch(row_index){return self}
+          end
+        when :off_diagonal
+          rows.each_with_index do |row, row_index|
+            column_count.times do |col_index|
+              yield row[col_index] unless row_index == col_index
+            end
+          end
+        when :lower
+          rows.each_with_index do |row, row_index|
+            0.upto([row_index, last].min) do |col_index|
+              yield row[col_index]
+            end
+          end
+        when :strict_lower
+          rows.each_with_index do |row, row_index|
+            [row_index, column_count].min.times do |col_index|
+              yield row[col_index]
+            end
+          end
+        when :strict_upper
+          rows.each_with_index do |row, row_index|
+            (row_index+1).upto(last) do |col_index|
+              yield row[col_index]
+            end
+          end
+        when :upper
+          rows.each_with_index do |row, row_index|
+            row_index.upto(last) do |col_index|
+              yield row[col_index]
+            end
+          end
+        else
+          raise ArgumentError, "expected #{which.inspect} to be one of :all, :diagonal, :off_diagonal, :lower, :strict_lower, :strict_upper or :upper"
+        end
+        self
+      end
 
     #
     # Same as #each, but the row index and column index in addition to the element
