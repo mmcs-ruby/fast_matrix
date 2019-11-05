@@ -66,10 +66,11 @@ module FastMatrix
         last = column_count - 1
         case which
         when :all
-          block = Proc.new
-          rows.each do |row|
-            row.each(&block)
-          end
+         (0...row_count).each do |i|
+           (0...column_count).each do |j|
+             yield self[i, j]
+           end
+         end
         when :diagonal
           rows.each_with_index do |row, row_index|
             yield row.fetch(row_index){return self}
