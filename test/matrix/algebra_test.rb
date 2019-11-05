@@ -235,5 +235,25 @@ module FastMatrixTest
       m2 = Matrix[[0, 0, 0, 0], [0, -10, -560, 560]]
       assert_in_delta m2, m1.round(-1), Matrix.new(2, 4).fill!(0.0001)
     end
+
+    def test_lower_triangular
+      m = Matrix[[1, 0, 0], [2, 3, 0], [4, 5, 6]];
+      assert m.lower_triangular?
+    end
+
+    def test_not_lower_triangular_1
+      m = Matrix[[1, 5, 0], [2, 3, 0], [4, 5, 6]];
+      refute m.lower_triangular?
+    end
+
+    def test_not_lower_triangular_2
+      m = Matrix[[1, 0, 0], [2, 3, 1], [4, 5, 6]];
+      refute m.lower_triangular?
+    end
+
+    def test_not_lower_triangular_3
+      m = Matrix[[1, 0, 3], [2, 3, 0], [4, 5, 6]];
+      refute m.lower_triangular?
+    end
   end
 end
