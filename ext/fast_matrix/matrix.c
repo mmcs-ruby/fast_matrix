@@ -1162,6 +1162,18 @@ bool martix_lower_triangular(int n, const double* A)
     return true;
 }
 
+bool martix_upper_triangular(int n, const double* A)
+{
+    for(int i = 1; i < n; ++i)
+    {
+        const double* line = A + n * i;
+        for(int j = 0; j < i; ++j)
+            if(line[j] != 0)
+                return false;
+    }
+    return true;
+}
+
 VALUE lower_triangular(VALUE self)
 {
 	struct matrix* A;
@@ -1174,6 +1186,22 @@ VALUE lower_triangular(VALUE self)
         rb_raise(fm_eIndexError, "Expected square matrix");
 
     if(martix_lower_triangular(n, A->data))
+        return Qtrue;
+    return Qfalse;
+}
+
+VALUE upper_triangular(VALUE self)
+{
+	struct matrix* A;
+	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
+    
+    int m = A->m;
+    int n = A->n;
+
+    if(m != n)
+        rb_raise(fm_eIndexError, "Expected square matrix");
+
+    if(martix_upper_triangular(n, A->data))
         return Qtrue;
     return Qfalse;
 }
@@ -1218,6 +1246,7 @@ void init_fm_matrix()
     rb_define_method(cMatrix, "rank", rank, 0);
     rb_define_method(cMatrix, "round", matrix_round, -1);
     rb_define_method(cMatrix, "lower_triangular?", lower_triangular, 0);
+    rb_define_method(cMatrix, "upper_triangular?", upper_triangular, 0);
     rb_define_module_function(cMatrix, "vstack", vstack, -1);
     rb_define_module_function(cMatrix, "hstack", hstack, -1);
     rb_define_module_function(cMatrix, "scalar", scalar, 2);

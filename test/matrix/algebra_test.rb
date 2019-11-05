@@ -255,5 +255,30 @@ module FastMatrixTest
       m = Matrix[[1, 0, 3], [2, 3, 0], [4, 5, 6]];
       refute m.lower_triangular?
     end
+
+    def test_upper_triangular
+      m = Matrix[[1, 2, 3], [0, 4, 5], [0, 0, 6]];
+      assert m.upper_triangular?
+    end
+
+    def test_upper_triangular_0
+      m = Matrix[[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+      assert m.upper_triangular?
+    end
+
+    def test_not_lower_triangular_1
+      m = Matrix[[1, 2, 3], [1, 4, 5], [0, 0, 6]];
+      refute m.upper_triangular?
+    end
+
+    def test_not_lower_triangular_2
+      m = Matrix[[1, 2, 3], [0, 4, 5], [2, 0, 6]];
+      refute m.upper_triangular?
+    end
+
+    def test_not_lower_triangular_3
+      m = Matrix[[1, 2, 3], [0, 4, 5], [0, 3, 6]];
+      refute m.upper_triangular?
+    end
   end
 end
