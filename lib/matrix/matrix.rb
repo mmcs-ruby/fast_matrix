@@ -61,48 +61,61 @@ module FastMatrix
     #
     #   Matrix[ [1,2], [3,4] ].each { |e| puts e }
     #     # => prints the numbers 1 to 4
-     def each(which = :all)
+     def each(which = :all) 
         return to_enum :each, which unless block_given?
-        last = column_count - 1
         case which
         when :all
-         (0...row_count).each do |i|
-           (0...column_count).each do |j|
-             yield self[i, j]
-           end
-         end
+          (0...row_count).each do |i|
+            (0...column_count).each do |j|
+              yield self[i, j]
+            end
+          end
         when :diagonal
-          rows.each_with_index do |row, row_index|
-            yield row.fetch(row_index){return self}
+          (0...row_count).each do |i|
+            (0...column_count).each do |j|
+              if i == j
+                yield self[i, j]
+              end
+            end
           end
         when :off_diagonal
-          rows.each_with_index do |row, row_index|
-            column_count.times do |col_index|
-              yield row[col_index] unless row_index == col_index
+          (0...row_count).each do |i|
+            (0...column_count).each do |j|
+              if i != j
+                yield self[i, j]
+              end
             end
           end
         when :lower
-          rows.each_with_index do |row, row_index|
-            0.upto([row_index, last].min) do |col_index|
-              yield row[col_index]
+          (0...row_count).each do |i|
+            (0...column_count).each do |j|
+              if j <= i then
+                yield self[i, j]
+              end
             end
           end
         when :strict_lower
-          rows.each_with_index do |row, row_index|
-            [row_index, column_count].min.times do |col_index|
-              yield row[col_index]
+          (1...row_count).each do |i|
+            (0...column_count).each do |j|
+              if j < i then
+                yield self[i, j]
+              end
             end
           end
         when :strict_upper
-          rows.each_with_index do |row, row_index|
-            (row_index+1).upto(last) do |col_index|
-              yield row[col_index]
+          (0...row_count).each do |i|
+            (1...column_count).each do |j|
+              if j > i then
+                yield self[i, j]
+              end
             end
           end
         when :upper
-          rows.each_with_index do |row, row_index|
-            row_index.upto(last) do |col_index|
-              yield row[col_index]
+          (0...row_count).each do |i|
+            (0...column_count).each do |j|
+              if j >= i then
+                yield self[i, j]
+              end
             end
           end
         else
@@ -110,7 +123,6 @@ module FastMatrix
         end
         self
       end
-
     #
     # Same as #each, but the row index and column index in addition to the element
     #
