@@ -280,5 +280,45 @@ module FastMatrixTest
       m = Matrix[[1, 2, 3], [0, 4, 5], [0, 3, 6]];
       refute m.upper_triangular?
     end
+
+    def test_permutation_1
+      m = Matrix[
+        [1, 0, 0, 0],
+        [0, 0, 0, 1],
+        [0, 1, 0, 0],
+        [0, 0, 1, 0], 
+      ]
+      assert m.permutation?
+    end
+
+    def test_permutation_2
+      m = Matrix[
+        [0, 0, 0, 1],
+        [1, 0, 0, 0],
+        [0, 0, 1, 0],
+        [0, 1, 0, 0], 
+      ]
+      assert m.permutation?
+    end
+
+    def test_not_permutation_1
+      m = Matrix[
+        [0, 0, 0, 1],
+        [0, 0, 2, 0],
+        [1, 0, 0, 0],
+        [0, 1, 0, 0], 
+      ]
+      refute m.permutation?
+    end
+
+    def test_not_permutation_2
+      m = Matrix[
+        [0, 0, 0, 1],
+        [0, 1, 0, 0],
+        [0, 0, 0, 1],
+        [0, 1, 0, 0], 
+      ]
+      refute m.permutation?
+    end
   end
 end

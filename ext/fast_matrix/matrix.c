@@ -1206,6 +1206,70 @@ VALUE upper_triangular(VALUE self)
     return Qfalse;
 }
 
+#define RETURN_MP_AND_FF(value)\
+{                   \
+    free(f);        \
+    return value;   \
+}
+
+bool matrix_permutation(int n, const double* A)
+{
+    bool* f = malloc(n * sizeof(bool));
+    for(int i = 0; i < n; ++i)
+        f[i] = false;
+    
+    bool result;
+    for(int i = 0; i < n; ++i)
+    {
+        const double* line = A + n * i; 
+        result = false;
+        for(int j = 0; j < n; ++j)
+        {
+            double v = line[j];
+            if(v == 0)
+                continue;
+
+            if(v != 1 || result || f[j])
+            {    
+                result = false;
+                break;
+            }
+            
+            result = f[j] = true;
+        }
+        if(!result)
+            break;
+    }
+
+    if(result)
+        for(int i = 0; i < n; ++i)
+            if(!f[i])
+            {
+                result = false;
+                break;
+            }
+    free(f);
+    return result;
+}
+
+#undef RETURN_MP_AND_FF
+
+VALUE permutation(VALUE self)
+{
+	struct matrix* A;
+	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
+    
+    int m = A->m;
+    int n = A->n;
+
+    if(m != n)
+        rb_raise(fm_eIndexError, "Expected square matrix");
+
+    if(matrix_permutation(n, A->data))
+        return Qtrue;
+    return Qfalse;
+}
+
 void init_fm_matrix()
 {
     VALUE  mod = rb_define_module("FastMatrix");
@@ -1247,6 +1311,7 @@ void init_fm_matrix()
     rb_define_method(cMatrix, "round", matrix_round, -1);
     rb_define_method(cMatrix, "lower_triangular?", lower_triangular, 0);
     rb_define_method(cMatrix, "upper_triangular?", upper_triangular, 0);
+    rb_define_method(cMatrix, "permutation?", permutation, 0);
     rb_define_module_function(cMatrix, "vstack", vstack, -1);
     rb_define_module_function(cMatrix, "hstack", hstack, -1);
     rb_define_module_function(cMatrix, "scalar", scalar, 2);
