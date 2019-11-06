@@ -39,6 +39,10 @@ module FastMatrix
     alias to_str to_s
     alias inspect to_str
 
+    def to_a
+      rows.collect(&:dup)
+    end
+    
     #
     # Create fast matrix from standard matrix
     #
@@ -57,13 +61,56 @@ module FastMatrix
     #
     #   Matrix[ [1,2], [3,4] ].each { |e| puts e }
     #     # => prints the numbers 1 to 4
-    def each(&block)
-      raise NotSupportedError unless block_given?
-
-      each_with_index { |elem, _, _| block.call(elem) }
-      self
-    end
-
+     def each(which = :all) # :yield: e
+        return to_enum :each, which unless block_given?
+        case which
+        when :all
+          (0...row_count).each do |i|
+            (0...column_count).each do |j|
+              yield self[i, j]
+            end
+          end
+        when :diagonal
+          (0...[row_count, column_count].min).each do |i|
+                yield self[i, i]
+          end
+        when :off_diagonal
+          (0...row_count).each do |i|
+            (0...column_count).each do |j|
+              if i != j
+                yield self[i, j]
+              end
+            end
+          end
+        when :lower
+          (0...row_count).each do |i|
+            (0..[i,column_count-1].min).each do |j|
+              yield self[i, j]
+            end
+          end
+        when :strict_lower
+          (1...row_count).each do |i|
+            (0...[i,column_count].min).each do |j|
+                yield self[i, j]
+            end
+          end
+        when :strict_upper
+          (0...row_count).each do |i|
+            (i+1...column_count).each do |j|
+              yield self[i, j]
+            end
+          end
+        when :upper
+          (0...row_count).each do |i|
+            (i...column_count).each do |j|
+              yield self[i, j]
+            end
+          end
+        else
+          raise ArgumentError, "expected #{which.inspect} to be one of :all, :diagonal, :off_diagonal, :lower, :strict_lower, :strict_upper or :upper"
+        end
+        self
+      end
     #
     # Same as #each, but the row index and column index in addition to the element
     #
