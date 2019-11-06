@@ -72,11 +72,7 @@ module FastMatrix
           end
         when :diagonal
           (0...row_count).each do |i|
-            (0...column_count).each do |j|
-              if i == j
-                yield self[i, j]
-              end
-            end
+                yield self[i, i]
           end
         when :off_diagonal
           (0...row_count).each do |i|
@@ -88,34 +84,26 @@ module FastMatrix
           end
         when :lower
           (0...row_count).each do |i|
-            (0...column_count).each do |j|
-              if j <= i then
-                yield self[i, j]
-              end
+            (0..i).each do |j|
+              yield self[i, j]
             end
           end
         when :strict_lower
           (1...row_count).each do |i|
-            (0...column_count).each do |j|
-              if j < i then
+            (0...i).each do |j|
                 yield self[i, j]
-              end
             end
           end
         when :strict_upper
           (0...row_count).each do |i|
-            (1...column_count).each do |j|
-              if j > i then
-                yield self[i, j]
-              end
+            (i+1...column_count).each do |j|
+              yield self[i, j]
             end
           end
         when :upper
           (0...row_count).each do |i|
-            (0...column_count).each do |j|
-              if j >= i then
-                yield self[i, j]
-              end
+            (i...column_count).each do |j|
+              yield self[i, j]
             end
           end
         else
