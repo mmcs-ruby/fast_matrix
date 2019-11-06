@@ -61,7 +61,7 @@ module FastMatrix
     #
     #   Matrix[ [1,2], [3,4] ].each { |e| puts e }
     #     # => prints the numbers 1 to 4
-     def each(which = :all) 
+     def each(which = :all) # :yield: e
         return to_enum :each, which unless block_given?
         case which
         when :all
@@ -71,7 +71,7 @@ module FastMatrix
             end
           end
         when :diagonal
-          (0...row_count).each do |i|
+          (0...[row_count, column_count].min).each do |i|
                 yield self[i, i]
           end
         when :off_diagonal
@@ -84,13 +84,13 @@ module FastMatrix
           end
         when :lower
           (0...row_count).each do |i|
-            (0..i).each do |j|
+            (0..[i,column_count-1].min).each do |j|
               yield self[i, j]
             end
           end
         when :strict_lower
           (1...row_count).each do |i|
-            (0...i).each do |j|
+            (0...[i,column_count].min).each do |j|
                 yield self[i, j]
             end
           end
