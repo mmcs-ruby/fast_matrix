@@ -154,39 +154,109 @@ module FastMatrixTest
       refute m.zero?
     end
     
-    def test_each_all
-      m = Matrix[ [1,2], [3,4] ]
+    def test_each_all_sq
+      m = Matrix[[1, 2], [3, 4]]
      assert_equal [1, 2, 3, 4], m.each(:all).to_a
     end
 
-    def test_each_diagonal
-      m = Matrix[ [1,2], [3,4] ]
+    def test_each_all_rec1
+      m = Matrix[[1, 2], [3, 4], [5, 6]]
+      assert_equal [1, 2, 3, 4, 5, 6], m.each(:all).to_a
+    end
+
+    def test_each_all_rec2
+      m = Matrix[[1, 2, 3], [4, 5, 6]]
+      assert_equal [1, 2, 3, 4, 5, 6], m.each(:all).to_a
+    end
+
+    def test_each_diagonal_sq
+      m = Matrix[[1, 2], [3, 4]]
       assert_equal [1, 4], m.each(:diagonal).to_a
     end
 
-    def test_each_off_diagonal
-      m = Matrix[ [1,2], [3,4] ]
+    def test_each_diagonal_rec1
+      m = Matrix[[1, 2], [3, 4], [5, 6]]
+      assert_equal [1, 4], m.each(:diagonal).to_a
+    end
+
+    def test_each_diagonal_rec2
+      m = Matrix[[1, 2, 3], [4, 5, 6]]
+      assert_equal [1, 5], m.each(:diagonal).to_a
+    end
+
+    def test_each_off_diagonal_sq
+      m = Matrix[[1, 2], [3, 4]]
       assert_equal [2, 3], m.each(:off_diagonal).to_a
     end
 
-    def test_each_lower
-      m = Matrix[ [1,2], [3,4] ]
+    def test_each_off_diagonal_rec1
+      m = Matrix[[1, 2], [3, 4], [5, 6]]
+      assert_equal [2, 3, 5, 6], m.each(:off_diagonal).to_a
+    end
+
+    def test_each_off_diagonal_rec2
+      m = Matrix[[1, 2, 3], [4, 5, 6]]
+      assert_equal [2, 3, 4, 6], m.each(:off_diagonal).to_a
+    end
+
+    def test_each_lower_sq
+      m = Matrix[[1, 2], [3, 4]]
       assert_equal [1, 3, 4], m.each(:lower).to_a
     end
 
-    def test_each_strict_lower
-      m = Matrix[ [1,2], [3,4] ]
+    def test_each_lower_rec1
+      m = Matrix[[1, 2], [3, 4], [5, 6]]
+      assert_equal [1, 3, 4, 5 ,6], m.each(:lower).to_a
+    end
+
+    def test_each_lower_rec2
+      m = Matrix[[1, 2, 3], [4, 5, 6]]
+      assert_equal [1, 4, 5], m.each(:lower).to_a
+    end
+
+    def test_each_strict_lower_sq
+      m = Matrix[[1, 2], [3, 4]]
       assert_equal [3], m.each(:strict_lower).to_a
     end
 
-    def test_each_upper
-      m = Matrix[ [1,2], [3,4] ]
+    def test_each_strict_lower_rec1
+      m = Matrix[[1, 2], [3, 4], [5, 6]]
+      assert_equal [3, 5, 6], m.each(:strict_lower).to_a
+    end
+
+    def test_each_strict_lower_rec2
+      m = Matrix[[1, 2, 3], [4, 5, 6]]
+      assert_equal [4], m.each(:strict_lower).to_a
+    end
+
+    def test_each_upper_sq
+      m = Matrix[[1, 2], [3, 4]]
       assert_equal [1, 2, 4], m.each(:upper).to_a
     end
 
-    def test_each_strict_upper
-      m = Matrix[ [1,2], [3,4] ]
+    def test_each_upper_rec1
+      m = Matrix[[1, 2], [3, 4], [5, 6]]
+      assert_equal [1, 2, 4], m.each(:upper).to_a,
+    end
+
+    def test_each_upper_rec2
+      m = Matrix[[1, 2, 3], [4, 5, 6]]
+      assert_equal [1, 2, 3, 5, 6], m.each(:upper).to_a
+    end
+
+    def test_each_strict_upper_sq
+      m = Matrix[[1, 2], [3, 4]]
       assert_equal [2], m.each(:strict_upper).to_a
+    end
+
+    def test_each_strict_upper_rec1
+      m = Matrix[[1, 2], [3, 4], [5, 6]]
+      assert_equal [2], m.each(:strict_upper).to_a
+    end
+
+    def test_each_strict_upper_rec2
+      m = Matrix[[1, 2, 3], [4, 5, 6]]
+      assert_equal [2, 3, 6], m.each(:strict_upper).to_a 
     end
     
   end
