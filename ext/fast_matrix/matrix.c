@@ -1206,11 +1206,6 @@ VALUE upper_triangular(VALUE self)
     return Qfalse;
 }
 
-#define RETURN_MP_AND_FF(value)\
-{                   \
-    free(f);        \
-    return value;   \
-}
 
 bool matrix_permutation(int n, const double* A)
 {
@@ -1252,8 +1247,6 @@ bool matrix_permutation(int n, const double* A)
     return result;
 }
 
-#undef RETURN_MP_AND_FF
-
 VALUE permutation(VALUE self)
 {
 	struct matrix* A;
@@ -1266,6 +1259,46 @@ VALUE permutation(VALUE self)
         rb_raise(fm_eIndexError, "Expected square matrix");
 
     if(matrix_permutation(n, A->data))
+        return Qtrue;
+    return Qfalse;
+}
+
+bool matrix_identity(int n, const double* A)
+{
+    for(int i = 0; i < n; ++i)
+    {
+        const double* p_a = A + i * n;
+        for(int j = 0; j < n; ++j)
+            if(i == j)
+            { if(p_a[j] != 1) return false; }
+            else
+            { if(p_a[j] != 0) return false; }
+    }
+    return true;
+} 
+
+VALUE orthogonal(VALUE self)
+{
+	struct matrix* A;
+	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
+    
+    int m = A->m;
+    int n = A->n;
+
+    if(m != n)
+        rb_raise(fm_eIndexError, "Expected square matrix");
+    
+    double* B = malloc(sizeof(double) * n * n);
+    double* C = malloc(sizeof(double) * n * n);
+
+    matrix_transpose(n, n, A->data, B);
+    fill_d_array(n * n, C, 0);
+    recursive_strassen(n, n, n, A->data, B, C);
+    bool result = matrix_identity(n, C);
+
+    free(B);
+    free(C);
+    if(result)
         return Qtrue;
     return Qfalse;
 }
@@ -1312,6 +1345,7 @@ void init_fm_matrix()
     rb_define_method(cMatrix, "lower_triangular?", lower_triangular, 0);
     rb_define_method(cMatrix, "upper_triangular?", upper_triangular, 0);
     rb_define_method(cMatrix, "permutation?", permutation, 0);
+    rb_define_method(cMatrix, "orthogonal?", orthogonal, 0);
     rb_define_module_function(cMatrix, "vstack", vstack, -1);
     rb_define_module_function(cMatrix, "hstack", hstack, -1);
     rb_define_module_function(cMatrix, "scalar", scalar, 2);

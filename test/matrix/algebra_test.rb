@@ -320,5 +320,20 @@ module FastMatrixTest
       ]
       refute m.permutation?
     end
+
+    def test_orthogonal?
+      m = Matrix[[0.96, -0.28], [0.28, 0.96]]
+      assert m.orthogonal?
+    end
+
+    def test_not_orthogonal?
+      m = Matrix[[1, 1], [0, 1]]
+      refute m.orthogonal?
+    end
+
+    def test_orthogonal_error
+      m = Matrix[[1, 1, 1], [1, 1, 1]]
+      assert_raises(IndexError) { m.orthogonal? }
+    end
   end
 end
