@@ -236,7 +236,7 @@ module FastMatrixTest
 
     def test_each_upper_rec1
       m = Matrix[[1, 2], [3, 4], [5, 6]]
-      assert_equal [1, 2, 4], m.each(:upper).to_a,
+      assert_equal [1, 2, 4], m.each(:upper).to_a
     end
 
     def test_each_upper_rec2
