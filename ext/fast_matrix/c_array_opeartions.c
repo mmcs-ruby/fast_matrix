@@ -95,33 +95,9 @@ void swap_d_arrays(int len, double* A, double* B)
     }
 }
 
-inline double round_acc(double v, double deg)
-{
-    v = v * deg;
-    return roundf(v) / deg;
-}
-
-int in_deg(int acc)
-{
-    if(acc == 1)
-        return 10;
-    return in_deg(acc / 2) * in_deg(acc - acc / 2);
-}
-
 void round_d_array(int len, const double* Input, double* Output, int acc)
 {
-    if(acc == 0)
-        for(int i = 0; i < len; ++i)
-            Output[i] = roundf(Input[i]);
-    else if(acc > 0)
-    {
-        int d = in_deg(acc);
-        for(int i = 0; i < len; ++i)
-            Output[i] = roundf(Input[i] * d) / d;
-    }else
-    {
-        int d = in_deg(-acc);
-        for(int i = 0; i < len; ++i)
-            Output[i] = roundf(Input[i] / d) * d;
-    }
+    int d = pow(10, acc);
+    for(int i = 0; i < len; ++i)
+        Output[i] = roundf(Input[i] * d) / d;
 }
