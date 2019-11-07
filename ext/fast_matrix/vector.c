@@ -303,6 +303,41 @@ VALUE vector_multiply(VALUE self, VALUE v)
     rb_raise(fm_eTypeError, "Invalid klass for multiply");
 }
 
+double vector_magnitude(int n, const double* A)
+{
+    double sum = 0;
+    for(int i = 0; i < n; ++i)
+        sum += A[i] * A[i];
+    return sqrt(sum);
+}
+
+VALUE magnitude(VALUE self)
+{
+    struct vector* A;
+    TypedData_Get_Struct(self, struct vector, &vector_type, A);
+    return DBL2NUM(vector_magnitude(A->n, A->data));
+}
+
+void vector_normalize(int n, const double* A, double* B)
+{
+    double m = vector_magnitude(n, A);
+    for(int i = 0; i < n; ++i)
+        B[i] = A[i] / m;
+}
+
+VALUE normalize(VALUE self)
+{
+    struct vector* A;
+    TypedData_Get_Struct(self, struct vector, &vector_type, A);
+
+    struct vector* R;
+    VALUE result = TypedData_Make_Struct(cVector, struct vector, &vector_type, R);
+    c_vector_init(R, A->n);
+    vector_normalize(A->n, A->data, R->data);
+
+    return result;
+}
+
 void init_fm_vector()
 {
     VALUE  mod = rb_define_module("FastMatrix");
@@ -320,5 +355,7 @@ void init_fm_vector()
 	rb_define_method(cVector, "-=", vector_sub_from, 1);
 	rb_define_method(cVector, "eql?", vector_equal, 1);
 	rb_define_method(cVector, "clone", vector_copy, 0);
+	rb_define_method(cVector, "magnitude", magnitude, 0);
+	rb_define_method(cVector, "normalize", normalize, 0);
 	rb_define_method(cVector, "*", vector_multiply, 1);
 }

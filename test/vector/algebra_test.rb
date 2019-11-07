@@ -80,5 +80,27 @@ module FastVectorTest
       n = FastMatrix::Vector[1, 4, 5]
       refute m.eql?(n)
     end
+
+    def test_magnitude5
+      v = Vector[1, 2, 1, 3, 1]
+      assert_equal 4, v.magnitude
+    end
+
+    def test_magnitude2
+      v = Vector[3, 4]
+      assert_equal 5, v.magnitude
+    end
+
+    def test_normalize5
+      v1 = Vector[1, 2, 1, 3, 1]
+      v2 = Vector[0.25, 0.5, 0.25, 0.75, 0.25]
+      assert_equal v2, v1.normalize
+    end
+
+    def test_normalize2
+      v1 = Vector[3, 4]
+      v2 = Vector[0.6, 0.8]
+      assert_equal v2, v1.normalize
+    end
   end
 end
