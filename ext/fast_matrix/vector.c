@@ -325,6 +325,13 @@ void vector_normalize(int n, const double* A, double* B)
         B[i] = A[i] / m;
 }
 
+void vector_normalize_self(int n, double* A)
+{
+    double m = vector_magnitude(n, A);
+    for(int i = 0; i < n; ++i)
+        A[i] = A[i] / m;
+}
+
 VALUE normalize(VALUE self)
 {
     struct vector* A;
@@ -336,6 +343,33 @@ VALUE normalize(VALUE self)
     vector_normalize(A->n, A->data, R->data);
 
     return result;
+}
+
+VALUE normalize_self(VALUE self)
+{
+    struct vector* A;
+    TypedData_Get_Struct(self, struct vector, &vector_type, A);
+    vector_normalize_self(A->n, A->data);
+    return self;
+}
+
+VALUE vactor_minus(VALUE self)
+{
+    struct vector* A;
+    TypedData_Get_Struct(self, struct vector, &vector_type, A);
+
+    struct vector* R;
+    VALUE result = TypedData_Make_Struct(cVector, struct vector, &vector_type, R);
+    c_vector_init(R, A->n);
+
+    multiply_d_array_to_result(A->n, A->data, -1, R->data);
+
+    return result;
+}
+
+VALUE vector_plus(VALUE self)
+{
+    return self;
 }
 
 void init_fm_vector()
@@ -357,5 +391,8 @@ void init_fm_vector()
 	rb_define_method(cVector, "clone", vector_copy, 0);
 	rb_define_method(cVector, "magnitude", magnitude, 0);
 	rb_define_method(cVector, "normalize", normalize, 0);
+	rb_define_method(cVector, "normalize!", normalize_self, 0);
+    rb_define_method(cVector, "-@", vactor_minus, 0);
+    rb_define_method(cVector, "+@", vector_plus, 0);
 	rb_define_method(cVector, "*", vector_multiply, 1);
 }

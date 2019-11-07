@@ -102,5 +102,43 @@ module FastVectorTest
       v2 = Vector[0.6, 0.8]
       assert_equal v2, v1.normalize
     end
+
+    def test_normalize5!
+      v1 = Vector[1, 2, 1, 3, 1]
+      v2 = Vector[0.25, 0.5, 0.25, 0.75, 0.25]
+      v1.normalize!
+      assert_equal v2, v1
+    end
+
+    def test_normalize2!
+      v1 = Vector[3, 4]
+      v2 = Vector[0.6, 0.8]
+      v1.normalize!
+      assert_equal v2, v1
+    end
+
+    def test_minus2
+      v1 = Vector[3, 4]
+      v2 = Vector[-3, -4]
+      assert_equal v2, -v1
+    end
+
+    def test_minus5
+      v1 = Vector[1, 2, 1, 3, 1]
+      v2 = Vector[-1, -2, -1, -3, -1]
+      assert_equal v2, -v1
+    end
+
+    def test_minus2
+      v1 = Vector[3, 4]
+      v2 = Vector[3, 4]
+      assert_equal v2, +v1
+    end
+
+    def test_plus5
+        v1 = Vector[1, 2, 1, 3, 1]
+        v2 = Vector[1, 2, 1, 3, 1]
+        assert_equal v2, +v1
+    end
   end
 end

@@ -874,7 +874,7 @@ VALUE symmetric(VALUE self)
     return Qfalse;
 }
 
-VALUE minus(VALUE self)
+VALUE matrix_minus(VALUE self)
 {
 	struct matrix* A;
 	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
@@ -890,7 +890,7 @@ VALUE minus(VALUE self)
     return result;
 }
 
-VALUE plus(VALUE self)
+VALUE matrix_plus(VALUE self)
 {
     return self;
 }
@@ -1330,8 +1330,8 @@ void init_fm_matrix()
     rb_define_method(cMatrix, "eql?", matrix_equal, 1);
     rb_define_method(cMatrix, "antisymmetric?", antisymmetric, 0);
     rb_define_method(cMatrix, "symmetric?", symmetric, 0);
-    rb_define_method(cMatrix, "-@", minus, 0);
-    rb_define_method(cMatrix, "+@", plus, 0);
+    rb_define_method(cMatrix, "-@", matrix_minus, 0);
+    rb_define_method(cMatrix, "+@", matrix_plus, 0);
     rb_define_method(cMatrix, "column", column_vector, 1);
     rb_define_method(cMatrix, "row", row_vector, 1);
     rb_define_method(cMatrix, "diagonal?", diagonal, 0);
