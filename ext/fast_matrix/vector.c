@@ -461,6 +461,17 @@ VALUE vector_zero(VALUE self)
     return Qfalse;
 }
 
+VALUE vector_fill(VALUE self, VALUE value)
+{
+    double d = raise_rb_value_to_double(value);
+    struct vector* A;
+    TypedData_Get_Struct(self, struct vector, &vector_type, A);
+
+    fill_d_array(A->n, A->data, d);
+
+    return self;
+}
+
 void init_fm_vector()
 {
     VALUE  mod = rb_define_module("FastMatrix");
@@ -487,5 +498,6 @@ void init_fm_vector()
     rb_define_method(cVector, "to_matrix", to_matrix, 0);
     rb_define_method(cVector, "covector", covector, 0);
 	rb_define_method(cVector, "zero?", vector_zero, 0);
+	rb_define_method(cVector, "fill!", vector_fill, 1);
 	rb_define_module_function(cVector, "independent?", independent, -1);
 }

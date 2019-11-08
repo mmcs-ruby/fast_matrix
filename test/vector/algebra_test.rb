@@ -210,5 +210,12 @@ module FastVectorTest
       v = Vector[0, 0, 1, 0]
       refute v.zero?
     end
+
+    def test_fill!
+      v1 = Vector.new(5)
+      v1.fill!(3)
+      v2 = Vector[3, 3, 3, 3, 3]
+      assert_equal v2, v1
+    end
   end
 end
