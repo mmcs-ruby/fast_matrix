@@ -66,5 +66,10 @@ module FastMatrix
       end
       result
     end
+
+    def independent?(*vs)
+      vs << self
+      Vector.independent?(*vs)
+    end
   end
 end
