@@ -98,7 +98,7 @@ void swap_d_arrays(int len, double* A, double* B)
 
 void round_d_array(int len, const double* Input, double* Output, int acc)
 {
-    int d = pow(10, acc);
+    double d = pow(10, acc);
     for(int i = 0; i < len; ++i)
         Output[i] = roundf(Input[i] * d) / d;
 }

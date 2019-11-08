@@ -217,5 +217,23 @@ module FastVectorTest
       v2 = Vector[3, 3, 3, 3, 3]
       assert_equal v2, v1
     end
+
+    def test_round
+      v1 = Vector[0.5, 0.55, 0.41, 4, 11.11]
+      v2 = Vector[1, 1, 0, 4, 11]
+      assert_equal v2, v1.round
+    end
+    
+    def test_round_1
+      v1 = Vector[0.5, 0.55, 0.41, 4, 11.11]
+      v2 = Vector[0.5, 0.6, 0.4, 4, 11.1]
+      assert_equal v2, v1.round(1)
+    end
+
+    def test_round_not_1
+      v1 = Vector[0.5, 0.55, 0.41, 4, 11.11]
+      v2 = Vector[0, 0, 0, 0, 10]
+      assert_equal v2, v1.round(-1)
+    end
   end
 end
