@@ -176,5 +176,17 @@ module FastVectorTest
       v2 = Vector[2, 4, 6];
       assert_raises(IndexError) { v1.independent?(v2) }
     end
+
+    def test_to_matrix3
+      v = Vector[1, 2, 3]
+      m = Matrix[[1], [2], [3]]
+      assert_equal m, v.to_matrix
+    end
+
+    def test_to_matrix1
+      v = Vector[4]
+      m = Matrix[[4]]
+      assert_equal m, v.to_matrix
+    end
   end
 end
