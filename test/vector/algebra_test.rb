@@ -200,5 +200,15 @@ module FastVectorTest
       m = Matrix[[4]]
       assert_equal m, v.covector
     end
+
+    def test_zero?
+      v = Vector[0, 0, 0, 0]
+      assert v.zero?
+    end
+
+    def test_not_zero?
+      v = Vector[0, 0, 1, 0]
+      refute v.zero?
+    end
   end
 end
