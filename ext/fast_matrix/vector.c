@@ -372,6 +372,63 @@ VALUE vector_plus(VALUE self)
     return self;
 }
 
+struct vector** convert_vector_array(int argc, VALUE *argv, struct vector*** vcts)
+{
+    for(int i = 0; i < argc; ++i)
+        raise_check_rbasic(argv[i], cVector, "vector");
+    
+    *vcts = (struct vector**)malloc(argc * sizeof(struct vector*));
+
+    for(int i = 0; i < argc; ++i)
+	    TypedData_Get_Struct(argv[i], struct vector, &vector_type, (*vcts)[i]);
+}
+
+void vector_hstack(int m, int n, struct vector** vcts, double* C)
+{
+    for(int i = 0; i < n; ++i)
+    {
+        struct vector* V = vcts[i];
+        copy_d_array(m, V->data, C);
+        C += n;
+    }
+}
+
+bool vector_equal_by_size(int argc, struct vector** vcts)
+{
+    int n = vcts[0]->n;
+    for(int i = 1; i < argc; ++i)
+        if(n != vcts[i]->n)
+            return false;
+    return true;
+}
+
+VALUE independent(int argc, VALUE* argv, VALUE obj)
+{
+    if(argc == 0)
+        return Qtrue;
+    
+    struct vector** vcts;
+    convert_vector_array(argc, argv, &vcts);
+
+    if(!vector_equal_by_size(argc, vcts))
+    {
+        free(vcts);
+        rb_raise(fm_eIndexError, "Rows of different size");
+    }
+
+    int n = vcts[0]->n;
+
+    double* C = malloc(sizeof(double) * argc * n);
+    vector_hstack(n, argc, vcts, C);
+    int result = matrix_rank(n, argc, C);
+
+    free(vcts);
+    free(C);
+    if(result == argc)
+        return Qtrue;
+    return Qfalse;
+}
+
 void init_fm_vector()
 {
     VALUE  mod = rb_define_module("FastMatrix");
@@ -395,4 +452,5 @@ void init_fm_vector()
     rb_define_method(cVector, "-@", vactor_minus, 0);
     rb_define_method(cVector, "+@", vector_plus, 0);
 	rb_define_method(cVector, "*", vector_multiply, 1);
+	rb_define_module_function(cVector, "independent?", independent, -1);
 }

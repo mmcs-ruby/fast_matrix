@@ -140,5 +140,23 @@ module FastVectorTest
         v2 = Vector[1, 2, 1, 3, 1]
         assert_equal v2, +v1
     end
+
+    def test_independent
+      v1 = Vector[1, 2];
+      v2 = Vector[2, 2];
+      assert Vector.independent?(v1, v2)
+    end
+
+    def test_not_independent
+      v1 = Vector[1, 2];
+      v2 = Vector[2, 4];
+      refute Vector.independent?(v1, v2)
+    end
+
+    def test_independent_error
+      v1 = Vector[1, 2];
+      v2 = Vector[2, 4, 6];
+      assert_raises(IndexError) { Vector.independent?(v1, v2) }
+    end
   end
 end

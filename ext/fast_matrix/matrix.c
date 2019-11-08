@@ -1074,50 +1074,6 @@ VALUE matrix_zero(VALUE self)
     return Qfalse;
 }
 
-int matrix_rank(int m, int n, const double* C)
-{
-    double* A = malloc(sizeof(double) * m * n);
-    copy_d_array(m * n, C, A);
-
-    int i = 0;
-    int c_ptr = 0;
-    while(i < n && c_ptr < m)
-    {
-        double* line = A + c_ptr + i * m;
-        double val = line[0];
-        
-        if(val == 0)
-            for(int j = i + 1; j < n; ++j)
-                if(A[c_ptr + j * m] != 0)
-                {
-                    double* buf = A + c_ptr + j * m;
-                    swap_d_arrays(m - c_ptr, buf, line);
-                    val = line[0];
-                    break;
-                }
-
-        if(val == 0)
-        {
-            ++c_ptr;
-            continue;
-        }
-
-        for(int j = i + 1; j < n; ++j)
-        {
-            double* target = A + c_ptr + j * m;
-            double mul = target[0];
-            if(mul == 0)
-                continue;
-            for(int k = 1; k < m - c_ptr; ++k)
-                target[k] = val * target[k] - mul * line[k];
-        }
-        ++c_ptr;
-        ++i;
-    }
-    free(A);
-    return i;
-}
-
 VALUE rank(VALUE self)
 {
 	struct matrix* A;
