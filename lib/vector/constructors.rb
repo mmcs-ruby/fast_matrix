@@ -41,8 +41,7 @@ module FastMatrix
     #
     def self.zero(size)
       result = new(size)
-      result.each_with_index! { 0 }
-      result
+      result.fill!(0)
     end
 
     class << Vector
