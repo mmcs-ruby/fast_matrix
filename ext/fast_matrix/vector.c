@@ -440,6 +440,17 @@ VALUE to_matrix(VALUE self)
     copy_d_array(A->n, A->data, C->data);
     return result;
 }
+VALUE covector(VALUE self)
+{
+    struct vector* A;
+    TypedData_Get_Struct(self, struct vector, &vector_type, A);
+
+    struct matrix* C;
+    VALUE result = TypedData_Make_Struct(cMatrix, struct matrix, &matrix_type, C);
+    c_matrix_init(C, A->n, 1);
+    copy_d_array(A->n, A->data, C->data);
+    return result;
+}
 
 void init_fm_vector()
 {
@@ -465,5 +476,6 @@ void init_fm_vector()
     rb_define_method(cVector, "+@", vector_plus, 0);
 	rb_define_method(cVector, "*", vector_multiply, 1);
     rb_define_method(cVector, "to_matrix", to_matrix, 0);
+    rb_define_method(cVector, "covector", covector, 0);
 	rb_define_module_function(cVector, "independent?", independent, -1);
 }

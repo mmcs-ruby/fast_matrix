@@ -188,5 +188,17 @@ module FastVectorTest
       m = Matrix[[4]]
       assert_equal m, v.to_matrix
     end
+
+    def test_covector3
+      v = Vector[1, 2, 3]
+      m = Matrix[[1, 2, 3]]
+      assert_equal m, v.covector
+    end
+
+    def test_covector1
+      v = Vector[4]
+      m = Matrix[[4]]
+      assert_equal m, v.covector
+    end
   end
 end
