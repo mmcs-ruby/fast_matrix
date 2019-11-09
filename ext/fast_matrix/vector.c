@@ -517,6 +517,24 @@ VALUE inner_product(VALUE self, VALUE other)
     return DBL2NUM(result);
 }
 
+VALUE angle_with(VALUE self, VALUE other)
+{
+    raise_check_rbasic(other, cVector, "vector");
+	struct vector* A;
+    struct vector* B;
+	TypedData_Get_Struct(self, struct vector, &vector_type, A);
+	TypedData_Get_Struct(other, struct vector, &vector_type, B);
+
+    if(A->n != B->n)
+        rb_raise(fm_eTypeError, "Different lengths vectors");
+
+    double a = vector_magnitude(A->n, A->data);
+    double b = vector_magnitude(B->n, B->data);
+    double d = vector_inner_product(A->n, A->data, B->data);
+
+    return DBL2NUM(acos(d / (a * b)));
+}
+
 void init_fm_vector()
 {
     VALUE  mod = rb_define_module("FastMatrix");
@@ -546,5 +564,6 @@ void init_fm_vector()
 	rb_define_method(cVector, "fill!", vector_fill, 1);
 	rb_define_method(cVector, "round", vector_round, -1);
 	rb_define_method(cVector, "inner_product", inner_product, 1);
+	rb_define_method(cVector, "angle_with", angle_with, 1);
 	rb_define_module_function(cVector, "independent?", independent, -1);
 }

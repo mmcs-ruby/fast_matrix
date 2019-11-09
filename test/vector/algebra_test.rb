@@ -247,5 +247,17 @@ module FastVectorTest
       v2 = Vector[0, 4, 3]
       assert_equal 1, v1.inner_product(v2)
     end
+
+    def test_angle_with_90
+      v1 = Vector[1, 0]
+      v2 = Vector[0, 1]
+      assert_in_delta Math::PI / 2, v1.angle_with(v2), 1e-7
+    end
+
+    def test_angle_with_45
+      v1 = Vector[10, 0]
+      v2 = Vector[1, 1]
+      assert_in_delta Math::PI / 4, v1.angle_with(v2), 1e-7
+    end
   end
 end
