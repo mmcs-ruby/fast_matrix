@@ -235,5 +235,17 @@ module FastVectorTest
       v2 = Vector[0, 0, 0, 0, 10]
       assert_equal v2, v1.round(-1)
     end
+
+    def test_inner_product2
+      v1 = Vector[2, 5]
+      v2 = Vector[4, 7]
+      assert_equal 43, v1.inner_product(v2)
+    end
+
+    def test_inner_product3
+      v1 = Vector[2, 1, -1]
+      v2 = Vector[0, 4, 3]
+      assert_equal 1, v1.inner_product(v2)
+    end
   end
 end

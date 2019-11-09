@@ -494,6 +494,29 @@ VALUE vector_round(int argc, VALUE *argv, VALUE self)
     return result;
 }
 
+double vector_inner_product(int n, double* A, double* B)
+{
+    double sum = 0;
+    for(int i = 0; i < n; ++i)
+        sum += A[i] * B[i];
+    return sum;
+}
+
+VALUE inner_product(VALUE self, VALUE other)
+{
+    raise_check_rbasic(other, cVector, "vector");
+	struct vector* A;
+    struct vector* B;
+	TypedData_Get_Struct(self, struct vector, &vector_type, A);
+	TypedData_Get_Struct(other, struct vector, &vector_type, B);
+
+    if(A->n != B->n)
+        rb_raise(fm_eTypeError, "Different lengths vectors");
+
+    double result = vector_inner_product(A->n, A->data, B->data);
+    return DBL2NUM(result);
+}
+
 void init_fm_vector()
 {
     VALUE  mod = rb_define_module("FastMatrix");
@@ -522,5 +545,6 @@ void init_fm_vector()
 	rb_define_method(cVector, "zero?", vector_zero, 0);
 	rb_define_method(cVector, "fill!", vector_fill, 1);
 	rb_define_method(cVector, "round", vector_round, -1);
+	rb_define_method(cVector, "inner_product", inner_product, 1);
 	rb_define_module_function(cVector, "independent?", independent, -1);
 }
