@@ -26,9 +26,11 @@ module FastMatrix
     #
     # Returns a standard basis +n+-vector, where k is the index.
     #
-    #    Vector.basis(size, index) # => Vector[0, 1, 0]
+    #    Vector.basis(size:, index:) # => Vector[0, 1, 0]
     #
-    def self.basis(size, index)
+    def Vector.basis(size:, index:)
+      raise IndexError, "invalid size (#{size} for 1..)" if size < 1
+      raise IndexError, "invalid index (#{index} for 0...#{size})" unless 0 <= index && index < size    
       result = zero(size)
       result[index] = 1
       result

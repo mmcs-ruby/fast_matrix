@@ -33,11 +33,11 @@ module FastVectorTest
     end
 
     def test_basis1
-      assert_equal Vector[1, 0, 0, 0], Vector.basis(4, 0)
+      assert_equal Vector[1, 0, 0, 0], Vector.basis(size:4, index:0)
     end
 
     def test_basis2
-      assert_equal Vector[0, 1, 0], Vector.basis(3, 1)
+      assert_equal Vector[0, 1, 0], Vector.basis(size:3, index:1)
     end
 
     def test_zero
