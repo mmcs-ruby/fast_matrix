@@ -71,5 +71,9 @@ module FastMatrix
       vs << self
       Vector.independent?(*vs)
     end
+
+    def cross_product(*vs)
+      Vector.cross_product(self, *vs)
+    end
   end
 end

@@ -393,11 +393,10 @@ void vector_hstack(int m, int n, struct vector** vcts, double* C)
     }
 }
 
-bool vector_equal_by_size(int argc, struct vector** vcts)
+bool vector_equal_by_size(int argc, struct vector** vcts, int size)
 {
-    int n = vcts[0]->n;
-    for(int i = 1; i < argc; ++i)
-        if(n != vcts[i]->n)
+    for(int i = 0; i < argc; ++i)
+        if(size != vcts[i]->n)
             return false;
     return true;
 }
@@ -410,13 +409,13 @@ VALUE independent(int argc, VALUE* argv, VALUE obj)
     struct vector** vcts;
     convert_vector_array(argc, argv, &vcts);
 
-    if(!vector_equal_by_size(argc, vcts))
+    int n = vcts[0]->n;
+
+    if(!vector_equal_by_size(argc, vcts, n))
     {
         free(vcts);
         rb_raise(fm_eIndexError, "Rows of different size");
     }
-
-    int n = vcts[0]->n;
 
     double* C = malloc(sizeof(double) * argc * n);
     vector_hstack(n, argc, vcts, C);
@@ -535,6 +534,58 @@ VALUE angle_with(VALUE self, VALUE other)
     return DBL2NUM(acos(d / (a * b)));
 }
 
+void vector_cross_product(int argc, struct vector** vcts, double* R)
+{
+    int n = argc + 1;
+    double* rows = malloc(argc * n * sizeof(double));
+    double* M = malloc(argc * argc * sizeof(double));
+
+    for(int i = 0; i < argc; ++i)
+        for(int j = 0; j < n; ++j)
+            rows[i + j * argc] = vcts[i]->data[j];
+    
+    copy_d_array(argc * argc, rows + argc, M);
+
+    double* colM = M;
+    double* colR = rows;
+    int sign = (argc % 2 == 0) ? 1 : -1;
+    for(int i = 0; ; ++i)
+    {
+        R[i] = determinant(argc, M) * sign;
+        sign = - sign;
+        if(i == n - 1)
+            break;
+        copy_d_array(argc, colR, colM);
+        colM += argc;
+        colR += argc;
+    }
+
+    free(rows);
+    free(M);
+}
+
+VALUE cross_product(int argc, VALUE* argv, VALUE obj)
+{
+    struct vector** vcts;
+    convert_vector_array(argc, argv, &vcts);
+
+    int n = argc + 1;
+
+    if(!vector_equal_by_size(argc, vcts, n))
+    {
+        free(vcts);
+        rb_raise(fm_eIndexError, "Rows of different size");
+    }
+
+    struct vector* R;
+    VALUE result = TypedData_Make_Struct(cVector, struct vector, &vector_type, R);
+    c_vector_init(R, n);
+
+    vector_cross_product(argc, vcts, R->data);
+
+    return result;
+}
+
 void init_fm_vector()
 {
     VALUE  mod = rb_define_module("FastMatrix");
@@ -566,4 +617,5 @@ void init_fm_vector()
 	rb_define_method(cVector, "inner_product", inner_product, 1);
 	rb_define_method(cVector, "angle_with", angle_with, 1);
 	rb_define_module_function(cVector, "independent?", independent, -1);
+	rb_define_module_function(cVector, "cross_product", cross_product, -1);
 }

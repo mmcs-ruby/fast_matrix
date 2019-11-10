@@ -573,37 +573,6 @@ VALUE matrix_sub_from(VALUE self, VALUE value)
     return self;
 }
 
-double determinant(int n, const double* A)
-{
-    double* M = malloc(n * n * sizeof(double));
-    double det = 1;
-    copy_d_array(n * n, A, M);
-
-    for(int i = 0; i < n; ++i)
-    {
-        const double* line_p = M + i + i * n;
-        double current = *line_p; 
-        det *= current;
-
-        if(current == 0)
-        {
-            free(M);
-            return 0;
-        }
-
-        for(int j = i + 1; j < n; ++j)
-        {
-            double* t_line = M + i + j * n;
-            double head = *t_line;
-            for(int k = 1; k < n - i; ++k)
-                t_line[k] -= line_p[k] * head / current;
-        }
-    }
-
-    free(M);
-    return det;
-}
-
 VALUE matrix_determinant(VALUE self)
 {
     struct matrix* A;

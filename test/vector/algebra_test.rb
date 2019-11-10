@@ -259,5 +259,39 @@ module FastVectorTest
       v2 = Vector[1, 1]
       assert_in_delta Math::PI / 4, v1.angle_with(v2), 1e-7
     end
+
+    def test_cross_product2
+      v1 = Vector[1, 2]
+      v2 = Vector[-2, 1]
+      assert_equal v2, Vector.cross_product(v1)
+    end
+
+    def test_cross_product3
+      v1 = Vector[1, 0, 0]
+      v2 = Vector[0, 1, 0]
+      v3 = Vector[0, 0, 1]
+      assert_equal v3, Vector.cross_product(v1, v2)
+    end
+
+    def test_cross_product4
+      v1 = Vector[1, 0, 0, 0]
+      v2 = Vector[0, 1, 0, 0]
+      v3 = Vector[0, 0, 1, 0]
+      v4 = Vector[0, 0, 0, 1]
+      assert_equal v4, Vector.cross_product(v1, v2, v3)
+    end
+
+    def test_cross_product44
+      v1 = Vector[2, 1, 4, -2]
+      v2 = Vector[4, 1, 8, 0]
+      v3 = Vector[5, 5, 5, 5]
+      vv1 = v1.cross_product(v2, v3)
+
+      v1 = ::Vector[2, 1, 4, -2]
+      v2 = ::Vector[4, 1, 8, 0]
+      v3 = ::Vector[5, 5, 5, 5]
+      vv2 = v1.cross_product(v2, v3)
+      assert_equal vv2, vv1.convert
+    end
   end
 end

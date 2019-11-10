@@ -146,3 +146,45 @@ int matrix_rank(int m, int n, const double* C)
     free(A);
     return i;
 }
+
+double determinant(int n, const double* A)
+{
+    double* M = malloc(n * n * sizeof(double));
+    double det = 1;
+    copy_d_array(n * n, A, M);
+
+    for(int i = 0; i < n; ++i)
+    {
+        double* line_p = M + i + i * n;
+        double current = *line_p; 
+
+        if(current == 0)
+            for(int j = i + 1; j < n; ++j)
+                if(M[i + j * n] != 0)
+                {
+                    double* buf = M + i + j * n;
+                    swap_d_arrays(n - i, buf, line_p);
+                    current = line_p[0];
+                    det *= -1;
+                }
+
+        if(current == 0)
+        {
+            free(M);
+            return 0;
+        }
+
+        det *= current;
+
+        for(int j = i + 1; j < n; ++j)
+        {
+            double* t_line = M + i + j * n;
+            double head = *t_line;
+            for(int k = 1; k < n - i; ++k)
+                t_line[k] -= line_p[k] * head / current;
+        }
+    }
+
+    free(M);
+    return det;
+}
