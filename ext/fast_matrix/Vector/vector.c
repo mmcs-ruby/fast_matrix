@@ -1,10 +1,12 @@
 #include "Vector/vector.h"
+#include "Vector/errors.h"
+#include "Vector/helper.h"
+#include "Vector/c_vector.h"
+
 #include "Helper/c_array_operations.h"
 #include "Helper/errors.h"
 #include "Matrix/c_matrix.h"
 #include "Matrix/helper.h"
-#include "Vector/errors.h"
-#include "Vector/helper.h"
 
 VALUE cVector;
 
@@ -40,12 +42,6 @@ VALUE vector_alloc(VALUE self)
 	struct vector* vct = malloc(sizeof(struct vector));
     vct->data = NULL;
 	return TypedData_Wrap_Struct(self, &vector_type, vct);
-}
-
-void c_vector_init(struct vector* vect, int n)
-{
-    vect->n = n;
-    vect->data = malloc(n * sizeof(double));
 }
 
 VALUE vector_initialize(VALUE self, VALUE size)
@@ -89,7 +85,7 @@ VALUE vector_get(VALUE self, VALUE idx)
     return DBL2NUM(data->data[i]);
 }
 
-VALUE c_vector_size(VALUE self)
+VALUE vector_length(VALUE self)
 {
 	struct vector* data = get_vector_from_rb_value(self);
     return INT2NUM(data->n);
@@ -192,23 +188,6 @@ VALUE vector_copy(VALUE self)
     return result;
 }
 
-// V - vector n
-// M - matrix m x 1
-// R - matrix m x n
-void c_vector_matrix_multiply(int n, int m, const double* V, const double* M, double* R)
-{
-    fill_d_array(m * n, R, 0);
-
-    for(int j = 0; j < n; ++j)
-    {
-        double* p_r = R + m * j;
-        double d_v = V[j];
-        
-        for(int i = 0; i < m; ++i)
-            p_r[i] += d_v * M[i];
-    }
-}
-
 VALUE vector_multiply_vm(VALUE self, VALUE other)
 {
 	struct vector* V = get_vector_from_rb_value(self);
@@ -274,54 +253,33 @@ VALUE vector_multiply(VALUE self, VALUE v)
     rb_raise(fm_eTypeError, "Invalid klass for multiply");
 }
 
-double vector_magnitude(int n, const double* A)
-{
-    double sum = 0;
-    for(int i = 0; i < n; ++i)
-        sum += A[i] * A[i];
-    return sqrt(sum);
-}
-
-VALUE magnitude(VALUE self)
+VALUE vector_magnitude(VALUE self)
 {
 	struct vector* A = get_vector_from_rb_value(self);
-    return DBL2NUM(vector_magnitude(A->n, A->data));
+    return DBL2NUM(c_vector_magnitude(A->n, A->data));
 }
 
-void vector_normalize(int n, const double* A, double* B)
-{
-    double m = vector_magnitude(n, A);
-    for(int i = 0; i < n; ++i)
-        B[i] = A[i] / m;
-}
 
-void vector_normalize_self(int n, double* A)
-{
-    double m = vector_magnitude(n, A);
-    for(int i = 0; i < n; ++i)
-        A[i] = A[i] / m;
-}
-
-VALUE normalize(VALUE self)
+VALUE vector_normalize(VALUE self)
 {
 	struct vector* A = get_vector_from_rb_value(self);
 
     struct vector* R;
     VALUE result = TypedData_Make_Struct(cVector, struct vector, &vector_type, R);
     c_vector_init(R, A->n);
-    vector_normalize(A->n, A->data, R->data);
+    c_vector_normalize(A->n, A->data, R->data);
 
     return result;
 }
 
-VALUE normalize_self(VALUE self)
+VALUE vector_normalize_self(VALUE self)
 {
 	struct vector* A = get_vector_from_rb_value(self);
-    vector_normalize_self(A->n, A->data);
+    c_vector_normalize_self(A->n, A->data);
     return self;
 }
 
-VALUE vactor_minus(VALUE self)
+VALUE vector_minus(VALUE self)
 {
 	struct vector* A = get_vector_from_rb_value(self);
 
@@ -350,25 +308,8 @@ struct vector** convert_vector_array(int argc, VALUE *argv, struct vector*** vct
 	    TypedData_Get_Struct(argv[i], struct vector, &vector_type, (*vcts)[i]);
 }
 
-void vector_hstack(int m, int n, struct vector** vcts, double* C)
-{
-    for(int i = 0; i < n; ++i)
-    {
-        struct vector* V = vcts[i];
-        copy_d_array(m, V->data, C);
-        C += n;
-    }
-}
 
-bool vector_equal_by_size(int argc, struct vector** vcts, int size)
-{
-    for(int i = 0; i < argc; ++i)
-        if(size != vcts[i]->n)
-            return false;
-    return true;
-}
-
-VALUE independent(int argc, VALUE* argv, VALUE obj)
+VALUE vector_independent(int argc, VALUE* argv, VALUE obj)
 {
     if(argc == 0)
         return Qtrue;
@@ -378,14 +319,14 @@ VALUE independent(int argc, VALUE* argv, VALUE obj)
 
     int n = vcts[0]->n;
 
-    if(!vector_equal_by_size(argc, vcts, n))
+    if(!c_vector_equal_by_size(argc, vcts, n))
     {
         free(vcts);
         rb_raise(fm_eIndexError, "Rows of different size");
     }
 
     double* C = malloc(sizeof(double) * argc * n);
-    vector_hstack(n, argc, vcts, C);
+    c_vector_hstack(n, argc, vcts, C);
     int result = c_matrix_rank(n, argc, C);
 
     free(vcts);
@@ -395,7 +336,7 @@ VALUE independent(int argc, VALUE* argv, VALUE obj)
     return Qfalse;
 }
 
-VALUE to_matrix(VALUE self)
+VALUE vector_to_matrix(VALUE self)
 {
 	struct vector* A = get_vector_from_rb_value(self);
 
@@ -405,7 +346,7 @@ VALUE to_matrix(VALUE self)
     copy_d_array(A->n, A->data, C->data);
     return result;
 }
-VALUE covector(VALUE self)
+VALUE vector_covector(VALUE self)
 {
 	struct vector* A = get_vector_from_rb_value(self);
 
@@ -453,77 +394,39 @@ VALUE vector_round(int argc, VALUE *argv, VALUE self)
     return result;
 }
 
-double vector_inner_product(int n, double* A, double* B)
-{
-    double sum = 0;
-    for(int i = 0; i < n; ++i)
-        sum += A[i] * B[i];
-    return sum;
-}
-
-VALUE inner_product(VALUE self, VALUE other)
+VALUE vector_inner_product(VALUE self, VALUE other)
 {
     raise_check_rbasic(other, cVector, "vector");
 	struct vector* A = get_vector_from_rb_value(self);
 	struct vector* B = get_vector_from_rb_value(other);
     raise_check_equal_size_vectors(A, B);
 
-    double result = vector_inner_product(A->n, A->data, B->data);
+    double result = c_vector_inner_product(A->n, A->data, B->data);
     return DBL2NUM(result);
 }
 
-VALUE angle_with(VALUE self, VALUE other)
+VALUE vector_angle_with(VALUE self, VALUE other)
 {
     raise_check_rbasic(other, cVector, "vector");
 	struct vector* A = get_vector_from_rb_value(self);
 	struct vector* B = get_vector_from_rb_value(other);
     raise_check_equal_size_vectors(A, B);
 
-    double a = vector_magnitude(A->n, A->data);
-    double b = vector_magnitude(B->n, B->data);
-    double d = vector_inner_product(A->n, A->data, B->data);
+    double a = c_vector_magnitude(A->n, A->data);
+    double b = c_vector_magnitude(B->n, B->data);
+    double d = c_vector_inner_product(A->n, A->data, B->data);
 
     return DBL2NUM(acos(d / (a * b)));
 }
 
-void vector_cross_product(int argc, struct vector** vcts, double* R)
-{
-    int n = argc + 1;
-    double* rows = malloc(argc * n * sizeof(double));
-    double* M = malloc(argc * argc * sizeof(double));
-
-    for(int i = 0; i < argc; ++i)
-        for(int j = 0; j < n; ++j)
-            rows[i + j * argc] = vcts[i]->data[j];
-    
-    copy_d_array(argc * argc, rows + argc, M);
-
-    double* colM = M;
-    double* colR = rows;
-    int sign = (argc % 2 == 0) ? 1 : -1;
-    for(int i = 0; ; ++i)
-    {
-        R[i] = c_matrix_determinant(argc, M) * sign;
-        sign = - sign;
-        if(i == n - 1)
-            break;
-        copy_d_array(argc, colR, colM);
-        colM += argc;
-        colR += argc;
-    }
-
-    free(rows);
-    free(M);
-}
-
-VALUE cross_product(int argc, VALUE* argv, VALUE obj)
+VALUE vector_cross_product(int argc, VALUE* argv, VALUE obj)
 {
     struct vector** vcts;
     convert_vector_array(argc, argv, &vcts);
 
     int n = argc + 1;
 
-    if(!vector_equal_by_size(argc, vcts, n))
+    if(!c_vector_equal_by_size(argc, vcts, n))
     {
         free(vcts);
         rb_raise(fm_eIndexError, "Rows of different size");
@@ -533,7 +436,7 @@ VALUE cross_product(int argc, VALUE* argv, VALUE obj)
     VALUE result = TypedData_Make_Struct(cVector, struct vector, &vector_type, R);
     c_vector_init(R, n);
 
-    vector_cross_product(argc, vcts, R->data);
+    c_vector_cross_product(argc, vcts, R->data);
 
     return result;
 }
@@ -548,26 +451,26 @@ void init_fm_vector()
 	rb_define_method(cVector, "initialize", vector_initialize, 1);
 	rb_define_method(cVector, "[]", vector_get, 1);
 	rb_define_method(cVector, "[]=", vector_set, 2);
-	rb_define_method(cVector, "size", c_vector_size, 0);
+	rb_define_method(cVector, "size", vector_length, 0);
 	rb_define_method(cVector, "+", vector_add_with, 1);
 	rb_define_method(cVector, "+=", vector_add_from, 1);
 	rb_define_method(cVector, "-", vector_sub_with, 1);
 	rb_define_method(cVector, "-=", vector_sub_from, 1);
 	rb_define_method(cVector, "eql?", vector_equal, 1);
 	rb_define_method(cVector, "clone", vector_copy, 0);
-	rb_define_method(cVector, "magnitude", magnitude, 0);
-	rb_define_method(cVector, "normalize", normalize, 0);
-	rb_define_method(cVector, "normalize!", normalize_self, 0);
-    rb_define_method(cVector, "-@", vactor_minus, 0);
+	rb_define_method(cVector, "magnitude", vector_magnitude, 0);
+	rb_define_method(cVector, "normalize", vector_normalize, 0);
+	rb_define_method(cVector, "normalize!", vector_normalize_self, 0);
+    rb_define_method(cVector, "-@", vector_minus, 0);
     rb_define_method(cVector, "+@", vector_plus, 0);
 	rb_define_method(cVector, "*", vector_multiply, 1);
-    rb_define_method(cVector, "to_matrix", to_matrix, 0);
-    rb_define_method(cVector, "covector", covector, 0);
+    rb_define_method(cVector, "to_matrix", vector_to_matrix, 0);
+    rb_define_method(cVector, "covector", vector_covector, 0);
 	rb_define_method(cVector, "zero?", vector_zero, 0);
 	rb_define_method(cVector, "fill!", vector_fill, 1);
 	rb_define_method(cVector, "round", vector_round, -1);
-	rb_define_method(cVector, "inner_product", inner_product, 1);
-	rb_define_method(cVector, "angle_with", angle_with, 1);
-	rb_define_module_function(cVector, "independent?", independent, -1);
-	rb_define_module_function(cVector, "cross_product", cross_product, -1);
+	rb_define_method(cVector, "inner_product", vector_inner_product, 1);
+	rb_define_method(cVector, "angle_with", vector_angle_with, 1);
+	rb_define_module_function(cVector, "independent?", vector_independent, -1);
+	rb_define_module_function(cVector, "cross_product", vector_cross_product, -1);
 }

@@ -5,3 +5,4 @@
 #include "Matrix/c_matrix.c"
 
 #include "Vector/vector.c"
+#include "Vector/c_vector.c"
