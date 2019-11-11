@@ -1,9 +1,9 @@
 #ifndef FAST_MATRIX_H
 #define FAST_MATRIX_H 1
 
-#include "errors.h"
-#include "matrix.h"
-#include "vector.h"
+#include "Helper/errors.h"
+#include "Matrix/matrix.h"
+#include "Vector/vector.h"
 
 void Init_fast_matrix();
 

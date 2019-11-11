@@ -1,7 +1,7 @@
-#include "vector.h"
-#include "c_array_operations.h"
-#include "errors.h"
-#include "matrix.h"
+#include "Vector/vector.h"
+#include "Helper/c_array_operations.h"
+#include "Helper/errors.h"
+#include "Matrix/matrix.h"
 
 VALUE cVector;
 
