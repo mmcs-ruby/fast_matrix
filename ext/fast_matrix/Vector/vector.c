@@ -2,6 +2,7 @@
 #include "Helper/c_array_operations.h"
 #include "Helper/errors.h"
 #include "Matrix/matrix.h"
+#include "Vector/errors.h"
 
 VALUE cVector;
 
@@ -107,9 +108,7 @@ VALUE vector_add_with(VALUE self, VALUE value)
     struct vector* B;
 	TypedData_Get_Struct(self, struct vector, &vector_type, A);
 	TypedData_Get_Struct(value, struct vector, &vector_type, B);
-
-    if(A->n != B->n)
-        rb_raise(fm_eIndexError, "Different sizes matrices");
+    raise_check_equal_size_vectors(A, B);
 
     int n = A->n;
 
@@ -130,9 +129,7 @@ VALUE vector_add_from(VALUE self, VALUE value)
     struct vector* B;
 	TypedData_Get_Struct(self, struct vector, &vector_type, A);
 	TypedData_Get_Struct(value, struct vector, &vector_type, B);
-
-    if(A->n != B->n)
-        rb_raise(fm_eIndexError, "Different sizes matrices");
+    raise_check_equal_size_vectors(A, B);
 
     int n = A->n;
 
@@ -148,9 +145,7 @@ VALUE vector_sub_with(VALUE self, VALUE value)
     struct vector* B;
 	TypedData_Get_Struct(self, struct vector, &vector_type, A);
 	TypedData_Get_Struct(value, struct vector, &vector_type, B);
-
-    if(A->n != B->n)
-        rb_raise(fm_eIndexError, "Different sizes matrices");
+    raise_check_equal_size_vectors(A, B);
 
     int n = A->n;
 
@@ -171,9 +166,7 @@ VALUE vector_sub_from(VALUE self, VALUE value)
     struct vector* B;
 	TypedData_Get_Struct(self, struct vector, &vector_type, A);
 	TypedData_Get_Struct(value, struct vector, &vector_type, B);
-
-    if(A->n != B->n)
-        rb_raise(fm_eIndexError, "Different sizes matrices");
+    raise_check_equal_size_vectors(A, B);
 
     int n = A->n;
 
@@ -508,9 +501,7 @@ VALUE inner_product(VALUE self, VALUE other)
     struct vector* B;
 	TypedData_Get_Struct(self, struct vector, &vector_type, A);
 	TypedData_Get_Struct(other, struct vector, &vector_type, B);
-
-    if(A->n != B->n)
-        rb_raise(fm_eTypeError, "Different lengths vectors");
+    raise_check_equal_size_vectors(A, B);
 
     double result = vector_inner_product(A->n, A->data, B->data);
     return DBL2NUM(result);
@@ -523,9 +514,7 @@ VALUE angle_with(VALUE self, VALUE other)
     struct vector* B;
 	TypedData_Get_Struct(self, struct vector, &vector_type, A);
 	TypedData_Get_Struct(other, struct vector, &vector_type, B);
-
-    if(A->n != B->n)
-        rb_raise(fm_eTypeError, "Different lengths vectors");
+    raise_check_equal_size_vectors(A, B);
 
     double a = vector_magnitude(A->n, A->data);
     double b = vector_magnitude(B->n, B->data);
