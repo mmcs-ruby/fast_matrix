@@ -3,6 +3,8 @@
 #include "Helper/errors.h"
 #include "Vector/vector.h"
 #include "Matrix/errors.h"
+#include "Matrix/helper.h"
+#include "Vector/helper.h"
 
 VALUE cMatrix;
 
@@ -49,17 +51,14 @@ void c_matrix_init(struct matrix* mtr, int m, int n)
 
 VALUE matrix_initialize(VALUE self, VALUE rows_count, VALUE columns_count)
 {
-	struct matrix* data;
     int m = raise_rb_value_to_int(columns_count);
     int n = raise_rb_value_to_int(rows_count);
 
     if(m <= 0 || n <= 0)
         rb_raise(fm_eIndexError, "Size cannot be negative or zero");
 
-	TypedData_Get_Struct(self, struct matrix, &matrix_type, data);
-
+	struct matrix* data = get_matrix_from_rb_value(self);
     c_matrix_init(data, m, n);
-
 	return self;
 }
 
@@ -69,9 +68,7 @@ VALUE matrix_set(VALUE self, VALUE row, VALUE column, VALUE v)
     int m = raise_rb_value_to_int(column);
     int n = raise_rb_value_to_int(row);
     double x = raise_rb_value_to_double(v);
-
-	struct matrix* data;
-	TypedData_Get_Struct(self, struct matrix, &matrix_type, data);
+	struct matrix* data = get_matrix_from_rb_value(self);
     
     m = (m < 0) ? data->m + m : m;
     n = (n < 0) ? data->n + n : n;
@@ -88,9 +85,7 @@ VALUE matrix_get(VALUE self, VALUE row, VALUE column)
 {
     int m = raise_rb_value_to_int(column);
     int n = raise_rb_value_to_int(row);
-
-	struct matrix* data;
-	TypedData_Get_Struct(self, struct matrix, &matrix_type, data);
+	struct matrix* data = get_matrix_from_rb_value(self);
     
     m = (m < 0) ? data->m + m : m;
     n = (n < 0) ? data->n + n : n;
@@ -150,23 +145,14 @@ void c_matrix_vector_multiply(int n, int m, const double* M, const double* V, do
 
 VALUE matrix_multiply_mv(VALUE self, VALUE other)
 {
-    struct matrix* M;
-    struct vector* V;
-    TypedData_Get_Struct(self, struct matrix, &matrix_type, M);
-    TypedData_Get_Struct(other, struct vector, &vector_type, V);
+	struct matrix* M = get_matrix_from_rb_value(self);
+	struct vector* V = get_vector_from_rb_value(other);
 
     if(M->m != V->n)
         rb_raise(fm_eIndexError, "Matrix columns differs from vector size");
 
-    int m = M->m;
-    int n = M->n;
-
-    struct vector* R;
-    VALUE result = TypedData_Make_Struct(cVector, struct vector, &vector_type, R);
-
-    c_vector_init(R, n);
-    c_matrix_vector_multiply(n, m, M->data, V->data, R->data);
-
+    MAKE_VECTOR_AND_RB_VALUE(R, result, M->n);
+    c_matrix_vector_multiply(M->n, M->m, M->data, V->data, R->data);
     return result;
 }
 
@@ -375,10 +361,8 @@ void recursive_strassen(int n, int k, int m, const double* A, const double* B, d
 
 VALUE strassen(VALUE self, VALUE other)
 {
-	struct matrix* A;
-    struct matrix* B;
-	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
-	TypedData_Get_Struct(other, struct matrix, &matrix_type, B);
+	struct matrix* A = get_matrix_from_rb_value(self);
+	struct matrix* B = get_matrix_from_rb_value(other);
 
     if(A->m != B->n)
         rb_raise(fm_eIndexError, "First columns differs from second rows");
@@ -387,21 +371,17 @@ VALUE strassen(VALUE self, VALUE other)
     int k = A->m;
     int n = A->n;
 
-    struct matrix* C;
-    VALUE result = TypedData_Make_Struct(cMatrix, struct matrix, &matrix_type, C);
-
-    c_matrix_init(C, m, n);
+    MAKE_MATRIX_AND_RB_VALUE(C, result, m, n);
     fill_d_array(m * n, C->data, 0);
+
     recursive_strassen(n, k, m, A->data, B->data, C->data);
     return result;
 }
 
 VALUE matrix_multiply_mm(VALUE self, VALUE other)
 {
-	struct matrix* A;
-    struct matrix* B;
-	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
-	TypedData_Get_Struct(other, struct matrix, &matrix_type, B);
+	struct matrix* A = get_matrix_from_rb_value(self);
+	struct matrix* B = get_matrix_from_rb_value(other);
 
     if(A->m != B->n)
         rb_raise(fm_eIndexError, "First columns differs from second rows");
@@ -410,10 +390,7 @@ VALUE matrix_multiply_mm(VALUE self, VALUE other)
     int k = A->m;
     int n = A->n;
 
-    struct matrix* C;
-    VALUE result = TypedData_Make_Struct(cMatrix, struct matrix, &matrix_type, C);
-
-    c_matrix_init(C, m, n);
+    MAKE_MATRIX_AND_RB_VALUE(C, result, m, n);
     c_matrix_multiply(n, k, m, A->data, B->data, C->data);
 
     return result;
@@ -421,15 +398,10 @@ VALUE matrix_multiply_mm(VALUE self, VALUE other)
 
 VALUE matrix_multiply_mn(VALUE self, VALUE value)
 {
-	struct matrix* A;
-	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
-
     double d = NUM2DBL(value);
+	struct matrix* A = get_matrix_from_rb_value(self);
 
-    struct matrix* R;
-    VALUE result = TypedData_Make_Struct(cMatrix, struct matrix, &matrix_type, R);
-
-    c_matrix_init(R, A->m, A->n);
+    MAKE_MATRIX_AND_RB_VALUE(R, result, A->m, A->n);
     copy_d_array(A->m * A->n, A->data, R->data);
     multiply_d_array(R->m * R->n, R->data, d);
 
@@ -448,199 +420,132 @@ VALUE matrix_multiply(VALUE self, VALUE v)
     rb_raise(fm_eTypeError, "Invalid klass for multiply");
 }
 
-VALUE matrix_copy(VALUE mtrx)
+VALUE matrix_copy(VALUE self)
 {
-	struct matrix* M;
-	TypedData_Get_Struct(mtrx, struct matrix, &matrix_type, M);
-
-    struct matrix* R;
-    VALUE result = TypedData_Make_Struct(cMatrix, struct matrix, &matrix_type, R);
-
-    c_matrix_init(R, M->m, M->n);
+	struct matrix* M = get_matrix_from_rb_value(self);
+    MAKE_MATRIX_AND_RB_VALUE(R, result, M->m, M->n);
     copy_d_array(M->m * M->n, M->data, R->data);
-
     return result;
 }
 
 VALUE row_size(VALUE self)
 {
-	struct matrix* data;
-	TypedData_Get_Struct(self, struct matrix, &matrix_type, data);
+	struct matrix* data = get_matrix_from_rb_value(self);
     return INT2NUM(data->m);
 }
 
 VALUE column_size(VALUE self)
 {
-	struct matrix* data;
-	TypedData_Get_Struct(self, struct matrix, &matrix_type, data);
+	struct matrix* data = get_matrix_from_rb_value(self);
     return INT2NUM(data->n);
 }
 
 VALUE transpose(VALUE self)
 {
-	struct matrix* M;
-	TypedData_Get_Struct(self, struct matrix, &matrix_type, M);
-
-    struct matrix* R;
-    VALUE result = TypedData_Make_Struct(cMatrix, struct matrix, &matrix_type, R);
-
-    c_matrix_init(R, M->n, M->m);
+	struct matrix* M = get_matrix_from_rb_value(self);
+    MAKE_MATRIX_AND_RB_VALUE(R, result, M->n, M->m);
     matrix_transpose(M->m, M->n, M->data, R->data);
+    return result;
+}
+
+VALUE matrix_add_with(VALUE self, VALUE other)
+{
+    raise_check_rbasic(other, cMatrix, "matrix");
+	struct matrix* A = get_matrix_from_rb_value(self);
+	struct matrix* B = get_matrix_from_rb_value(other);
+
+    raise_check_equal_size_matrix(A, B);
+
+    MAKE_MATRIX_AND_RB_VALUE(C, result, A->m, A->n);
+    add_d_arrays_to_result(A->n * A->m, A->data, B->data, C->data);
 
     return result;
 }
 
-VALUE matrix_add_with(VALUE self, VALUE value)
+VALUE matrix_add_from(VALUE self, VALUE other)
 {
-    raise_check_rbasic(value, cMatrix, "matrix");
-	struct matrix* A;
-    struct matrix* B;
-	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
-	TypedData_Get_Struct(value, struct matrix, &matrix_type, B);
+    raise_check_rbasic(other, cMatrix, "matrix");
+	struct matrix* A = get_matrix_from_rb_value(self);
+	struct matrix* B = get_matrix_from_rb_value(other);
 
     raise_check_equal_size_matrix(A, B);
 
-    int m = B->m;
-    int n = A->n;
-
-    struct matrix* C;
-    VALUE result = TypedData_Make_Struct(cMatrix, struct matrix, &matrix_type, C);
-
-    c_matrix_init(C, m, n);
-    add_d_arrays_to_result(n * m, A->data, B->data, C->data);
-
-    return result;
-}
-
-VALUE matrix_add_from(VALUE self, VALUE value)
-{
-    raise_check_rbasic(value, cMatrix, "matrix");
-	struct matrix* A;
-    struct matrix* B;
-	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
-	TypedData_Get_Struct(value, struct matrix, &matrix_type, B);
-
-    raise_check_equal_size_matrix(A, B);
-
-    int m = B->m;
-    int n = A->n;
-
-    add_d_arrays_to_first(n * m, A->data, B->data);
-
+    add_d_arrays_to_first(A->n * B->m, A->data, B->data);
     return self;
 }
 
-VALUE matrix_sub_with(VALUE self, VALUE value)
+VALUE matrix_sub_with(VALUE self, VALUE other)
 {
-    raise_check_rbasic(value, cMatrix, "matrix");
-	struct matrix* A;
-    struct matrix* B;
-	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
-	TypedData_Get_Struct(value, struct matrix, &matrix_type, B);
-    
+    raise_check_rbasic(other, cMatrix, "matrix");
+	struct matrix* A = get_matrix_from_rb_value(self);
+	struct matrix* B = get_matrix_from_rb_value(other);
+
     raise_check_equal_size_matrix(A, B);
 
-    int m = B->m;
-    int n = A->n;
-
-    struct matrix* C;
-    VALUE result = TypedData_Make_Struct(cMatrix, struct matrix, &matrix_type, C);
-
-    c_matrix_init(C, m, n);
-    sub_d_arrays_to_result(n * m, A->data, B->data, C->data);
-
+    MAKE_MATRIX_AND_RB_VALUE(C, result, A->m, A->n);
+    sub_d_arrays_to_result(A->n * A->m, A->data, B->data, C->data);
     return result;
 }
 
-VALUE matrix_sub_from(VALUE self, VALUE value)
+VALUE matrix_sub_from(VALUE self, VALUE other)
 {
-    raise_check_rbasic(value, cMatrix, "matrix");
-	struct matrix* A;
-    struct matrix* B;
-	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
-	TypedData_Get_Struct(value, struct matrix, &matrix_type, B);
+    raise_check_rbasic(other, cMatrix, "matrix");
+	struct matrix* A = get_matrix_from_rb_value(self);
+	struct matrix* B = get_matrix_from_rb_value(other);
 
     raise_check_equal_size_matrix(A, B);
 
-    int m = B->m;
-    int n = A->n;
-
-    sub_d_arrays_to_first(n * m, A->data, B->data);
-
+    sub_d_arrays_to_first(A->n * B->m, A->data, B->data);
     return self;
 }
 
 VALUE matrix_determinant(VALUE self)
 {
-    struct matrix* A;
-    TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
+	struct matrix* A = get_matrix_from_rb_value(self);
     raise_check_square_matrix(A);
-
     return DBL2NUM(determinant(A->n, A->data));
 }
 
 VALUE matrix_fill(VALUE self, VALUE value)
 {
     double d = raise_rb_value_to_double(value);
-	struct matrix* A;
-	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
-
+	struct matrix* A = get_matrix_from_rb_value(self);
     fill_d_array(A->m * A->n, A->data, d);
-
     return self;
 }
 
-VALUE matrix_equal(VALUE self, VALUE value)
+VALUE matrix_equal(VALUE self, VALUE other)
 {
-    if(RBASIC_CLASS(value) != cMatrix)
+    if(RBASIC_CLASS(other) != cMatrix)
         return Qfalse;
-	struct matrix* A;
-    struct matrix* B;
-	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
-	TypedData_Get_Struct(value, struct matrix, &matrix_type, B);
+	struct matrix* A = get_matrix_from_rb_value(self);
+	struct matrix* B = get_matrix_from_rb_value(other);
 
     if(A->n != B->n || A->m != B->m)
         return Qfalse;
-
-    int n = A->n;
-    int m = B->m;
-
-    if(equal_d_arrays(n * m, A->data, B->data))
+        
+    if(equal_d_arrays(A->n * A->m, A->data, B->data))
 		return Qtrue;
 	return Qfalse;
 }
 
 VALUE matrix_abs(VALUE self)
 {
-	struct matrix* A;
-	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
-
-    int m = A->m;
-    int n = A->n;
-
-    struct matrix* B;
-    VALUE result = TypedData_Make_Struct(cMatrix, struct matrix, &matrix_type, B);
-
-    c_matrix_init(B, m, n);
-    abs_d_array(n * m, A->data, B->data);
-
+	struct matrix* A = get_matrix_from_rb_value(self);
+    MAKE_MATRIX_AND_RB_VALUE(R, result, A->m, A->n);
+    abs_d_array(A->n * A->m, A->data, R->data);
     return result;
 }
 
-VALUE matrix_greater_or_equal(VALUE self, VALUE value)
+VALUE matrix_greater_or_equal(VALUE self, VALUE other)
 {
-    raise_check_rbasic(value, cMatrix, "matrix");
-	struct matrix* A;
-    struct matrix* B;
-	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
-	TypedData_Get_Struct(value, struct matrix, &matrix_type, B);
+    raise_check_rbasic(other, cMatrix, "matrix");
+	struct matrix* A = get_matrix_from_rb_value(self);
+	struct matrix* B = get_matrix_from_rb_value(other);
 
     raise_check_equal_size_matrix(A, B);
 
-    int m = B->m;
-    int n = A->n;
-
-    if(greater_or_equal_d_array(n * m, A->data, B->data))
+    if(greater_or_equal_d_array(A->n * A->m, A->data, B->data))
         return Qtrue;
     return Qfalse;
 }
@@ -728,12 +633,8 @@ VALUE vstack(int argc, VALUE *argv, VALUE obj)
     int m = mtrs[0]->m;
     int n = matrix_sum_by_n(argc, mtrs);
 
-    struct matrix* C;
-    VALUE result = TypedData_Make_Struct(cMatrix, struct matrix, &matrix_type, C);
-
-    c_matrix_init(C, m, n);
+    MAKE_MATRIX_AND_RB_VALUE(C, result, m, n);
     matrix_vstack(argc, mtrs, C->data);
-
     free(mtrs);
     return result;
 }
@@ -754,10 +655,7 @@ VALUE hstack(int argc, VALUE *argv, VALUE obj)
     int m = matrix_sum_by_m(argc, mtrs);
     int n = mtrs[0]->n;
 
-    struct matrix* C;
-    VALUE result = TypedData_Make_Struct(cMatrix, struct matrix, &matrix_type, C);
-
-    c_matrix_init(C, m, n);
+    MAKE_MATRIX_AND_RB_VALUE(C, result, m, n);
     matrix_hstack(argc, mtrs, C->data, m);
 
     free(mtrs);
@@ -784,11 +682,8 @@ VALUE scalar(VALUE obj, VALUE size, VALUE value)
     int n = raise_rb_value_to_int(size);
     double v = raise_rb_value_to_double(value);
 
-    struct matrix* C;
-    VALUE result = TypedData_Make_Struct(cMatrix, struct matrix, &matrix_type, C);
-    c_matrix_init(C, n, n);
+    MAKE_MATRIX_AND_RB_VALUE(C, result, n, n);
     matrix_scalar(n, C->data, v);
-
     return result;
 }
 
@@ -812,8 +707,7 @@ bool matrix_antisymmetric(int n, const double* C)
 
 VALUE antisymmetric(VALUE self)
 {
-	struct matrix* A;
-	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
+	struct matrix* A = get_matrix_from_rb_value(self);
     raise_check_square_matrix(A);
 
     if(matrix_antisymmetric(A->n, A->data))
@@ -823,8 +717,7 @@ VALUE antisymmetric(VALUE self)
 
 VALUE symmetric(VALUE self)
 {
-	struct matrix* A;
-	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
+	struct matrix* A = get_matrix_from_rb_value(self);
     raise_check_square_matrix(A);
     if(matrix_symmetric(A->n, A->data))
         return Qtrue;
@@ -833,17 +726,9 @@ VALUE symmetric(VALUE self)
 
 VALUE matrix_minus(VALUE self)
 {
-	struct matrix* A;
-	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
-
-    int n = A->n;
-    int m = A->m;
-
-    struct matrix* C;
-    VALUE result = TypedData_Make_Struct(cMatrix, struct matrix, &matrix_type, C);
-    c_matrix_init(C, m, n);
-    multiply_d_array_to_result(n * m, A->data, -1, C->data);
-
+	struct matrix* A = get_matrix_from_rb_value(self);
+    MAKE_MATRIX_AND_RB_VALUE(C, result, A->m, A->n);
+    multiply_d_array_to_result(A->n * A->m, A->data, -1, C->data);
     return result;
 }
 
@@ -855,9 +740,7 @@ VALUE matrix_plus(VALUE self)
 VALUE row_vector(VALUE self, VALUE v)
 {
     int idx = raise_rb_value_to_int(v);
-
-	struct matrix* A;
-	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
+	struct matrix* A = get_matrix_from_rb_value(self);
 
     int m = A->m;
     int n = A->n;
@@ -866,21 +749,15 @@ VALUE row_vector(VALUE self, VALUE v)
     if(idx < 0 || idx >= m)
         return Qnil;
     
-    struct vector* C;
-    VALUE result = TypedData_Make_Struct(cVector, struct vector, &vector_type, C);
-
-    c_vector_init(C, n);
+    MAKE_VECTOR_AND_RB_VALUE(C, result, n);
     copy_d_array(m, A->data + idx * m, C->data);
-
     return result;
 }
 
 VALUE column_vector(VALUE self, VALUE v)
 {
     int idx = raise_rb_value_to_int(v);
-
-	struct matrix* A;
-	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
+	struct matrix* A = get_matrix_from_rb_value(self);
 
     int m = A->m;
     int n = A->n;
@@ -888,13 +765,9 @@ VALUE column_vector(VALUE self, VALUE v)
     
     if(idx < 0 || idx >= n)
         return Qnil;
-    
-    struct vector* C;
-    VALUE result = TypedData_Make_Struct(cVector, struct vector, &vector_type, C);
 
-    c_vector_init(C, n);
+    MAKE_VECTOR_AND_RB_VALUE(C, result, n);
     strassen_copy(1, n, A->data + idx, C->data, m, 1);
-
     return result;
 }
 
@@ -914,8 +787,7 @@ bool matrix_diagonal(int n, const double* C)
 
 VALUE diagonal(VALUE self)
 {
-	struct matrix* A;
-	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
+	struct matrix* A = get_matrix_from_rb_value(self);
     raise_check_square_matrix(A);
     
     if(matrix_diagonal(A->n, A->data))
@@ -926,22 +798,13 @@ VALUE diagonal(VALUE self)
 VALUE hadamard_product(VALUE self, VALUE other)
 {
     raise_check_rbasic(other, cMatrix, "matrix");
-	struct matrix* A;
-    struct matrix* B;
-	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
-	TypedData_Get_Struct(other, struct matrix, &matrix_type, B);
+	struct matrix* A = get_matrix_from_rb_value(self);
+	struct matrix* B = get_matrix_from_rb_value(other);
 
     raise_check_equal_size_matrix(A, B);
 
-    int m = B->m;
-    int n = A->n;
-
-    struct matrix* C;
-    VALUE result = TypedData_Make_Struct(cMatrix, struct matrix, &matrix_type, C);
-
-    c_matrix_init(C, m, n);
-    multiply_elems_d_array_to_result(n * m, A->data, B->data, C->data);
-
+    MAKE_MATRIX_AND_RB_VALUE(C, result, A->m, A->n);
+    multiply_elems_d_array_to_result(A->n * A->m, A->data, B->data, C->data);
     return result;
 }
 
@@ -955,8 +818,7 @@ double matrix_trace(int n, const double* A)
 
 VALUE trace(VALUE self)
 {
-	struct matrix* A;
-	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
+	struct matrix* A = get_matrix_from_rb_value(self);
     raise_check_square_matrix(A);
     return DBL2NUM(matrix_trace(A->n, A->data));
 }
@@ -978,19 +840,14 @@ VALUE first_minor(VALUE self, VALUE row, VALUE column)
 {
     int i = raise_rb_value_to_int(column);
     int j = raise_rb_value_to_int(row);
-
-	struct matrix* A;
-	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
+	struct matrix* A = get_matrix_from_rb_value(self);
 
     int m = A->m;
     int n = A->n;
     if(i < 0 || i >= m || j < 0 || j >= n)
         rb_raise(fm_eIndexError, "Index out of range");
 
-    struct matrix* C;
-    VALUE result = TypedData_Make_Struct(cMatrix, struct matrix, &matrix_type, C);
-
-    c_matrix_init(C, m - 1, n - 1);
+    MAKE_MATRIX_AND_RB_VALUE(C, result, m - 1, n - 1);
     matrix_minor(m, n, A->data, C->data, i, j);
     return result;
 }
@@ -999,9 +856,7 @@ VALUE cofactor(VALUE self, VALUE row, VALUE column)
 {
     int i = raise_rb_value_to_int(column);
     int j = raise_rb_value_to_int(row);
-
-	struct matrix* A;
-	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
+	struct matrix* A = get_matrix_from_rb_value(self);
 
     int m = A->m;
     int n = A->n;
@@ -1021,8 +876,7 @@ VALUE cofactor(VALUE self, VALUE row, VALUE column)
 
 VALUE matrix_zero(VALUE self)
 {
-	struct matrix* A;
-	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
+	struct matrix* A = get_matrix_from_rb_value(self);
     if(zero_d_array(A->m * A->n, A->data))
             return Qtrue;
     return Qfalse;
@@ -1030,8 +884,7 @@ VALUE matrix_zero(VALUE self)
 
 VALUE rank(VALUE self)
 {
-	struct matrix* A;
-	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
+	struct matrix* A = get_matrix_from_rb_value(self);
     return INT2NUM(matrix_rank(A->m, A->n, A->data));
 }
 
@@ -1045,18 +898,9 @@ VALUE matrix_round(int argc, VALUE *argv, VALUE self)
     else
         d = 0;
 
-	struct matrix* A;
-	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
-
-    int m = A->m;
-    int n = A->n;
-
-    struct matrix* R;
-    VALUE result = TypedData_Make_Struct(cMatrix, struct matrix, &matrix_type, R);
-    c_matrix_init(R, m, n);
-
-    round_d_array(m * n, A->data, R->data, d);
-
+	struct matrix* A = get_matrix_from_rb_value(self);
+    MAKE_MATRIX_AND_RB_VALUE(R, result, A->m, A->n);
+    round_d_array(A->m * A->n, A->data, R->data, d);
     return result;
 }
 
@@ -1086,30 +930,20 @@ bool martix_upper_triangular(int n, const double* A)
 
 VALUE lower_triangular(VALUE self)
 {
-	struct matrix* A;
-	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
-    
-    int m = A->m;
-    int n = A->n;
-
+	struct matrix* A = get_matrix_from_rb_value(self);
     raise_check_square_matrix(A);
 
-    if(martix_lower_triangular(n, A->data))
+    if(martix_lower_triangular(A->n, A->data))
         return Qtrue;
     return Qfalse;
 }
 
 VALUE upper_triangular(VALUE self)
 {
-	struct matrix* A;
-	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
-    
-    int m = A->m;
-    int n = A->n;
-
+	struct matrix* A = get_matrix_from_rb_value(self);
     raise_check_square_matrix(A);
 
-    if(martix_upper_triangular(n, A->data))
+    if(martix_upper_triangular(A->n, A->data))
         return Qtrue;
     return Qfalse;
 }
@@ -1157,9 +991,7 @@ bool matrix_permutation(int n, const double* A)
 
 VALUE permutation(VALUE self)
 {
-	struct matrix* A;
-	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
-    
+	struct matrix* A = get_matrix_from_rb_value(self);
     raise_check_square_matrix(A);
 
     if(matrix_permutation(A->n, A->data))
@@ -1183,9 +1015,7 @@ bool matrix_identity(int n, const double* A)
 
 VALUE orthogonal(VALUE self)
 {
-	struct matrix* A;
-	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
-    
+	struct matrix* A = get_matrix_from_rb_value(self);
     raise_check_square_matrix(A);
     
     int n = A->n;

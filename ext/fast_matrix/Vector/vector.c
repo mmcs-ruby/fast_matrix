@@ -2,7 +2,9 @@
 #include "Helper/c_array_operations.h"
 #include "Helper/errors.h"
 #include "Matrix/matrix.h"
+#include "Matrix/helper.h"
 #include "Vector/errors.h"
+#include "Vector/helper.h"
 
 VALUE cVector;
 
@@ -48,14 +50,12 @@ void c_vector_init(struct vector* vect, int n)
 
 VALUE vector_initialize(VALUE self, VALUE size)
 {
-	struct vector* data;
     int n = raise_rb_value_to_int(size);
 
     if(n <= 0)
         rb_raise(fm_eIndexError, "Size cannot be negative or zero");
 
-	TypedData_Get_Struct(self, struct vector, &vector_type, data);
-
+	struct vector* data = get_vector_from_rb_value(self);
     c_vector_init(data, n);
 
 	return self;
@@ -66,9 +66,7 @@ VALUE vector_set(VALUE self, VALUE idx, VALUE v)
 {
     int i = raise_rb_value_to_int(idx);
     double x = raise_rb_value_to_double(v);
-
-	struct vector* data;
-	TypedData_Get_Struct(self, struct vector, &vector_type, data);
+	struct vector* data = get_vector_from_rb_value(self);
 
     i = (i < 0) ? data->n + i : i;
     raise_check_range(i, 0, data->n);
@@ -81,9 +79,7 @@ VALUE vector_set(VALUE self, VALUE idx, VALUE v)
 VALUE vector_get(VALUE self, VALUE idx)
 {
     int i = raise_rb_value_to_int(idx);
-
-	struct vector* data;
-	TypedData_Get_Struct(self, struct vector, &vector_type, data);
+	struct vector* data = get_vector_from_rb_value(self);
 
     i = (i < 0) ? data->n + i : i;
     
@@ -95,19 +91,16 @@ VALUE vector_get(VALUE self, VALUE idx)
 
 VALUE c_vector_size(VALUE self)
 {
-	struct vector* data;
-	TypedData_Get_Struct(self, struct vector, &vector_type, data);
+	struct vector* data = get_vector_from_rb_value(self);
     return INT2NUM(data->n);
 }
 
 
-VALUE vector_add_with(VALUE self, VALUE value)
+VALUE vector_add_with(VALUE self, VALUE other)
 {
-    raise_check_rbasic(value, cVector, "vector");
-	struct vector* A;
-    struct vector* B;
-	TypedData_Get_Struct(self, struct vector, &vector_type, A);
-	TypedData_Get_Struct(value, struct vector, &vector_type, B);
+    raise_check_rbasic(other, cVector, "vector");
+	struct vector* A = get_vector_from_rb_value(self);
+	struct vector* B = get_vector_from_rb_value(other);
     raise_check_equal_size_vectors(A, B);
 
     int n = A->n;
@@ -122,13 +115,11 @@ VALUE vector_add_with(VALUE self, VALUE value)
 }
 
 
-VALUE vector_add_from(VALUE self, VALUE value)
+VALUE vector_add_from(VALUE self, VALUE other)
 {
-    raise_check_rbasic(value, cVector, "vector");
-	struct vector* A;
-    struct vector* B;
-	TypedData_Get_Struct(self, struct vector, &vector_type, A);
-	TypedData_Get_Struct(value, struct vector, &vector_type, B);
+    raise_check_rbasic(other, cVector, "vector");
+	struct vector* A = get_vector_from_rb_value(self);
+	struct vector* B = get_vector_from_rb_value(other);
     raise_check_equal_size_vectors(A, B);
 
     int n = A->n;
@@ -138,13 +129,11 @@ VALUE vector_add_from(VALUE self, VALUE value)
     return self;
 }
 
-VALUE vector_sub_with(VALUE self, VALUE value)
+VALUE vector_sub_with(VALUE self, VALUE other)
 {
-    raise_check_rbasic(value, cVector, "vector");
-	struct vector* A;
-    struct vector* B;
-	TypedData_Get_Struct(self, struct vector, &vector_type, A);
-	TypedData_Get_Struct(value, struct vector, &vector_type, B);
+    raise_check_rbasic(other, cVector, "vector");
+	struct vector* A = get_vector_from_rb_value(self);
+	struct vector* B = get_vector_from_rb_value(other);
     raise_check_equal_size_vectors(A, B);
 
     int n = A->n;
@@ -159,13 +148,11 @@ VALUE vector_sub_with(VALUE self, VALUE value)
 }
 
 
-VALUE vector_sub_from(VALUE self, VALUE value)
+VALUE vector_sub_from(VALUE self, VALUE other)
 {
-    raise_check_rbasic(value, cVector, "vector");
-	struct vector* A;
-    struct vector* B;
-	TypedData_Get_Struct(self, struct vector, &vector_type, A);
-	TypedData_Get_Struct(value, struct vector, &vector_type, B);
+    raise_check_rbasic(other, cVector, "vector");
+	struct vector* A = get_vector_from_rb_value(self);
+	struct vector* B = get_vector_from_rb_value(other);
     raise_check_equal_size_vectors(A, B);
 
     int n = A->n;
@@ -175,14 +162,12 @@ VALUE vector_sub_from(VALUE self, VALUE value)
     return self;
 }
 
-VALUE vector_equal(VALUE self, VALUE value)
+VALUE vector_equal(VALUE self, VALUE other)
 {
-    if(RBASIC_CLASS(value) != cVector)
+    if(RBASIC_CLASS(other) != cVector)
         return Qfalse;
-	struct vector* A;
-    struct vector* B;
-	TypedData_Get_Struct(self, struct vector, &vector_type, A);
-	TypedData_Get_Struct(value, struct vector, &vector_type, B);
+	struct vector* A = get_vector_from_rb_value(self);
+	struct vector* B = get_vector_from_rb_value(other);
 
     if(A->n != B->n)
 		return Qfalse;
@@ -194,10 +179,9 @@ VALUE vector_equal(VALUE self, VALUE value)
 	return Qfalse;
 }
 
-VALUE vector_copy(VALUE v)
+VALUE vector_copy(VALUE self)
 {
-	struct vector* V;
-	TypedData_Get_Struct(v, struct vector, &vector_type, V);
+	struct vector* V = get_vector_from_rb_value(self);
 
     struct vector* R;
     VALUE result = TypedData_Make_Struct(cVector, struct vector, &vector_type, R);
@@ -227,10 +211,8 @@ void c_vector_matrix_multiply(int n, int m, const double* V, const double* M, do
 
 VALUE vector_multiply_vm(VALUE self, VALUE other)
 {
-	struct vector* V;
-    struct matrix* M;
-	TypedData_Get_Struct(self, struct vector, &vector_type, V);
-	TypedData_Get_Struct(other, struct matrix, &matrix_type, M);
+	struct vector* V = get_vector_from_rb_value(self);
+	struct matrix* M = get_matrix_from_rb_value(other);
 
     if(M->n != 1)
         rb_raise(fm_eIndexError, "Number of rows must be 1");
@@ -249,9 +231,7 @@ VALUE vector_multiply_vm(VALUE self, VALUE other)
 
 VALUE vector_multiply_vn(VALUE self, VALUE value)
 {
-	struct vector* A;
-	TypedData_Get_Struct(self, struct vector, &vector_type, A);
-
+	struct vector* A = get_vector_from_rb_value(self);
     double d = NUM2DBL(value);
 
     struct vector* R;
@@ -266,10 +246,8 @@ VALUE vector_multiply_vn(VALUE self, VALUE value)
 
 VALUE vector_multiply_vv(VALUE self, VALUE other)
 {
-    struct vector* A;
-    struct vector* B;
-    TypedData_Get_Struct(self, struct vector, &vector_type, A);
-    TypedData_Get_Struct(other, struct vector, &vector_type, B);
+	struct vector* A = get_vector_from_rb_value(self);
+	struct vector* B = get_vector_from_rb_value(other);
     
     if(B->n != 1)
         rb_raise(fm_eIndexError, "Length of vector must be equal to 1");
@@ -306,8 +284,7 @@ double vector_magnitude(int n, const double* A)
 
 VALUE magnitude(VALUE self)
 {
-    struct vector* A;
-    TypedData_Get_Struct(self, struct vector, &vector_type, A);
+	struct vector* A = get_vector_from_rb_value(self);
     return DBL2NUM(vector_magnitude(A->n, A->data));
 }
 
@@ -327,8 +304,7 @@ void vector_normalize_self(int n, double* A)
 
 VALUE normalize(VALUE self)
 {
-    struct vector* A;
-    TypedData_Get_Struct(self, struct vector, &vector_type, A);
+	struct vector* A = get_vector_from_rb_value(self);
 
     struct vector* R;
     VALUE result = TypedData_Make_Struct(cVector, struct vector, &vector_type, R);
@@ -340,16 +316,14 @@ VALUE normalize(VALUE self)
 
 VALUE normalize_self(VALUE self)
 {
-    struct vector* A;
-    TypedData_Get_Struct(self, struct vector, &vector_type, A);
+	struct vector* A = get_vector_from_rb_value(self);
     vector_normalize_self(A->n, A->data);
     return self;
 }
 
 VALUE vactor_minus(VALUE self)
 {
-    struct vector* A;
-    TypedData_Get_Struct(self, struct vector, &vector_type, A);
+	struct vector* A = get_vector_from_rb_value(self);
 
     struct vector* R;
     VALUE result = TypedData_Make_Struct(cVector, struct vector, &vector_type, R);
@@ -423,8 +397,7 @@ VALUE independent(int argc, VALUE* argv, VALUE obj)
 
 VALUE to_matrix(VALUE self)
 {
-    struct vector* A;
-    TypedData_Get_Struct(self, struct vector, &vector_type, A);
+	struct vector* A = get_vector_from_rb_value(self);
 
     struct matrix* C;
     VALUE result = TypedData_Make_Struct(cMatrix, struct matrix, &matrix_type, C);
@@ -434,8 +407,7 @@ VALUE to_matrix(VALUE self)
 }
 VALUE covector(VALUE self)
 {
-    struct vector* A;
-    TypedData_Get_Struct(self, struct vector, &vector_type, A);
+	struct vector* A = get_vector_from_rb_value(self);
 
     struct matrix* C;
     VALUE result = TypedData_Make_Struct(cMatrix, struct matrix, &matrix_type, C);
@@ -446,8 +418,7 @@ VALUE covector(VALUE self)
 
 VALUE vector_zero(VALUE self)
 {
-    struct vector* A;
-    TypedData_Get_Struct(self, struct vector, &vector_type, A);
+	struct vector* A = get_vector_from_rb_value(self);
     if(zero_d_array(A->n, A->data))
             return Qtrue;
     return Qfalse;
@@ -456,11 +427,8 @@ VALUE vector_zero(VALUE self)
 VALUE vector_fill(VALUE self, VALUE value)
 {
     double d = raise_rb_value_to_double(value);
-    struct vector* A;
-    TypedData_Get_Struct(self, struct vector, &vector_type, A);
-
+	struct vector* A = get_vector_from_rb_value(self);
     fill_d_array(A->n, A->data, d);
-
     return self;
 }
 
@@ -474,8 +442,7 @@ VALUE vector_round(int argc, VALUE *argv, VALUE self)
     else
         d = 0;
 
-    struct vector* A;
-    TypedData_Get_Struct(self, struct vector, &vector_type, A);
+	struct vector* A = get_vector_from_rb_value(self);
 
     struct vector* R;
     VALUE result = TypedData_Make_Struct(cVector, struct vector, &vector_type, R);
@@ -497,10 +464,8 @@ double vector_inner_product(int n, double* A, double* B)
 VALUE inner_product(VALUE self, VALUE other)
 {
     raise_check_rbasic(other, cVector, "vector");
-	struct vector* A;
-    struct vector* B;
-	TypedData_Get_Struct(self, struct vector, &vector_type, A);
-	TypedData_Get_Struct(other, struct vector, &vector_type, B);
+	struct vector* A = get_vector_from_rb_value(self);
+	struct vector* B = get_vector_from_rb_value(other);
     raise_check_equal_size_vectors(A, B);
 
     double result = vector_inner_product(A->n, A->data, B->data);
@@ -510,10 +475,8 @@ VALUE inner_product(VALUE self, VALUE other)
 VALUE angle_with(VALUE self, VALUE other)
 {
     raise_check_rbasic(other, cVector, "vector");
-	struct vector* A;
-    struct vector* B;
-	TypedData_Get_Struct(self, struct vector, &vector_type, A);
-	TypedData_Get_Struct(other, struct vector, &vector_type, B);
+	struct vector* A = get_vector_from_rb_value(self);
+	struct vector* B = get_vector_from_rb_value(other);
     raise_check_equal_size_vectors(A, B);
 
     double a = vector_magnitude(A->n, A->data);
