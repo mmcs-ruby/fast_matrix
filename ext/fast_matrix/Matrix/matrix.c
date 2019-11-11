@@ -2,6 +2,7 @@
 #include "Helper/c_array_operations.h"
 #include "Helper/errors.h"
 #include "Vector/vector.h"
+#include "Matrix/errors.h"
 
 VALUE cMatrix;
 
@@ -497,8 +498,7 @@ VALUE matrix_add_with(VALUE self, VALUE value)
 	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
 	TypedData_Get_Struct(value, struct matrix, &matrix_type, B);
 
-    if(A->m != B->m || A->n != B->n)
-        rb_raise(fm_eIndexError, "Different sizes matrices");
+    raise_check_equal_size_matrix(A, B);
 
     int m = B->m;
     int n = A->n;
@@ -520,8 +520,7 @@ VALUE matrix_add_from(VALUE self, VALUE value)
 	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
 	TypedData_Get_Struct(value, struct matrix, &matrix_type, B);
 
-    if(A->m != B->m || A->n != B->n)
-        rb_raise(fm_eIndexError, "Different sizes matrices");
+    raise_check_equal_size_matrix(A, B);
 
     int m = B->m;
     int n = A->n;
@@ -538,9 +537,8 @@ VALUE matrix_sub_with(VALUE self, VALUE value)
     struct matrix* B;
 	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
 	TypedData_Get_Struct(value, struct matrix, &matrix_type, B);
-
-    if(A->m != B->m || A->n != B->n)
-        rb_raise(fm_eIndexError, "Different sizes matrices");
+    
+    raise_check_equal_size_matrix(A, B);
 
     int m = B->m;
     int n = A->n;
@@ -562,8 +560,7 @@ VALUE matrix_sub_from(VALUE self, VALUE value)
 	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
 	TypedData_Get_Struct(value, struct matrix, &matrix_type, B);
 
-    if(A->m != B->m || A->n != B->n)
-        rb_raise(fm_eIndexError, "Different sizes matrices");
+    raise_check_equal_size_matrix(A, B);
 
     int m = B->m;
     int n = A->n;
@@ -577,13 +574,9 @@ VALUE matrix_determinant(VALUE self)
 {
     struct matrix* A;
     TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
+    raise_check_square_matrix(A);
 
-    int m = A->m;
-    int n = A->n;
-    if(m != n)
-        rb_raise(fm_eIndexError, "Not a square matrix");
-
-    return DBL2NUM(determinant(n, A->data));
+    return DBL2NUM(determinant(A->n, A->data));
 }
 
 VALUE matrix_fill(VALUE self, VALUE value)
@@ -636,15 +629,13 @@ VALUE matrix_abs(VALUE self)
 
 VALUE matrix_greater_or_equal(VALUE self, VALUE value)
 {
-    if(RBASIC_CLASS(value) != cMatrix)
-        rb_raise(fm_eTypeError, "Expected class matrix");
+    raise_check_rbasic(value, cMatrix, "matrix");
 	struct matrix* A;
     struct matrix* B;
 	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
 	TypedData_Get_Struct(value, struct matrix, &matrix_type, B);
 
-    if(A->m != B->m || A->n != B->n)
-        rb_raise(fm_eIndexError, "Different sizes matrices");
+    raise_check_equal_size_matrix(A, B);
 
     int m = B->m;
     int n = A->n;
@@ -723,8 +714,7 @@ void matrix_hstack(int argc, struct matrix** mtrs, double* C, int m)
 
 VALUE vstack(int argc, VALUE *argv, VALUE obj)
 {
-    if(argc == 0)
-        rb_raise(fm_eIndexError, "No arguments");
+    raise_check_no_arguments(argc);
     
     struct matrix** mtrs;
     convert_matrix_array(argc, argv, &mtrs);
@@ -750,8 +740,7 @@ VALUE vstack(int argc, VALUE *argv, VALUE obj)
 
 VALUE hstack(int argc, VALUE *argv, VALUE obj)
 {
-    if(argc == 0)
-        rb_raise(fm_eIndexError, "No arguments");
+    raise_check_no_arguments(argc);
     
     struct matrix** mtrs;
     convert_matrix_array(argc, argv, &mtrs);
@@ -825,8 +814,8 @@ VALUE antisymmetric(VALUE self)
 {
 	struct matrix* A;
 	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
-    if(A->n != A->m)
-        rb_raise(fm_eIndexError, "Expected square matrix");
+    raise_check_square_matrix(A);
+
     if(matrix_antisymmetric(A->n, A->data))
         return Qtrue;
     return Qfalse;
@@ -836,8 +825,7 @@ VALUE symmetric(VALUE self)
 {
 	struct matrix* A;
 	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
-    if(A->n != A->m)
-        rb_raise(fm_eIndexError, "Expected square matrix");
+    raise_check_square_matrix(A);
     if(matrix_symmetric(A->n, A->data))
         return Qtrue;
     return Qfalse;
@@ -928,8 +916,8 @@ VALUE diagonal(VALUE self)
 {
 	struct matrix* A;
 	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
-    if(A->n != A->m)
-        rb_raise(fm_eIndexError, "Expected square matrix");
+    raise_check_square_matrix(A);
+    
     if(matrix_diagonal(A->n, A->data))
         return Qtrue;
     return Qfalse;
@@ -943,8 +931,7 @@ VALUE hadamard_product(VALUE self, VALUE other)
 	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
 	TypedData_Get_Struct(other, struct matrix, &matrix_type, B);
 
-    if(A->m != B->m || A->n != B->n)
-        rb_raise(fm_eIndexError, "Different sizes matrices");
+    raise_check_equal_size_matrix(A, B);
 
     int m = B->m;
     int n = A->n;
@@ -970,8 +957,7 @@ VALUE trace(VALUE self)
 {
 	struct matrix* A;
 	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
-    if(A->n != A->m)
-        rb_raise(fm_eIndexError, "Expected square matrix");
+    raise_check_square_matrix(A);
     return DBL2NUM(matrix_trace(A->n, A->data));
 }
 
@@ -1021,8 +1007,7 @@ VALUE cofactor(VALUE self, VALUE row, VALUE column)
     int n = A->n;
     if(i < 0 || i >= m || j < 0 || j >= n)
         rb_raise(fm_eIndexError, "Index out of range");
-    if(m != n)
-        rb_raise(fm_eIndexError, "Expected square matrix");
+    raise_check_square_matrix(A);
 
     double* D = malloc(sizeof(double) * (n - 1) * (n - 1));
     matrix_minor(n, n, A->data, D, i, j);
@@ -1107,8 +1092,7 @@ VALUE lower_triangular(VALUE self)
     int m = A->m;
     int n = A->n;
 
-    if(m != n)
-        rb_raise(fm_eIndexError, "Expected square matrix");
+    raise_check_square_matrix(A);
 
     if(martix_lower_triangular(n, A->data))
         return Qtrue;
@@ -1123,8 +1107,7 @@ VALUE upper_triangular(VALUE self)
     int m = A->m;
     int n = A->n;
 
-    if(m != n)
-        rb_raise(fm_eIndexError, "Expected square matrix");
+    raise_check_square_matrix(A);
 
     if(martix_upper_triangular(n, A->data))
         return Qtrue;
@@ -1177,13 +1160,9 @@ VALUE permutation(VALUE self)
 	struct matrix* A;
 	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
     
-    int m = A->m;
-    int n = A->n;
+    raise_check_square_matrix(A);
 
-    if(m != n)
-        rb_raise(fm_eIndexError, "Expected square matrix");
-
-    if(matrix_permutation(n, A->data))
+    if(matrix_permutation(A->n, A->data))
         return Qtrue;
     return Qfalse;
 }
@@ -1207,12 +1186,9 @@ VALUE orthogonal(VALUE self)
 	struct matrix* A;
 	TypedData_Get_Struct(self, struct matrix, &matrix_type, A);
     
-    int m = A->m;
-    int n = A->n;
-
-    if(m != n)
-        rb_raise(fm_eIndexError, "Expected square matrix");
+    raise_check_square_matrix(A);
     
+    int n = A->n;
     double* B = malloc(sizeof(double) * n * n);
     double* C = malloc(sizeof(double) * n * n);
 
