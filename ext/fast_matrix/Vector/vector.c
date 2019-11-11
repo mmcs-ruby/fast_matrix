@@ -1,7 +1,7 @@
 #include "Vector/vector.h"
 #include "Helper/c_array_operations.h"
 #include "Helper/errors.h"
-#include "Matrix/matrix.h"
+#include "Matrix/c_matrix.h"
 #include "Matrix/helper.h"
 #include "Vector/errors.h"
 #include "Vector/helper.h"
@@ -386,7 +386,7 @@ VALUE independent(int argc, VALUE* argv, VALUE obj)
 
     double* C = malloc(sizeof(double) * argc * n);
     vector_hstack(n, argc, vcts, C);
-    int result = matrix_rank(n, argc, C);
+    int result = c_matrix_rank(n, argc, C);
 
     free(vcts);
     free(C);
@@ -503,7 +503,7 @@ void vector_cross_product(int argc, struct vector** vcts, double* R)
     int sign = (argc % 2 == 0) ? 1 : -1;
     for(int i = 0; ; ++i)
     {
-        R[i] = determinant(argc, M) * sign;
+        R[i] = c_matrix_determinant(argc, M) * sign;
         sign = - sign;
         if(i == n - 1)
             break;
