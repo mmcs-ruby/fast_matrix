@@ -335,5 +335,27 @@ module FastMatrixTest
       m = Matrix[[1, 1, 1], [1, 1, 1]]
       assert_raises(IndexError) { m.orthogonal? }
     end
+    
+    def test_inverse_2x2
+      m1 = Matrix[[1, 2], [3, 4]]
+      m2 = Matrix[[-2, 1], [1.5, -0.5]]
+      assert_equal m2, m1.inverse
+    end
+
+    def test_inverse_3x3
+      m1 = Matrix[[1, 2, 3], [1, 2, 4], [1, 3, 3]]
+      m2 = Matrix[[6, -3, -2], [-1, 0, 1], [-1, 1, 0]]
+      assert_equal m2, m1.inverse
+    end
+
+    def test_inverse_error_zero_det
+      m = Matrix[[1, 2, 3], [1, 2, 4], [2, 4, 0]]
+      assert_raises(IndexError) { m.inverse }
+    end
+
+    def test_inverse_error_not_squere
+      m = Matrix[[1, 2, 3], [1, 2, 4]]
+      assert_raises(IndexError) { m.inverse }
+    end
   end
 end

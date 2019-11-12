@@ -574,6 +574,16 @@ VALUE matrix_orthogonal(VALUE self)
     return Qfalse;
 }
 
+VALUE matrix_inverse(VALUE self)
+{
+	struct matrix* A = get_matrix_from_rb_value(self);
+    raise_check_square_matrix(A);
+    MAKE_MATRIX_AND_RB_VALUE(R, result, A->n, A->n);
+    if(!c_matrix_inverse(R->n, A->data, R->data))
+        rb_raise(fm_eIndexError, "The discriminant is zero");
+    return result;
+}
+
 void init_fm_matrix()
 {
     VALUE  mod = rb_define_module("FastMatrix");
@@ -616,6 +626,7 @@ void init_fm_matrix()
     rb_define_method(cMatrix, "upper_triangular?", matrix_upper_triangular, 0);
     rb_define_method(cMatrix, "permutation?", matrix_permutation, 0);
     rb_define_method(cMatrix, "orthogonal?", matrix_orthogonal, 0);
+    rb_define_method(cMatrix, "inverse", matrix_inverse, 0);
     rb_define_module_function(cMatrix, "vstack", matrix_vstack, -1);
     rb_define_module_function(cMatrix, "hstack", matrix_hstack, -1);
     rb_define_module_function(cMatrix, "scalar", matrix_scalar, 2);

@@ -548,3 +548,59 @@ double c_matrix_determinant(int n, const double* A)
     free(M);
     return det;
 }
+
+void c_matrix_shift_identity(int n, double* A, int s_a)
+{
+    for(int i = 0; i < n; ++i)
+    {
+        double* line_p = A + i * s_a;
+        for(int j = 0; j < n; ++j)
+            line_p[j] = (i == j) ? 1 : 0;
+    }
+}
+
+bool c_matrix_inverse(int n, const double* A, double* B)
+{
+    int m = 2 * n;
+    double* M = malloc(m * n * sizeof(double));
+    strassen_copy(n, n, A, M, n, m);
+    c_matrix_shift_identity(n, M + n, m);
+
+    for(int i = 0; i < n; ++i)
+    {
+        double* line_p = M + i + i * m;
+        double current = *line_p; 
+
+        if(current == 0)
+            for(int j = i + 1; j < n; ++j)
+                if(M[i + j * m] != 0)
+                {
+                    double* buf = M + i + j * m;
+                    swap_d_arrays(m - i, buf, line_p);
+                    current = line_p[0];
+                }
+
+        if(current == 0)
+        {
+            free(M);
+            return false;
+        }
+
+        for(int j = 0; j < n; ++j)
+        {
+            double* t_line = M + i + j * m;
+            double head = *t_line;
+            if(i == j || head == 0) 
+                continue;
+            for(int k = 1; k < m - i; ++k)
+                t_line[k] -= line_p[k] * head / current;
+        }
+        for(int k = 1; k < m - i; ++k)
+            line_p[k] = line_p[k] / current;
+    }
+
+    strassen_copy(n, n, M + n, B, m, n);
+
+    free(M);
+    return true;
+}
