@@ -1,4 +1,5 @@
 #include "c_matrix.h"
+#include "Helper/c_array_operations.h"
 
 // in  - matrix m x n
 // out - matrix n x m
@@ -602,5 +603,14 @@ bool c_matrix_inverse(int n, const double* A, double* B)
     strassen_copy(n, n, M + n, B, m, n);
 
     free(M);
+    return true;
+}
+
+bool c_matrix_adjugate(int n, const double* A, double* B)
+{
+    if(!c_matrix_inverse(n, A, B))
+        return false;
+    double d = c_matrix_determinant(n, A);
+    multiply_d_array(n * n, B, d);
     return true;
 }

@@ -357,5 +357,11 @@ module FastMatrixTest
       m = Matrix[[1, 2, 3], [1, 2, 4]]
       assert_raises(IndexError) { m.inverse }
     end
+
+    def test_adjugate
+      m1 = Matrix[[7, 6], [3, 9]]
+      m2 = Matrix[[9, -6], [-3, 7]]
+      assert_equal m2, m1.adjugate
+    end
   end
 end

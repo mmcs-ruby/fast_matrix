@@ -584,6 +584,16 @@ VALUE matrix_inverse(VALUE self)
     return result;
 }
 
+VALUE matrix_adjugate(VALUE self)
+{
+	struct matrix* A = get_matrix_from_rb_value(self);
+    raise_check_square_matrix(A);
+    MAKE_MATRIX_AND_RB_VALUE(R, result, A->n, A->n);
+    if(!c_matrix_adjugate(R->n, A->data, R->data))
+        rb_raise(fm_eIndexError, "The discriminant is zero");
+    return result;
+}
+
 void init_fm_matrix()
 {
     VALUE  mod = rb_define_module("FastMatrix");
@@ -627,6 +637,7 @@ void init_fm_matrix()
     rb_define_method(cMatrix, "permutation?", matrix_permutation, 0);
     rb_define_method(cMatrix, "orthogonal?", matrix_orthogonal, 0);
     rb_define_method(cMatrix, "inverse", matrix_inverse, 0);
+    rb_define_method(cMatrix, "adjugate", matrix_adjugate, 0);
     rb_define_module_function(cMatrix, "vstack", matrix_vstack, -1);
     rb_define_module_function(cMatrix, "hstack", matrix_hstack, -1);
     rb_define_module_function(cMatrix, "scalar", matrix_scalar, 2);
