@@ -1,6 +1,8 @@
-[![Build Status](https://travis-ci.org/mmcs-ruby/fast_matrix.svg?branch=master)](https://travis-ci.org/mmcs-ruby/fast_matrix)
-[![Maintainability](https://api.codeclimate.com/v1/badges/fd171bae2ca444aaca29/maintainability)](https://codeclimate.com/github/mmcs-ruby/fast_matrix/maintainability)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/fd171bae2ca444aaca29/test_coverage)](https://codeclimate.com/github/mmcs-ruby/fast_matrix/test_coverage)
+|Gem|Activity|Code|Issue|Statistic|
+|--:|--:|--:|--:|--:|
+|![Gem](https://img.shields.io/gem/v/fast_matrix?color=light)|![GitHub last commit](https://img.shields.io/github/last-commit/mmcs-ruby/fast_matrix)|[![Build Status](https://travis-ci.org/mmcs-ruby/fast_matrix.svg?branch=master)](https://travis-ci.org/mmcs-ruby/fast_matrix)|![GitHub issues](https://img.shields.io/github/issues-raw/mmcs-ruby/fast_matrix)|[![Top language](https://img.shields.io/github/languages/top/mmcs-ruby/fast_matrix.svg)](https://img.shields.io/github/languages/top/mmcs-ruby/fast_matrix.svg)
+|[![Downloads](https://img.shields.io/gem/dt/fast_matrix.svg)]((https://img.shields.io/gem/dt/fast_matrix.svg))|![GitHub commits since tagged version](https://img.shields.io/github/commits-since/mmcs-ruby/fast_matrix/v0.2.0/develop?color=light)|[![Maintainability](https://api.codeclimate.com/v1/badges/fd171bae2ca444aaca29/maintainability)](https://codeclimate.com/github/mmcs-ruby/fast_matrix/maintainability)|![GitHub closed issues](https://img.shields.io/github/issues-closed-raw/mmcs-ruby/fast_matrix)|[![Languages](https://img.shields.io/github/languages/count/mmcs-ruby/fast_matrix.svg)](https://img.shields.io/github/languages/count/mmcs-ruby/fast_matrix.svg)
+|[![Downloads Latest](https://img.shields.io/gem/dtv/fast_matrix.svg)](https://badge.fury.io/rb/fast_matrix.svg)|![GitHub commit activity](https://img.shields.io/github/commit-activity/m/mmcs-ruby/fast_matrix?color=light)|[![Test Coverage](https://api.codeclimate.com/v1/badges/fd171bae2ca444aaca29/test_coverage)](https://codeclimate.com/github/mmcs-ruby/fast_matrix/test_coverage)|![GitHub issues by-label](https://img.shields.io/github/issues-raw/mmcs-ruby/fast_matrix/bug)|![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/mmcs-ruby/fast_matrix)
 
 # FastMatrix
 
