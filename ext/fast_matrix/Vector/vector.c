@@ -441,6 +441,58 @@ VALUE vector_cross_product(int argc, VALUE* argv, VALUE obj)
     return result;
 }
 
+VALUE vector_greater_or_equal(VALUE self, VALUE other)
+{
+    raise_check_rbasic(other, cVector, "vector");
+	struct vector* A = get_vector_from_rb_value(self);
+	struct vector* B = get_vector_from_rb_value(other);
+
+    raise_check_equal_size_vectors(A, B);
+
+    if(greater_or_equal_d_array(A->n, A->data, B->data))
+        return Qtrue;
+    return Qfalse;
+}
+
+VALUE vector_less_or_equal(VALUE self, VALUE other)
+{
+    raise_check_rbasic(other, cVector, "vector");
+	struct vector* A = get_vector_from_rb_value(self);
+	struct vector* B = get_vector_from_rb_value(other);
+
+    raise_check_equal_size_vectors(A, B);
+
+    if(less_or_equal_d_array(A->n, A->data, B->data))
+        return Qtrue;
+    return Qfalse;
+}
+
+VALUE vector_greater(VALUE self, VALUE other)
+{
+    raise_check_rbasic(other, cVector, "vector");
+	struct vector* A = get_vector_from_rb_value(self);
+	struct vector* B = get_vector_from_rb_value(other);
+
+    raise_check_equal_size_vectors(A, B);
+
+    if(greater_d_array(A->n, A->data, B->data))
+        return Qtrue;
+    return Qfalse;
+}
+
+VALUE vector_less(VALUE self, VALUE other)
+{
+    raise_check_rbasic(other, cVector, "vector");
+	struct vector* A = get_vector_from_rb_value(self);
+	struct vector* B = get_vector_from_rb_value(other);
+
+    raise_check_equal_size_vectors(A, B);
+
+    if(less_d_array(A->n, A->data, B->data))
+        return Qtrue;
+    return Qfalse;
+}
+
 void init_fm_vector()
 {
     VALUE  mod = rb_define_module("FastMatrix");
@@ -471,6 +523,10 @@ void init_fm_vector()
 	rb_define_method(cVector, "round", vector_round, -1);
 	rb_define_method(cVector, "inner_product", vector_inner_product, 1);
 	rb_define_method(cVector, "angle_with", vector_angle_with, 1);
+	rb_define_method(cVector, ">=", vector_greater_or_equal, 1);
+	rb_define_method(cVector, "<=", vector_less_or_equal, 1);
+	rb_define_method(cVector, ">", vector_greater, 1);
+	rb_define_method(cVector, "<", vector_less, 1);
 	rb_define_module_function(cVector, "independent?", vector_independent, -1);
 	rb_define_module_function(cVector, "cross_product", vector_cross_product, -1);
 }

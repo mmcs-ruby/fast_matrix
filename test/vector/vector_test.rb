@@ -75,7 +75,7 @@ module FastVectorTest
     def test_not_greater
       v1 = Vector[3, 3, 3, 3]
       v2 = Vector[4, 5, 6, 3]
-      refute m2 > m1
+      refute v2 > v1
     end
     
     def test_less
