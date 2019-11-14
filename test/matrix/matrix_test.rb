@@ -273,7 +273,7 @@ module FastMatrixTest
     
     def test_less
       m1 = Matrix[[1, 2, 3], [-3, 2, 1]]
-      m2 = Matrix[[1, 1, 0], [-5, 1, -1]]
+      m2 = Matrix[[0, 1, 0], [-5, 1, -1]]
       assert m2 < m1
     end
 

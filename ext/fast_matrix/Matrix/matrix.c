@@ -293,6 +293,45 @@ VALUE matrix_greater_or_equal(VALUE self, VALUE other)
     return Qfalse;
 }
 
+VALUE matrix_less_or_equal(VALUE self, VALUE other)
+{
+    raise_check_rbasic(other, cMatrix, "matrix");
+	struct matrix* A = get_matrix_from_rb_value(self);
+	struct matrix* B = get_matrix_from_rb_value(other);
+
+    raise_check_equal_size_matrix(A, B);
+
+    if(less_or_equal_d_array(A->n * A->m, A->data, B->data))
+        return Qtrue;
+    return Qfalse;
+}
+
+VALUE matrix_greater(VALUE self, VALUE other)
+{
+    raise_check_rbasic(other, cMatrix, "matrix");
+	struct matrix* A = get_matrix_from_rb_value(self);
+	struct matrix* B = get_matrix_from_rb_value(other);
+
+    raise_check_equal_size_matrix(A, B);
+
+    if(greater_d_array(A->n * A->m, A->data, B->data))
+        return Qtrue;
+    return Qfalse;
+}
+
+VALUE matrix_less(VALUE self, VALUE other)
+{
+    raise_check_rbasic(other, cMatrix, "matrix");
+	struct matrix* A = get_matrix_from_rb_value(self);
+	struct matrix* B = get_matrix_from_rb_value(other);
+
+    raise_check_equal_size_matrix(A, B);
+
+    if(less_d_array(A->n * A->m, A->data, B->data))
+        return Qtrue;
+    return Qfalse;
+}
+
 struct matrix** convert_matrix_array(int argc, VALUE *argv, struct matrix*** mtrs)
 {
     for(int i = 0; i < argc; ++i)
@@ -616,6 +655,9 @@ void init_fm_matrix()
 	rb_define_method(cMatrix, "fill!", matrix_fill, 1);
     rb_define_method(cMatrix, "abs", matrix_abs, 0);
     rb_define_method(cMatrix, ">=", matrix_greater_or_equal, 1);
+    rb_define_method(cMatrix, "<=", matrix_less_or_equal, 1);
+    rb_define_method(cMatrix, ">", matrix_greater, 1);
+    rb_define_method(cMatrix, "<", matrix_less, 1);
     rb_define_method(cMatrix, "determinant", matrix_determinant, 0);
     rb_define_method(cMatrix, "eql?", matrix_equal, 1);
     rb_define_method(cMatrix, "antisymmetric?", matrix_antisymmetric, 0);

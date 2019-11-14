@@ -78,6 +78,30 @@ bool greater_or_equal_d_array(int len, const double* A, const double* B)
     return true;
 }
 
+bool less_or_equal_d_array(int len, const double* A, const double* B)
+{
+    for(int i = 0; i < len; ++i)
+        if(A[i] > B[i])
+            return false;
+    return true;
+}
+
+bool greater_d_array(int len, const double* A, const double* B)
+{
+    for(int i = 0; i < len; ++i)
+        if(A[i] <= B[i])
+            return false;
+    return true;
+}
+
+bool less_d_array(int len, const double* A, const double* B)
+{
+    for(int i = 0; i < len; ++i)
+        if(A[i] >= B[i])
+            return false;
+    return true;
+}
+
 bool zero_d_array(int len, const double* A)
 {
     for(int i = 0; i < len; ++i)
