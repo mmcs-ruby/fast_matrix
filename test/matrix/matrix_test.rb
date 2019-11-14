@@ -259,5 +259,52 @@ module FastMatrixTest
       assert_equal [2, 3, 6], m.each(:strict_upper).to_a 
     end
     
+    def test_greater
+      m1 = Matrix[[1, 2, 3], [3, 2, 1]]
+      m2 = Matrix[[2, 3, 6], [4, 4, 4]]
+      assert m2 > m1
+    end
+    
+    def test_not_greater
+      m1 = Matrix[[1, 2, 3], [3, 2, 1]]
+      m2 = Matrix[[2, 3, 3], [4, 4, 4]]
+      refute m2 > m1
+    end
+    
+    def test_less
+      m1 = Matrix[[1, 2, 3], [-3, 2, 1]]
+      m2 = Matrix[[1, 1, 0], [-5, 1, -1]]
+      assert m2 < m1
+    end
+
+    def test_not_less
+      m1 = Matrix[[1, 2, 3], [-3, 2, 1]]
+      m2 = Matrix[[1, 2, 3], [-3, 2, 1]]
+      refute m2 < m1
+    end
+
+    def test_greater_or_equal
+      m1 = Matrix[[1, 2, 3], [-3, 2, 1]]
+      m2 = Matrix[[1, 2, 3], [-3, 2, 1]]
+      assert m2 >= m1
+    end
+
+    def test_not_greater_or_equal
+      m1 = Matrix[[1, 2, 3], [3, 2, 1]]
+      m2 = Matrix[[3, 3, 3], [-3, 3, 3]]
+      refute m2 >= m1
+    end
+
+    def test_less_or_equal
+      m1 = Matrix[[1, 2, 3], [3, 2, 1]]
+      m2 = Matrix[[1, 1, 1], [1, 1, 1]]
+      assert m2 <= m1
+    end
+
+    def test_not_less_or_equal
+      m1 = Matrix[[1, 2, 3], [3, 2, 1]]
+      m2 = Matrix[[3, 3, 3], [-3, 3, 3]]
+      refute m2 <= m1
+    end
   end
 end
