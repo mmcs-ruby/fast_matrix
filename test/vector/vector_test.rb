@@ -65,5 +65,53 @@ module FastVectorTest
       v1 = Vector[1, 2, 3]
       assert_equal "FastMatrix::Vector[1.0, 2.0, 3.0]", v1.inspect
     end
+
+    def test_greater
+      v1 = Vector[3, 3, 3, 3]
+      v2 = Vector[4, 5, 6, 4]
+      assert v2 > v1
+    end
+    
+    def test_not_greater
+      v1 = Vector[3, 3, 3, 3]
+      v2 = Vector[4, 5, 6, 3]
+      refute m2 > m1
+    end
+    
+    def test_less
+      v1 = Vector[3, 3, 3, 3]
+      v2 = Vector[0, 1, 2, -4]
+      assert v2 < v1
+    end
+
+    def test_not_less
+      v1 = Vector[3, 3, 3, 3]
+      v2 = Vector[3, 1, 2, -4]
+      refute v2 < v1
+    end
+
+    def test_greater_or_equal
+      v1 = Vector[3, 3, 3, 3]
+      v2 = Vector[3, 4, 3, 5]
+      assert v2 >= v1
+    end
+
+    def test_not_greater_or_equal
+      v1 = Vector[3, 3, 3, 3]
+      v2 = Vector[3, -4, -3, 5]
+      refute v2 >= v1
+    end
+
+    def test_less_or_equal
+      v1 = Vector[3, 3, 3, 3]
+      v2 = Vector[3, -4, 3, -5]
+      assert v2 <= v1
+    end
+
+    def test_not_less_or_equal
+      v1 = Vector[3, 3, 3, 3]
+      v2 = Vector[3, 4, 3, 5]
+      refute v2 <= v1
+    end
   end
 end
