@@ -363,5 +363,11 @@ module FastMatrixTest
       m2 = Matrix[[9, -6], [-3, 7]]
       assert_equal m2, m1.adjugate
     end
+
+    def test_imaginary
+      m1 = Matrix[[1, 2, 0], [-3, 0, 1]]
+      m2 = Matrix[[0, 0, 0], [0, 0, 0]]
+      assert_equal m2, m1.imaginary
+    end
   end
 end

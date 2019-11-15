@@ -40,6 +40,16 @@ module FastMatrix
     end
 
     # 
+    # Returns the imaginary part of the matrix.
+    # Always returns a zero matrix
+    #     
+    def imaginary()
+      Matrix.zero(row_count, column_count)
+    end
+
+    alias imag imaginary
+    
+    # 
     # Conjugate real matrix is equal to this matrix
     #     
     alias conjugate to_matrix
