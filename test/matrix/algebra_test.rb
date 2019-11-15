@@ -402,10 +402,16 @@ module FastMatrixTest
       assert_equal m2, m1**6
     end
 
-    def test_exponentiation_neg
+    def test_exponentiation_neg_2
       m1 = Matrix[[1, 2], [2, 3]]
       m2 = Matrix[[13, -8], [-8, 5]]
       assert_equal m2, m1**-2
+    end
+
+    def test_exponentiation_neg_1
+      m1 = Matrix[[1, 2], [2, 3]]
+      m2 = Matrix[[-3, 2], [2, -1]]
+      assert_equal m2, m1**-1
     end
 
     def test_exponentiation_zero
