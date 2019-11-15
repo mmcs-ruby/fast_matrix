@@ -163,6 +163,48 @@ VALUE matrix_multiply(VALUE self, VALUE v)
     rb_raise(fm_eTypeError, "Invalid klass for multiply");
 }
 
+VALUE matrix_division_mn(VALUE self, VALUE value)
+{
+    double d = NUM2DBL(value);
+	struct matrix* A = get_matrix_from_rb_value(self);
+
+    MAKE_MATRIX_AND_RB_VALUE(R, result, A->m, A->n);
+    copy_d_array(A->m * A->n, A->data, R->data);
+    multiply_d_array(R->m * R->n, R->data, 1 / d);
+
+    return result;
+}
+
+VALUE matrix_division_mm(VALUE self, VALUE other)
+{
+	struct matrix* A = get_matrix_from_rb_value(self);
+	struct matrix* B = get_matrix_from_rb_value(other);
+
+    if(A->m != B->n)
+        rb_raise(fm_eIndexError, "First columns differs from second rows");
+    raise_check_square_matrix(B);
+
+    int n = B->n;
+    double* M = malloc(n * n * sizeof(double));
+    c_matrix_inverse(n, B->data, M);
+    
+    MAKE_MATRIX_AND_RB_VALUE(C, result, n, n);
+    c_matrix_strassen(n, n, n, A->data, M, C->data);
+
+    free(M);
+    return result;
+}
+
+VALUE matrix_division(VALUE self, VALUE v)
+{
+    if(RB_FLOAT_TYPE_P(v) || FIXNUM_P(v)
+        || RB_TYPE_P(v, T_BIGNUM))
+        return matrix_division_mn(self, v);
+    if(RBASIC_CLASS(v) == cMatrix)
+        return matrix_division_mm(self, v);
+    rb_raise(fm_eTypeError, "Invalid klass for division");
+}
+
 VALUE matrix_copy(VALUE self)
 {
 	struct matrix* M = get_matrix_from_rb_value(self);
@@ -680,6 +722,7 @@ void init_fm_matrix()
     rb_define_method(cMatrix, "orthogonal?", matrix_orthogonal, 0);
     rb_define_method(cMatrix, "inverse", matrix_inverse, 0);
     rb_define_method(cMatrix, "adjugate", matrix_adjugate, 0);
+    rb_define_method(cMatrix, "/", matrix_division, 1);
     rb_define_module_function(cMatrix, "vstack", matrix_vstack, -1);
     rb_define_module_function(cMatrix, "hstack", matrix_hstack, -1);
     rb_define_module_function(cMatrix, "scalar", matrix_scalar, 2);

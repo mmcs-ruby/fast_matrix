@@ -376,5 +376,18 @@ module FastMatrixTest
       m2 = Matrix[[1, 2], [0, -1]]
       assert_equal [m2, m1], m.rect
     end
+
+    def test_division_matrix
+      m1 = Matrix[[1, 2], [3, 4]]
+      m2 = Matrix[[3, 3], [2, 5]]
+      m = Matrix[[-1.5, 1.5], [3.5, -0.5]]
+      assert_equal m, m2 / m1
+    end
+
+    def test_division_numder
+      m1 = Matrix[[1, 2], [3, 4]]
+      m2 = Matrix[[0.5, 1], [1.5, 2]]
+      assert_equal m2, m1 / 2
+    end
   end
 end
