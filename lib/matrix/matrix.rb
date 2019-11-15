@@ -48,7 +48,16 @@ module FastMatrix
     end
 
     alias imag imaginary
-    
+
+    # 
+    # Returns an array containing matrices corresponding to the real and imaginary parts of the matrix
+    #     
+    def rect
+      [real, imag]
+    end
+
+    alias rectangular rect
+
     # 
     # Conjugate real matrix is equal to this matrix
     #     

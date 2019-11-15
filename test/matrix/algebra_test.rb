@@ -369,5 +369,12 @@ module FastMatrixTest
       m2 = Matrix[[0, 0, 0], [0, 0, 0]]
       assert_equal m2, m1.imaginary
     end
+    
+    def test_ract
+      m = Matrix[[1, 2], [0, -1]]
+      m1 = Matrix[[0, 0], [0, 0]]
+      m2 = Matrix[[1, 2], [0, -1]]
+      assert_equal [m2, m1], m.rect
+    end
   end
 end
