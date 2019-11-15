@@ -389,5 +389,34 @@ module FastMatrixTest
       m2 = Matrix[[0.5, 1], [1.5, 2]]
       assert_equal m2, m1 / 2
     end
+
+    def test_exponentiation_pos_10
+      m1 = Matrix[[1, 2], [-1, 0]]
+      m2 = Matrix[[23, -22], [11, 34]]
+      assert_equal m2, m1**10
+    end
+
+    def test_exponentiation_pos_6
+      m1 = Matrix[[1, 2], [-1, 0]]
+      m2 = Matrix[[7, 10], [-5, 2]]
+      assert_equal m2, m1**6
+    end
+
+    def test_exponentiation_neg
+      m1 = Matrix[[1, 2], [2, 3]]
+      m2 = Matrix[[13, -8], [-8, 5]]
+      assert_equal m2, m1**-2
+    end
+
+    def test_exponentiation_zero
+      m1 = Matrix[[1, 2], [2, 3]]
+      m2 = Matrix[[1, 0], [0, 1]]
+      assert_equal m2, m1**0
+    end
+    
+    def test_exponentiation_one
+      m1 = Matrix[[1, 2, 4], [2, 3, 4]]
+      assert_equal m1, m1**1
+    end
   end
 end

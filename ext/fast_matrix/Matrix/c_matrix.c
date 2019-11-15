@@ -614,3 +614,72 @@ bool c_matrix_adjugate(int n, const double* A, double* B)
     multiply_d_array(n * n, B, d);
     return true;
 }
+
+void c_matrix_recursive_exponentiation(int n, const double* A, double* B, int d)
+{
+    if(d == 2)
+        return c_matrix_strassen(n, n, n, A, A, B);
+    
+    double* C = malloc(n * n * sizeof(double));
+    
+    if(d == 3)
+    {
+        c_matrix_strassen(n, n, n, A, A, C);
+        c_matrix_strassen(n, n, n, A, C, B);
+        free(C);
+        return;
+    }
+
+    c_matrix_recursive_exponentiation(n, A, C, d / 2);
+    
+    if(d % 2 == 0)
+    {
+        c_matrix_strassen(n, n, n, C, C, B);
+        free(C);
+        return;
+    }
+    
+    double* D = malloc(n * n * sizeof(double));
+    
+    c_matrix_strassen(n, n, n, C, C, D);
+    c_matrix_strassen(n, n, n, A, D, B);
+    free(C);
+    free(D);
+}
+
+bool c_matrix_exponentiation(int m, int n, const double* A, double* B, int d)
+{
+    if(d == 1)
+    {
+        copy_d_array(m * n, A, B);
+        return true;
+    }
+
+    if(m != n)
+        return false;
+
+    if(d == 0)
+    {
+        c_matrix_shift_identity(n, B, n);
+        return true;
+    }
+
+    if(d > 0)
+    {
+        c_matrix_recursive_exponentiation(n, A, B, d);
+        return true;
+    }
+
+    if(d == -1)
+    {
+        c_matrix_inverse(n, A, B);
+        return true;
+    }
+
+    double* C = malloc(n * n * sizeof(double));
+    c_matrix_inverse(n, A, C);
+    c_matrix_recursive_exponentiation(n, C, B, -d);
+    free(C);
+    
+    return true;
+}

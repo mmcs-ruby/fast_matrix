@@ -187,7 +187,7 @@ VALUE matrix_division_mm(VALUE self, VALUE other)
     int n = B->n;
     double* M = malloc(n * n * sizeof(double));
     c_matrix_inverse(n, B->data, M);
-    
+
     MAKE_MATRIX_AND_RB_VALUE(C, result, n, n);
     c_matrix_strassen(n, n, n, A->data, M, C->data);
 
@@ -675,6 +675,17 @@ VALUE matrix_adjugate(VALUE self)
     return result;
 }
 
+VALUE matrix_exponentiation(VALUE self, VALUE value)
+{
+	struct matrix* A = get_matrix_from_rb_value(self);
+    int d = raise_rb_value_to_int(value);
+    
+    MAKE_MATRIX_AND_RB_VALUE(C, result, A->m, A->n);
+    if(!c_matrix_exponentiation(A->m, A->n, A->data, C->data, d))
+        rb_raise(fm_eIndexError, "Invalid exponentiation");
+    return result;
+}
+
 void init_fm_matrix()
 {
     VALUE  mod = rb_define_module("FastMatrix");
@@ -723,6 +734,7 @@ void init_fm_matrix()
     rb_define_method(cMatrix, "inverse", matrix_inverse, 0);
     rb_define_method(cMatrix, "adjugate", matrix_adjugate, 0);
     rb_define_method(cMatrix, "/", matrix_division, 1);
+    rb_define_method(cMatrix, "**", matrix_exponentiation, 1);
     rb_define_module_function(cMatrix, "vstack", matrix_vstack, -1);
     rb_define_module_function(cMatrix, "hstack", matrix_hstack, -1);
     rb_define_module_function(cMatrix, "scalar", matrix_scalar, 2);
