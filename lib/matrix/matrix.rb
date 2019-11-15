@@ -13,11 +13,45 @@ module FastMatrix
     # Returns the number of columns.
     #
     alias column_size column_count
+    # 
+    # Laplace expansion is equal to the determinant in the real numbers
+    # 
+    alias laplace_expansion determinant
+    alias cofactor_expansion laplace_expansion
+    # 
+    # Returns the inverse of the matrix.
+    # 
+    alias inv inverse
+    alias entrywise_product hadamard_product
     #
     # Returns element (+i+,+j+) of the matrix.  That is: row +i+, column +j+.
     #
     alias element []
     alias component []
+
+    alias t transpose
+    alias tr trace
+
+    #
+    # Explicit conversion to a Matrix. Returns self
+    #
+    def to_matrix
+      self
+    end
+
+    # 
+    # Conjugate real matrix is equal to this matrix
+    #     
+    alias conjugate to_matrix
+    alias conj conjugate
+    # 
+    # Real method in real matrix is equal to this matrix
+    #     
+    alias real to_matrix
+
+    def real?
+      true
+    end
 
     def collect
       collected_rows = []
