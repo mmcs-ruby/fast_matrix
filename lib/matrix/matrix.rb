@@ -14,11 +14,6 @@ module FastMatrix
     #
     alias column_size column_count
     # 
-    # Laplace expansion is equal to the determinant in the real numbers
-    # 
-    alias laplace_expansion determinant
-    alias cofactor_expansion laplace_expansion
-    # 
     # Returns the inverse of the matrix.
     # 
     alias inv inverse
@@ -48,6 +43,14 @@ module FastMatrix
     end
 
     alias imag imaginary
+
+    # 
+    # Laplace expansion is equal to the determinant in the real numbers
+    # 
+    def laplace_expansion(row: nil, column: nil) 
+      determinant
+    end
+    alias cofactor_expansion laplace_expansion
 
     # 
     # Returns an array containing matrices corresponding to the real and imaginary parts of the matrix
