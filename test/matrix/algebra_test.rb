@@ -29,11 +29,6 @@ module FastMatrixTest
       assert_equal expected, m * 5
     end
 
-    def test_multiply_mn_commutative
-      m = Matrix[[1, 2], [3, 4], [7, 0], [-3, 1]]
-      assert_equal m * 5, 5 * m
-    end
-
     def test_multiply_mv
       m = Matrix[[1, 2], [3, 4], [7, 0], [-3, 1]]
       v = Vector[5, 10]

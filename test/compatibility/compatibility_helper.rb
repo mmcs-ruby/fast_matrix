@@ -32,5 +32,9 @@ module CompatibilityTest
       fast = FastMatrix::Vector.zero(size)
       [standard, fast]
     end
+
+    def make_scalar(int)
+      FastMatrix::Matrix.zero(2).coerce(int).first
+    end
   end
 end

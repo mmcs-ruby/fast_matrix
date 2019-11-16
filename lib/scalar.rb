@@ -1,4 +1,5 @@
 require 'fast_matrix/fast_matrix'
+require 'errors'
 
 module FastMatrix
 
@@ -13,7 +14,7 @@ module FastMatrix
     def coerce(other)
       case other
       when Numeric
-        return Scalar.new(other), self
+        [Scalar.new(other), self]
       else
         raise TypeError, "#{self.class} can't be coerced into #{other.class}"
       end
@@ -31,19 +32,36 @@ module FastMatrix
     def coerce(other)
       case other
       when Numeric
-        return Scalar.new(other), self
+        [Scalar.new(other), self]
       else
         raise TypeError, "#{self.class} can't be coerced into #{other.class}"
       end
     end
   end
 
-  private
-
   class Scalar < Numeric # :nodoc:
+    attr_reader :value
 
     def initialize(value)
       @value = value
+    end
+
+    def +(other)
+      case other
+      when Vector, Matrix
+        raise OperationNotDefinedError, "#{@value.class}+#{other.class}"
+      else
+        Scalar.new(@value + other)
+      end
+    end
+
+    def -(other)
+      case other
+      when Vector, Matrix
+        raise OperationNotDefinedError, "#{@value.class}+#{other.class}"
+      else
+        Scalar.new(@value - other)
+      end
     end
 
     def *(other)
@@ -53,6 +71,39 @@ module FastMatrix
       else
         Scalar.new(@value * other)
       end
+    end
+
+    def /(other)
+      case other
+      when Vector
+        raise OperationNotDefinedError, "#{@value.class}/#{other.class}"
+      when Matrix
+        self * other.inverse
+      else
+        Scalar.new(@value / other)
+      end
+    end
+
+    def **(other)
+      case other
+      when Vector, Matrix
+        raise OperationNotDefinedError, "#{@value.class}**#{other.class}"
+      else
+        Scalar.new(@value**other)
+      end
+    end
+
+    def ==(other)
+      case other
+      when Scalar
+        other.value == @value
+      else
+        @value == other
+      end
+    end
+
+    def coerce(other)
+      @value.coerce(other)
     end
   end
 end

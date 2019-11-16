@@ -5,5 +5,5 @@ module FastMatrix
 
   class Error < StandardError; end
   class NotSupportedError < NotImplementedError; end
-
+  class OperationNotDefinedError < Error; end
 end

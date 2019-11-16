@@ -43,7 +43,7 @@ module FastVectorTest
       assert_equal expected, v1 - v2
     end
 
-    def test_sum_error
+    def test_sub_error
       v = Vector[1, 3]
       assert_raises(TypeError) { v - 'not a vector' }
     end
@@ -53,12 +53,6 @@ module FastVectorTest
       expected = Vector[15, 25, 50, -10, 0]
 
       assert_equal expected, v * 5
-    end
-
-    def test_multiply_vn_commutative
-      v = Vector[3, 5, 10, -2, 0]
-
-      assert_equal v * 5, 5 * v
     end
 
     def test_multiply_vv
