@@ -259,6 +259,111 @@ module FastMatrixTest
       assert_equal [2, 3, 6], m.each(:strict_upper).to_a 
     end
     
+    def test_each_wi_all_sq
+      m = Matrix[[1, 2], [3, 4]]
+      assert_equal [[1.0, 0, 0], [2.0, 0, 1], [3.0, 1, 0], [4.0, 1, 1]], m.each_with_index(:all).to_a
+    end
+
+    def test_each_wi_all_rec1
+      m = Matrix[[1, 2], [3, 4], [5, 6]]
+      assert_equal [[1.0, 0, 0], [2.0, 0, 1], [3.0, 1, 0], [4.0, 1, 1], [5.0, 2, 0], [6.0, 2, 1]], m.each_with_index(:all).to_a
+    end
+
+    def test_each_wi_all_rec2
+      m = Matrix[[1, 2, 3], [4, 5, 6]]
+      assert_equal [[1.0, 0, 0], [2.0, 0, 1], [3.0, 0, 2], [4.0, 1, 0], [5.0, 1, 1], [6.0, 1, 2]], m.each_with_index(:all).to_a
+    end
+
+    def test_each_wi_diagonal_sq
+      m = Matrix[[1, 2], [3, 4]]
+      assert_equal [[1.0, 0, 0], [4.0, 1, 1]], m.each_with_index(:diagonal).to_a
+    end
+
+    def test_each_wi_diagonal_rec1
+      m = Matrix[[1, 2], [3, 4], [5, 6]]
+      assert_equal [[1.0, 0, 0], [4.0, 1, 1]], m.each_with_index(:diagonal).to_a
+    end
+
+    def test_each_wi_diagonal_rec2
+      m = Matrix[[1, 2, 3], [4, 5, 6]]
+      assert_equal [[1.0, 0, 0], [5.0, 1, 1]], m.each_with_index(:diagonal).to_a
+    end
+
+    def test_each_wi_off_diagonal_sq
+      m = Matrix[[1, 2], [3, 4]]
+      assert_equal [[2.0, 0, 1], [3.0, 1, 0]], m.each_with_index(:off_diagonal).to_a
+    end
+
+    def test_each_wi_off_diagonal_rec1
+      m = Matrix[[1, 2], [3, 4], [5, 6]]
+      assert_equal [[2.0, 0, 1], [3.0, 1, 0], [5.0, 2, 0], [6.0, 2, 1]], m.each_with_index(:off_diagonal).to_a
+    end
+
+    def test_each_wi_off_diagonal_rec2
+      m = Matrix[[1, 2, 3], [4, 5, 6]]
+      assert_equal [[2.0, 0, 1], [3.0, 0, 2], [4.0, 1, 0], [6.0, 1, 2]], m.each_with_index(:off_diagonal).to_a
+    end
+
+    def test_each_wi_lower_sq
+      m = Matrix[[1, 2], [3, 4]]
+      assert_equal [[1.0, 0, 0], [3.0, 1, 0], [4.0, 1, 1]], m.each_with_index(:lower).to_a
+    end
+
+    def test_each_wi_lower_rec1
+      m = Matrix[[1, 2], [3, 4], [5, 6]]
+      assert_equal [[1.0, 0, 0], [3.0, 1, 0], [4.0, 1, 1], [5.0, 2, 0], [6.0, 2, 1]], m.each_with_index(:lower).to_a
+    end
+
+    def test_each_wi_lower_rec2
+      m = Matrix[[1, 2, 3], [4, 5, 6]]
+      assert_equal [[1.0, 0, 0], [4.0, 1, 0], [5.0, 1, 1]], m.each_with_index(:lower).to_a
+    end
+
+    def test_each_wi_strict_lower_sq
+      m = Matrix[[1, 2], [3, 4]]
+      assert_equal [[3.0, 1, 0]], m.each_with_index(:strict_lower).to_a
+    end
+
+    def test_each_wi_strict_lower_rec1
+      m = Matrix[[1, 2], [3, 4], [5, 6]]
+      assert_equal [[3.0, 1, 0], [5.0, 2, 0], [6.0, 2, 1]], m.each_with_index(:strict_lower).to_a
+    end
+
+    def test_each_wi_strict_lower_rec2
+      m = Matrix[[1, 2, 3], [4, 5, 6]]
+      assert_equal [[4.0, 1, 0]], m.each_with_index(:strict_lower).to_a
+    end
+
+    def test_each_wi_upper_sq
+      m = Matrix[[1, 2], [3, 4]]
+      assert_equal [[1.0, 0, 0], [2.0, 0, 1], [4.0, 1, 1]], m.each_with_index(:upper).to_a
+    end
+
+    def test_each_wi_upper_rec1
+      m = Matrix[[1, 2], [3, 4], [5, 6]]
+      assert_equal [[1.0, 0, 0], [2.0, 0, 1], [4.0, 1, 1]], m.each_with_index(:upper).to_a
+    end
+
+    def test_each_wi_upper_rec2
+      m = Matrix[[1, 2, 3], [4, 5, 6]]
+      assert_equal [[1.0, 0, 0], [2.0, 0, 1], [3.0, 0, 2], [5.0, 1, 1], [6.0, 1, 2]], m.each_with_index(:upper).to_a
+    end
+
+    def test_each_wi_strict_upper_sq
+      m = Matrix[[1, 2], [3, 4]]
+      assert_equal [[2.0, 0, 1]], m.each_with_index(:strict_upper).to_a
+    end
+
+    def test_each_wi_strict_upper_rec1
+      m = Matrix[[1, 2], [3, 4], [5, 6]]
+      assert_equal [[2.0, 0, 1]], m.each_with_index(:strict_upper).to_a
+    end
+
+    def test_each_wi_strict_upper_rec2
+      m = Matrix[[1, 2, 3], [4, 5, 6]]
+      assert_equal [[2.0, 0, 1], [3.0, 0, 2], [6.0, 1, 2]], m.each_with_index(:strict_upper).to_a
+    end
+    
     def test_greater
       m1 = Matrix[[1, 2, 3], [3, 2, 1]]
       m2 = Matrix[[2, 3, 6], [4, 4, 4]]
