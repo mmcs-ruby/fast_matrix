@@ -31,7 +31,7 @@ module FastMatrix
     # Iterate over the elements of this vector
     #
     def each
-      raise NotSupportedError unless block_given?
+      return to_enum :each unless block_given?
 
       (0...size).each do |i|
         yield self[i]
@@ -40,6 +40,8 @@ module FastMatrix
     end
 
     def each_with_index
+      return to_enum :each_with_index unless block_given?
+
       (0...size).each do |i|
         yield self[i], i
       end

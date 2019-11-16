@@ -67,6 +67,12 @@ module FastMatrixTest
       assert_equal m2, m1
     end
 
+    def test_identity
+      expected = Matrix[[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+      actual = Matrix.identity(3)
+      assert_equal expected, actual
+    end
+
     def test_build_incorrect_dimensions
       assert_raises(IndexError) { Matrix.build(-2, 4) }
     end

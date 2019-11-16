@@ -6,19 +6,21 @@ module FastMatrixTest
   class AlgebraTest < Minitest::Test
     include FastMatrix
 
+    def test_real
+      assert Matrix.new(1, 1).real?
+    end
+
     def test_multiply_mm
       m1 = Matrix[[1, 2],
-                              [3, 4],
-                              [7, 0],
-                              [-3, 1]]
-
+                  [3, 4],
+                  [7, 0],
+                  [-3, 1]]
       m2 = Matrix[[1, 0, 3],
-                              [4, 5, -2]]
-
+                  [4, 5, -2]]
       expected = Matrix[[9, 10, -1],
-                                    [19, 20, 1],
-                                    [7, 0, 21],
-                                    [1, 5, -11]]
+                        [19, 20, 1],
+                        [7, 0, 21],
+                        [1, 5, -11]]
       assert_equal expected, m1 * m2
     end
 
@@ -82,13 +84,14 @@ module FastMatrixTest
 
     def test_determinant_4x4
       m = FastMatrix::Matrix[
-        [1, 2, 6, 1], 
+        [1, 2, 6, 1],
         [3, 4, 5, 0],
-        [0, 1,-6, 1], 
+        [0, 1,-6, 1],
         [-5,4, -5, 10]]
       assert_equal -84, m.determinant
+      assert_equal m.determinant, m.laplace_expansion
     end
-    
+
     def test_eql_equal
       m = FastMatrix::Matrix[[1, 2, 5], [3, 4, 1]]
       n = FastMatrix::Matrix[[1, 2, 5], [3, 4, 1]]
