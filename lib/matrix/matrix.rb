@@ -49,6 +49,13 @@ module FastMatrix
     def singular?
       determinant == 0
     end
+    
+    # 
+    # Returns true if this is a regular (i.e. non-singular) matrix.
+    #     
+    def regular?
+      not singular?
+    end
 
     # 
     # Returns the imaginary part of the matrix.

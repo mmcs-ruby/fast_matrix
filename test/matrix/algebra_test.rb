@@ -432,5 +432,15 @@ module FastMatrixTest
       m = Matrix[[1, 2], [3, 4]]
       refute m.singular?
     end
+
+    def test_regular?
+      m = Matrix[[1, 2], [3, 4]]
+      assert m.regular?
+    end
+
+    def test_not_regular?
+      m = Matrix[[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+      refute m.regular?
+    end
   end
 end
