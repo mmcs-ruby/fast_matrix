@@ -34,6 +34,10 @@ module FastMatrix
       self
     end
 
+    def empty?
+      row_count * column_count == 0
+    end
+
     # 
     # Returns the imaginary part of the matrix.
     # Always returns a zero matrix

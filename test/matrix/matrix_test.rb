@@ -306,5 +306,10 @@ module FastMatrixTest
       m2 = Matrix[[3, 3, 3], [-3, 3, 3]]
       refute m2 <= m1
     end
+
+    def test_empty?
+      m = Matrix[[1]]
+      refute m.empty?
+    end
   end
 end
