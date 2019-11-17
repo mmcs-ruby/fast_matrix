@@ -27,6 +27,11 @@ module FastMatrix
     alias t transpose
     alias tr trace
 
+    # 
+    # In real numbers is equivalent to checking for symmetry
+    #     
+    alias hermitian? symmetric?
+
     #
     # Explicit conversion to a Matrix. Returns self
     #
