@@ -462,5 +462,15 @@ module FastMatrixTest
       m = Matrix[[1, 2], [3, 4]]
       refute m.normal?
     end
+
+    def test_unitary?
+      m = Matrix[[0, 1], [1, 0]]
+      assert m.unitary?
+    end
+
+    def test_not_unitary?
+      m = Matrix[[1, 2], [3, 4]]
+      refute m.unitary?
+    end
   end
 end
