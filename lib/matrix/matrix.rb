@@ -43,6 +43,13 @@ module FastMatrix
       row_count * column_count == 0
     end
 
+    #     
+    # Returns true if this is a singular matrix.
+    #     
+    def singular?
+      determinant == 0
+    end
+
     # 
     # Returns the imaginary part of the matrix.
     # Always returns a zero matrix
