@@ -118,26 +118,9 @@ module FastMatrix
     #   Matrix[ [1,2], [3,4] ].each { |e| puts e }
     #     # => prints the numbers 1 to 4
       def each(which = :all) # :yield: e
-        return to_enum :each, which unless block_given?
-        case which
-        when :all
-          each_all{|i, j| yield self[i, j]}
-        when :diagonal
-          each_diagonal{|i, j| yield self[i, j]}
-        when :off_diagonal
-          each_off_diagonal{|i, j| yield self[i, j]}
-        when :lower
-          each_lower{|i, j| yield self[i, j]}
-        when :strict_lower
-          each_strict_lower{|i, j| yield self[i, j]}
-        when :strict_upper
-          each_strict_upper{|i, j| yield self[i, j]}
-        when :upper
-          each_upper{|i, j| yield self[i, j]}
-        else
-          raise ArgumentError, "expected #{which.inspect} to be one of :all, :diagonal, :off_diagonal, :lower, :strict_lower, :strict_upper or :upper"
-        end
-        self
+        return to_enum :each, which unless block_given?        
+        
+        each_with_index(which){ |elem, _, _| yield elem}
       end
 
     #
