@@ -364,6 +364,16 @@ module FastMatrixTest
       assert_equal [[2.0, 0, 1], [3.0, 0, 2], [6.0, 1, 2]], m.each_with_index(:strict_upper).to_a
     end
     
+    def test_each_argument_error
+      m = Matrix[[1, 2, 3], [4, 5, 6]]
+      assert_raises (ArgumentError){ m.each(:al).to_a }
+    end  
+    
+     def test_each_wi_argument_error
+      m = Matrix[[1, 2, 3], [4, 5, 6]]
+      assert_raises (ArgumentError){ m.each_with_index(:al).to_a }
+    end  
+    
     def test_greater
       m1 = Matrix[[1, 2, 3], [3, 2, 1]]
       m2 = Matrix[[2, 3, 6], [4, 4, 4]]
