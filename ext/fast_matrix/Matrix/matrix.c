@@ -686,6 +686,31 @@ VALUE matrix_exponentiation(VALUE self, VALUE value)
     return result;
 }
 
+VALUE matrix_normal(VALUE self)
+{
+	struct matrix* A = get_matrix_from_rb_value(self);
+    if(A->m != A-> n)
+        return Qfalse;
+    
+    int n = A->n;
+    double* B = malloc(n * n * sizeof(double));
+    double* C = malloc(n * n * sizeof(double));
+    double* D = malloc(n * n * sizeof(double));
+    
+    c_matrix_transpose(n, n, A->data, B);
+    c_matrix_strassen(n, n, n, A->data, B, C);
+    c_matrix_strassen(n, n, n, B, A->data, D);
+    
+    VALUE res = Qfalse;
+    if(equal_d_arrays(n * n, C, D))
+        res = Qtrue;
+    
+    free(B);
+    free(C);
+    free(D);
+    return res;
+}
+
 void init_fm_matrix()
 {
     VALUE  mod = rb_define_module("FastMatrix");
@@ -735,6 +760,7 @@ void init_fm_matrix()
     rb_define_method(cMatrix, "adjugate", matrix_adjugate, 0);
     rb_define_method(cMatrix, "/", matrix_division, 1);
     rb_define_method(cMatrix, "**", matrix_exponentiation, 1);
+    rb_define_method(cMatrix, "normal?", matrix_normal, 0);
     rb_define_module_function(cMatrix, "vstack", matrix_vstack, -1);
     rb_define_module_function(cMatrix, "hstack", matrix_hstack, -1);
     rb_define_module_function(cMatrix, "scalar", matrix_scalar, 2);

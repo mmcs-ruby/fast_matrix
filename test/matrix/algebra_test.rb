@@ -452,5 +452,15 @@ module FastMatrixTest
       m = Matrix[[1, 2, 3], [7, 8, 9]]
       refute m.square?
     end
+    
+    def test_normal?
+      m = Matrix[[1, 1, 0], [0, 1, 1], [1, 0, 1]]
+      assert m.normal?
+    end
+
+    def test_not_normal?
+      m = Matrix[[1, 2], [3, 4]]
+      refute m.normal?
+    end
   end
 end
