@@ -27,6 +27,7 @@ module FastMatrix
     alias t transpose
     alias tr trace
 
+    alias skew_symmetric? antisymmetric?
     # 
     # In real numbers is equivalent to checking for symmetry
     #     
@@ -55,6 +56,13 @@ module FastMatrix
     #     
     def regular?
       not singular?
+    end
+
+    # 
+    # Returns true if this is a square matrix.
+    #     
+    def square?
+      column_count == row_count
     end
 
     # 
