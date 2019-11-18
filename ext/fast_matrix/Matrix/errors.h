@@ -18,6 +18,13 @@ inline void raise_check_square_matrix(struct matrix* A)
         rb_raise(fm_eIndexError, "Expected square matrix");
 }
 
+//  check if the matrix is frozen and raise an error if not
+inline void raise_check_frozen_matrix(struct matrix* A)
+{
+    if(A->frozen)
+        rb_raise(fm_eFrozenError, "Can't modify frozen Matrix");
+}
+
 //  check if the value is zero and raise an error if not
 inline void raise_check_no_arguments(int argc)
 {

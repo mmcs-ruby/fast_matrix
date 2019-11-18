@@ -2,6 +2,7 @@
 
 VALUE fm_eTypeError;
 VALUE fm_eIndexError;
+VALUE fm_eFrozenError;
 
 double raise_rb_value_to_double(VALUE v)
 {
@@ -40,4 +41,5 @@ void init_fm_errors()
     
     fm_eTypeError  = rb_define_class_under(mod, "TypeError",  rb_eTypeError);
     fm_eIndexError = rb_define_class_under(mod, "IndexError", rb_eIndexError);
+    fm_eFrozenError = rb_define_class_under(mod, "FrozenError", rb_eFrozenError);
 }

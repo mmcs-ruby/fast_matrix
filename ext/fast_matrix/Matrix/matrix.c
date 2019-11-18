@@ -39,6 +39,7 @@ VALUE matrix_alloc(VALUE self)
 {
 	struct matrix* mtx = malloc(sizeof(struct matrix));
     mtx->data = NULL;
+    mtx->frozen = false;
 	return TypedData_Wrap_Struct(self, &matrix_type, mtx);
 }
 
@@ -58,11 +59,13 @@ VALUE matrix_initialize(VALUE self, VALUE rows_count, VALUE columns_count)
 //  []=
 VALUE matrix_set(VALUE self, VALUE row, VALUE column, VALUE v)
 {
+	struct matrix* data = get_matrix_from_rb_value(self);
+    raise_check_frozen_matrix(data);
+
     int m = raise_rb_value_to_int(column);
     int n = raise_rb_value_to_int(row);
     double x = raise_rb_value_to_double(v);
-	struct matrix* data = get_matrix_from_rb_value(self);
-    
+
     m = (m < 0) ? data->m + m : m;
     n = (n < 0) ? data->n + n : n;
 
@@ -249,8 +252,9 @@ VALUE matrix_add_with(VALUE self, VALUE other)
 
 VALUE matrix_add_from(VALUE self, VALUE other)
 {
-    raise_check_rbasic(other, cMatrix, "matrix");
 	struct matrix* A = get_matrix_from_rb_value(self);
+    raise_check_frozen_matrix(A);
+    raise_check_rbasic(other, cMatrix, "matrix");
 	struct matrix* B = get_matrix_from_rb_value(other);
 
     raise_check_equal_size_matrix(A, B);
@@ -274,8 +278,9 @@ VALUE matrix_sub_with(VALUE self, VALUE other)
 
 VALUE matrix_sub_from(VALUE self, VALUE other)
 {
-    raise_check_rbasic(other, cMatrix, "matrix");
 	struct matrix* A = get_matrix_from_rb_value(self);
+    raise_check_frozen_matrix(A);
+    raise_check_rbasic(other, cMatrix, "matrix");
 	struct matrix* B = get_matrix_from_rb_value(other);
 
     raise_check_equal_size_matrix(A, B);
@@ -293,8 +298,9 @@ VALUE matrix_determinant(VALUE self)
 
 VALUE matrix_fill(VALUE self, VALUE value)
 {
-    double d = raise_rb_value_to_double(value);
 	struct matrix* A = get_matrix_from_rb_value(self);
+    raise_check_frozen_matrix(A);
+    double d = raise_rb_value_to_double(value);
     fill_d_array(A->m * A->n, A->data, d);
     return self;
 }
@@ -733,6 +739,13 @@ VALUE matrix_unitary(VALUE self)
     return res;
 }
 
+VALUE matrix_freeze(VALUE self)
+{
+	struct matrix* A = get_matrix_from_rb_value(self);
+    A->frozen = true;
+    return self;
+}
+
 void init_fm_matrix()
 {
     VALUE  mod = rb_define_module("FastMatrix");
@@ -749,9 +762,9 @@ void init_fm_matrix()
 	rb_define_method(cMatrix, "clone", matrix_copy, 0);
 	rb_define_method(cMatrix, "transpose", matrix_transpose, 0);
 	rb_define_method(cMatrix, "+", matrix_add_with, 1);
-	rb_define_method(cMatrix, "+=", matrix_add_from, 1);
+	rb_define_method(cMatrix, "add!", matrix_add_from, 1);
 	rb_define_method(cMatrix, "-", matrix_sub_with, 1);
-	rb_define_method(cMatrix, "-=", matrix_sub_from, 1);
+	rb_define_method(cMatrix, "sub!", matrix_sub_from, 1);
 	rb_define_method(cMatrix, "fill!", matrix_fill, 1);
     rb_define_method(cMatrix, "abs", matrix_abs, 0);
     rb_define_method(cMatrix, ">=", matrix_greater_or_equal, 1);
@@ -784,6 +797,7 @@ void init_fm_matrix()
     rb_define_method(cMatrix, "**", matrix_exponentiation, 1);
     rb_define_method(cMatrix, "normal?", matrix_normal, 0);
     rb_define_method(cMatrix, "unitary?", matrix_unitary, 0);
+    rb_define_method(cMatrix, "freeze", matrix_freeze, 0);
     rb_define_module_function(cMatrix, "vstack", matrix_vstack, -1);
     rb_define_module_function(cMatrix, "hstack", matrix_hstack, -1);
     rb_define_module_function(cMatrix, "scalar", matrix_scalar, 2);

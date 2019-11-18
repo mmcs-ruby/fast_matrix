@@ -311,5 +311,23 @@ module FastMatrixTest
       m = Matrix[[1]]
       refute m.empty?
     end
+
+    def test_freeze_index
+      m = Matrix[[1, 2], [3, 4]]
+      m.freeze
+      assert_raises (FrozenError) { m[1, 1] = 1 }  
+    end
+
+    def test_freeze_fill
+      m = Matrix[[1, 2], [3, 4]]
+      m.freeze
+      assert_raises (FrozenError) { m.fill!(1) }  
+    end
+
+    def test_freeze_add
+      m = Matrix[[1, 2], [3, 4]]
+      m.freeze
+      assert_raises (FrozenError) { m.add!(Matrix[[1, 2], [3, 4]]) }  
+    end
   end
 end

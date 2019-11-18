@@ -61,7 +61,7 @@ module FastMatrixTest
 
     def test_sum_with_assigment
       m = Matrix[[1, -2], [3, 4], [7, 0]]
-      m += Matrix[[4, 0], [-3, 4], [2, 2]]
+      m.add!(Matrix[[4, 0], [-3, 4], [2, 2]])
       expected = Matrix[[5, -2], [0, 8], [9, 2]]
 
       assert_equal expected, m

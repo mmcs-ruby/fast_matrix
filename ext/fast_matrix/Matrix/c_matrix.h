@@ -16,6 +16,8 @@ struct matrix
     int n;
 
     double* data;
+
+    bool frozen;
 };
 
 double c_matrix_trace(int n, const double* A);
