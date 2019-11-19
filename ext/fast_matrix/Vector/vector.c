@@ -505,9 +505,9 @@ void init_fm_vector()
 	rb_define_method(cVector, "[]=", vector_set, 2);
 	rb_define_method(cVector, "size", vector_length, 0);
 	rb_define_method(cVector, "+", vector_add_with, 1);
-	rb_define_method(cVector, "+=", vector_add_from, 1);
+	rb_define_method(cVector, "add!", vector_add_from, 1);
 	rb_define_method(cVector, "-", vector_sub_with, 1);
-	rb_define_method(cVector, "-=", vector_sub_from, 1);
+	rb_define_method(cVector, "sub!", vector_sub_from, 1);
 	rb_define_method(cVector, "eql?", vector_equal, 1);
 	rb_define_method(cVector, "clone", vector_copy, 0);
 	rb_define_method(cVector, "magnitude", vector_magnitude, 0);

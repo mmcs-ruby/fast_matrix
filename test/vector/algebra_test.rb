@@ -21,7 +21,7 @@ module FastVectorTest
 
     def test_sum_with_assignment
       v1 = Vector[1, 3]
-      v1 += Vector[4, 3]
+      v1.add!(Vector[4, 3])
       expected = Vector[5, 6]
 
       assert_equal expected, v1
