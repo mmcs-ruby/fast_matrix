@@ -11,4 +11,11 @@ inline void raise_check_equal_size_vectors(struct vector* A, struct vector* B)
         rb_raise(fm_eIndexError, "Different sizes vectors");
 }
 
+//  check if the vector is frozen and raise an error if not
+inline void raise_check_frozen_vector(struct vector* A)
+{
+    if(A->frozen)
+        rb_raise(fm_eFrozenError, "Can't modify frozen Vector");
+}
+
 #endif /* FAST_MATRIX_VECTOR_ERRORS_H */

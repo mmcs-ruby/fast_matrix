@@ -47,7 +47,7 @@ VALUE matrix_initialize(VALUE self, VALUE rows_count, VALUE columns_count)
 {
     int m = raise_rb_value_to_int(columns_count);
     int n = raise_rb_value_to_int(rows_count);
-
+    
     if(m <= 0 || n <= 0)
         rb_raise(fm_eIndexError, "Size cannot be negative or zero");
 
@@ -161,7 +161,7 @@ VALUE matrix_multiply(VALUE self, VALUE v)
         return matrix_multiply_mn(self, v);
     if(RBASIC_CLASS(v) == cMatrix)
         return matrix_strassen(self, v);
-    if(RBASIC_CLASS(v) == cVector);
+    if(RBASIC_CLASS(v) == cVector)
         return matrix_multiply_mv(self, v);
     rb_raise(fm_eTypeError, "Invalid klass for multiply");
 }
@@ -380,7 +380,7 @@ VALUE matrix_less(VALUE self, VALUE other)
     return Qfalse;
 }
 
-struct matrix** convert_matrix_array(int argc, VALUE *argv, struct matrix*** mtrs)
+void convert_matrix_array(int argc, VALUE *argv, struct matrix*** mtrs)
 {
     for(int i = 0; i < argc; ++i)
         raise_check_rbasic(argv[i], cMatrix, "matrix");
@@ -604,7 +604,7 @@ VALUE matrix_round(int argc, VALUE *argv, VALUE self)
     else
         d = 0;
 
-	struct matrix* A = get_matrix_from_rb_value(self);
+    struct matrix* A = get_matrix_from_rb_value(self);
     MAKE_MATRIX_AND_RB_VALUE(R, result, A->m, A->n);
     round_d_array(A->m * A->n, A->data, R->data, d);
     return result;

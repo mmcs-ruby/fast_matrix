@@ -41,6 +41,7 @@ VALUE vector_alloc(VALUE self)
 {
 	struct vector* vct = malloc(sizeof(struct vector));
     vct->data = NULL;
+    vct->frozen = false;
 	return TypedData_Wrap_Struct(self, &vector_type, vct);
 }
 
@@ -51,7 +52,7 @@ VALUE vector_initialize(VALUE self, VALUE size)
     if(n <= 0)
         rb_raise(fm_eIndexError, "Size cannot be negative or zero");
 
-	struct vector* data = get_vector_from_rb_value(self);
+    struct vector* data = get_vector_from_rb_value(self);
     c_vector_init(data, n);
 
 	return self;
@@ -60,9 +61,10 @@ VALUE vector_initialize(VALUE self, VALUE size)
 //  []=
 VALUE vector_set(VALUE self, VALUE idx, VALUE v)
 {
+	struct vector* data = get_vector_from_rb_value(self);
+    raise_check_frozen_vector(data);
     int i = raise_rb_value_to_int(idx);
     double x = raise_rb_value_to_double(v);
-	struct vector* data = get_vector_from_rb_value(self);
 
     i = (i < 0) ? data->n + i : i;
     raise_check_range(i, 0, data->n);
@@ -113,8 +115,9 @@ VALUE vector_add_with(VALUE self, VALUE other)
 
 VALUE vector_add_from(VALUE self, VALUE other)
 {
-    raise_check_rbasic(other, cVector, "vector");
 	struct vector* A = get_vector_from_rb_value(self);
+    raise_check_frozen_vector(A);
+    raise_check_rbasic(other, cVector, "vector");
 	struct vector* B = get_vector_from_rb_value(other);
     raise_check_equal_size_vectors(A, B);
 
@@ -162,8 +165,9 @@ VALUE vector_equal(VALUE self, VALUE other)
 {
     if(RBASIC_CLASS(other) != cVector)
         return Qfalse;
-	struct vector* A = get_vector_from_rb_value(self);
-	struct vector* B = get_vector_from_rb_value(other);
+
+    struct vector* A = get_vector_from_rb_value(self);
+    struct vector* B = get_vector_from_rb_value(other);
 
     if(A->n != B->n)
 		return Qfalse;
@@ -297,7 +301,7 @@ VALUE vector_plus(VALUE self)
     return self;
 }
 
-struct vector** convert_vector_array(int argc, VALUE *argv, struct vector*** vcts)
+void convert_vector_array(int argc, VALUE *argv, struct vector*** vcts)
 {
     for(int i = 0; i < argc; ++i)
         raise_check_rbasic(argv[i], cVector, "vector");
@@ -367,8 +371,9 @@ VALUE vector_zero(VALUE self)
 
 VALUE vector_fill(VALUE self, VALUE value)
 {
-    double d = raise_rb_value_to_double(value);
 	struct vector* A = get_vector_from_rb_value(self);
+    raise_check_frozen_vector(A);
+    double d = raise_rb_value_to_double(value);
     fill_d_array(A->n, A->data, d);
     return self;
 }
@@ -383,7 +388,7 @@ VALUE vector_round(int argc, VALUE *argv, VALUE self)
     else
         d = 0;
 
-	struct vector* A = get_vector_from_rb_value(self);
+    struct vector* A = get_vector_from_rb_value(self);
 
     struct vector* R;
     VALUE result = TypedData_Make_Struct(cVector, struct vector, &vector_type, R);
@@ -493,6 +498,13 @@ VALUE vector_less(VALUE self, VALUE other)
     return Qfalse;
 }
 
+VALUE vector_freeze(VALUE self)
+{
+	struct vector* A = get_vector_from_rb_value(self);
+    A->frozen = true;
+    return self;
+}
+
 void init_fm_vector()
 {
     VALUE  mod = rb_define_module("FastMatrix");
@@ -527,6 +539,7 @@ void init_fm_vector()
 	rb_define_method(cVector, "<=", vector_less_or_equal, 1);
 	rb_define_method(cVector, ">", vector_greater, 1);
 	rb_define_method(cVector, "<", vector_less, 1);
+	rb_define_method(cVector, "freeze", vector_freeze, 0);
 	rb_define_module_function(cVector, "independent?", vector_independent, -1);
 	rb_define_module_function(cVector, "cross_product", vector_cross_product, -1);
 }

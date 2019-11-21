@@ -118,5 +118,23 @@ module FastVectorTest
       vector = Vector[1, 2, 3, 4]
       assert_equal [1, 2, 3, 4], vector.each.to_a
     end
+
+    def test_freeze_index
+      v = Vector[1, 2, 3, 4]
+      v.freeze
+      assert_raises (FrozenError) { v[1] = 1 }  
+    end
+
+    def test_freeze_fill
+      v = Vector[1, 2, 3, 4]
+      v.freeze
+      assert_raises (FrozenError) { v.fill!(1) }  
+    end
+
+    def test_freeze_add
+      v = Vector[1, 2, 3, 4]
+      v.freeze
+      assert_raises (FrozenError) { v.add!(Vector[1, 2, 3, 4]) }  
+    end
   end
 end

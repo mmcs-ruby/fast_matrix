@@ -8,6 +8,8 @@ struct vector
 {
     int n;
     double* data;
+    
+    bool frozen;
 };
 
 double c_vector_magnitude(int n, const double* A);
