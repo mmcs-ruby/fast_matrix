@@ -505,6 +505,20 @@ VALUE vector_freeze(VALUE self)
     return self;
 }
 
+VALUE vector_division(VALUE self, VALUE v)
+{
+    double d = raise_rb_value_to_double(v);
+    struct vector* A = get_vector_from_rb_value(self);
+
+    struct vector* R;
+    VALUE result = TypedData_Make_Struct(cVector, struct vector, &vector_type, R);
+    c_vector_init(R, A->n);
+
+    multiply_d_array_to_result(A->n, A->data, 1/d, R->data);
+
+    return result;
+}
+
 void init_fm_vector()
 {
     VALUE  mod = rb_define_module("FastMatrix");
@@ -539,6 +553,7 @@ void init_fm_vector()
 	rb_define_method(cVector, "<=", vector_less_or_equal, 1);
 	rb_define_method(cVector, ">", vector_greater, 1);
 	rb_define_method(cVector, "<", vector_less, 1);
+	rb_define_method(cVector, "/", vector_division, 1);
 	rb_define_method(cVector, "freeze", vector_freeze, 0);
 	rb_define_module_function(cVector, "independent?", vector_independent, -1);
 	rb_define_module_function(cVector, "cross_product", vector_cross_product, -1);

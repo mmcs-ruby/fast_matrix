@@ -287,5 +287,11 @@ module FastVectorTest
       vv2 = v1.cross_product(v2, v3)
       assert_equal vv2, vv1.convert
     end
+    
+    def test_division
+      v1 = Vector[1, 2, 4]
+      v2 = Vector[0.5, 1, 2]
+      assert_equal v2, v1/2
+    end
   end
 end
