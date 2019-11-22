@@ -3,6 +3,11 @@ require 'vector/constructors'
 module FastMatrix
   class Vector
 
+    alias cross cross_product
+    alias dot inner_product
+    alias r magnitude
+    alias norm magnitude
+
     #
     # Create fast vector from standard vector
     #
