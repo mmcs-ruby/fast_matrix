@@ -683,3 +683,10 @@ bool c_matrix_exponentiation(int m, int n, const double* A, double* B, int d)
     
     return true;
 }
+
+bool c_matrix_lup(int n, const double* A, double* LU, double* V)
+{
+    fill_d_array(n, V, 0);
+    fill_d_array(n * n, LU, 0);
+    return true;
+}

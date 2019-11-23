@@ -5,6 +5,8 @@
 #include "Matrix/errors.h"
 #include "Matrix/helper.h"
 #include "Vector/helper.h"
+#include "LUPDecomposition/c_lup.h"
+#include "LUPDecomposition/lup.h"
 
 VALUE cMatrix;
 
@@ -746,6 +748,32 @@ VALUE matrix_freeze(VALUE self)
     return self;
 }
 
+VALUE matrix_lup(VALUE self)
+{
+	struct matrix* A = get_matrix_from_rb_value(self);
+    raise_check_square_matrix(A);
+
+    int n = A->n;
+
+    struct lupdecomposition lp;
+    lp.n = n;
+    lp.data = malloc(n * n * sizeof(double));
+    lp.permutation = malloc(n * sizeof(double));
+    if(!c_matrix_lup(n, A->data, lp.data, lp.permutation))
+    {
+        free(lp.data);
+        free(lp.permutation);
+        rb_raise(fm_eIndexError, "The discriminant is zero");
+    }
+
+    struct lupdecomposition* p_lp;
+    VALUE result = TypedData_Make_Struct(cLUPDecomposition, struct lupdecomposition, &lup_type, p_lp); 
+    p_lp->data = lp.data;
+    p_lp->permutation = lp.permutation;
+    p_lp->n = n;
+    return result;
+}
+
 void init_fm_matrix()
 {
     VALUE  mod = rb_define_module("FastMatrix");
@@ -798,6 +826,7 @@ void init_fm_matrix()
     rb_define_method(cMatrix, "normal?", matrix_normal, 0);
     rb_define_method(cMatrix, "unitary?", matrix_unitary, 0);
     rb_define_method(cMatrix, "freeze", matrix_freeze, 0);
+    rb_define_method(cMatrix, "lup", matrix_lup, 0);
     rb_define_module_function(cMatrix, "vstack", matrix_vstack, -1);
     rb_define_module_function(cMatrix, "hstack", matrix_hstack, -1);
     rb_define_module_function(cMatrix, "scalar", matrix_scalar, 2);

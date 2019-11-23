@@ -6,3 +6,6 @@
 
 #include "Vector/vector.c"
 #include "Vector/c_vector.c"
+
+#include "LUPDecomposition/lup.c"
+#include "LUPDecomposition/c_lup.c"
