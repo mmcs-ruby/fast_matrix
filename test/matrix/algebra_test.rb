@@ -497,7 +497,7 @@ module FastMatrixTest
     def test_lup_det
       m = Matrix[[1, 2, 3], [4, 5, 6], [7, 8, 11]]
       lp = m.lup
-      assert_equal -6, lp.det
+      assert_in_delta -6, lp.det, 1e10
     end
   end
 end
