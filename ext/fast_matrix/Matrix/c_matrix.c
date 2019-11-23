@@ -692,7 +692,41 @@ void c_matrix_fill_range_array(int n, int* V)
 
 bool c_matrix_lup(int n, const double* A, double* LU, int* V)
 {
+    copy_d_array(n * n, A, LU);
     c_matrix_fill_range_array(n, V);
-    fill_d_array(n * n, LU, 2);
+
+    for(int i = 0; i < n; ++i)
+    {
+        double* line = LU + n * i;
+        double current = 0;
+        int swap_line = -1;
+        for(int j = i; j < n; ++j)
+            if(fabs(LU[j * n]) > current)
+            {
+                swap_line = j;
+                current = fabs(LU[j * n]);
+            }
+        if(swap_line == -1)
+            return false;
+        
+        if(swap_line != i)
+        {
+            swap_d_arrays(n, LU + swap_line * n, line);
+            int buf = V[i];
+            V[i] = V[swap_line];
+            V[swap_line] = buf;
+        }
+
+        current = line[i];
+        for(int j = i + 1; j < n; ++j)
+        {
+            double* w_line = LU + j * n;
+            w_line[i] = w_line[i] / current;
+            double start = w_line[i];
+            for(int k = i + 1; k < n; ++k)
+                w_line[k] -= start * line[k];
+        }
+    }
+
     return true;
 }
