@@ -47,3 +47,11 @@ void c_lup_p(int n, const int* prm, double* P)
             p_line[j] = 0;
     }
 }
+
+double c_lup_determinant(int n, double* LUP, int sign)
+{
+    double res = sign;
+    for(int i = 0; i < n; ++i)
+        res *= LUP[i + i * n];
+    return res;
+}

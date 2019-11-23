@@ -759,7 +759,7 @@ VALUE matrix_lup(VALUE self)
     lp.n = n;
     lp.data = malloc(n * n * sizeof(double));
     lp.permutation = malloc(n * sizeof(double));
-    if(!c_matrix_lup(n, A->data, lp.data, lp.permutation))
+    if(!c_matrix_lup(n, A->data, lp.data, lp.permutation, &(lp.pivot_sign)))
     {
         free(lp.data);
         free(lp.permutation);
@@ -771,6 +771,7 @@ VALUE matrix_lup(VALUE self)
     p_lp->data = lp.data;
     p_lp->permutation = lp.permutation;
     p_lp->n = n;
+    p_lp->pivot_sign = lp.pivot_sign;
     return result;
 }
 

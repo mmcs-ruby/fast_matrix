@@ -39,6 +39,7 @@ VALUE lup_alloc(VALUE self)
 	struct lupdecomposition* lp = malloc(sizeof(struct lupdecomposition));
     lp->data = NULL;
     lp->permutation = NULL;
+    lp->pivot_sign = 1;
 	return TypedData_Wrap_Struct(self, &lup_type, lp);
 }
 
@@ -66,6 +67,12 @@ VALUE lup_p(VALUE self)
     return result;
 }
 
+VALUE lup_determinant(VALUE self)
+{
+	struct lupdecomposition* lp = get_lup_from_rb_value(self);
+    return DBL2NUM(c_lup_determinant(lp->n, lp->data, lp->pivot_sign));
+}
+
 void init_fm_lup()
 {
 	cLUPDecomposition = rb_define_class_under(cMatrix, "LUPDecomposition", rb_cData);
@@ -74,4 +81,5 @@ void init_fm_lup()
 	rb_define_method(cLUPDecomposition, "l", lup_l, 0);
 	rb_define_method(cLUPDecomposition, "u", lup_u, 0);
 	rb_define_method(cLUPDecomposition, "p", lup_p, 0);
+	rb_define_method(cLUPDecomposition, "det", lup_determinant, 0);
 }

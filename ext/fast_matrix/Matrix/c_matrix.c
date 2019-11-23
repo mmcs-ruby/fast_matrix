@@ -690,10 +690,11 @@ void c_matrix_fill_range_array(int n, int* V)
         V[i] = i;
 }
 
-bool c_matrix_lup(int n, const double* A, double* LU, int* V)
+bool c_matrix_lup(int n, const double* A, double* LU, int* V, int* sign)
 {
     copy_d_array(n * n, A, LU);
     c_matrix_fill_range_array(n, V);
+    *sign = 1;
 
     for(int i = 0; i < n; ++i)
     {
@@ -715,6 +716,7 @@ bool c_matrix_lup(int n, const double* A, double* LU, int* V)
             int buf = V[i];
             V[i] = V[swap_line];
             V[swap_line] = buf;
+            *sign = -*sign;
         }
 
         current = line[i];
