@@ -477,21 +477,21 @@ module FastMatrixTest
       m = Matrix[[1, 2], [4, 3]]
       lp = m.lup
       lm = Matrix[[1, 0], [0.25, 1]]
-      assert lm, lp.l
+      assert_equal lm, lp.l
     end
 
     def test_lup_u
       m = Matrix[[1, 2], [4, 3]]
       lp = m.lup
       um = Matrix[[4, 3], [0, 1.25]]
-      assert um, lp.u
+      assert_equal um, lp.u
     end
 
     def test_lup_p
       m = Matrix[[1, 2], [4, 3]]
       lp = m.lup
       pm = Matrix[[0, 1], [1, 0]]
-      assert pm, lp.p
+      assert_equal pm, lp.p
     end
   end
 end

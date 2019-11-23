@@ -1,6 +1,8 @@
 #include "LUPDecomposition/lup.h"
 #include "LUPDecomposition/c_lup.h"
+#include "LUPDecomposition/helper.h"
 #include "Matrix/matrix.h"
+#include "Matrix/helper.h"
 
 VALUE cLUPDecomposition;
 
@@ -40,10 +42,36 @@ VALUE lup_alloc(VALUE self)
 	return TypedData_Wrap_Struct(self, &lup_type, lp);
 }
 
+VALUE lup_l(VALUE self)
+{
+	struct lupdecomposition* lp = get_lup_from_rb_value(self);
+    MAKE_MATRIX_AND_RB_VALUE(R, result, lp->n, lp->n);
+    c_lup_l(lp->n, lp->data, R->data);
+    return result;
+}
+
+VALUE lup_u(VALUE self)
+{
+	struct lupdecomposition* lp = get_lup_from_rb_value(self);
+    MAKE_MATRIX_AND_RB_VALUE(R, result, lp->n, lp->n);
+    c_lup_u(lp->n, lp->data, R->data);
+    return result;
+}
+
+VALUE lup_p(VALUE self)
+{
+	struct lupdecomposition* lp = get_lup_from_rb_value(self);
+    MAKE_MATRIX_AND_RB_VALUE(R, result, lp->n, lp->n);
+    c_lup_p(lp->n, lp->permutation, R->data);
+    return result;
+}
+
 void init_fm_lup()
 {
 	cLUPDecomposition = rb_define_class_under(cMatrix, "LUPDecomposition", rb_cData);
 	rb_define_alloc_func(cLUPDecomposition, lup_alloc);
 
-	// rb_define_method(cLUPDecomposition, "initialize", lup_initialize, 2);
+	rb_define_method(cLUPDecomposition, "l", lup_l, 0);
+	rb_define_method(cLUPDecomposition, "u", lup_u, 0);
+	rb_define_method(cLUPDecomposition, "p", lup_p, 0);
 }

@@ -5,7 +5,11 @@ struct lupdecomposition
 {
     int n;
     double* data;
-    double* permutation;
+    int* permutation;
 };
+
+void c_lup_l(int n, const double* LUP, double* L);
+void c_lup_u(int n, const double* LUP, double* U);
+void c_lup_p(int n, const int* prm, double* P);
 
 #endif /* FAST_MATRIX_MATRIX_C_LUPDECOMPOSITION_H */

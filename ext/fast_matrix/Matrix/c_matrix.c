@@ -684,9 +684,15 @@ bool c_matrix_exponentiation(int m, int n, const double* A, double* B, int d)
     return true;
 }
 
-bool c_matrix_lup(int n, const double* A, double* LU, double* V)
+void c_matrix_fill_range_array(int n, int* V)
 {
-    fill_d_array(n, V, 0);
-    fill_d_array(n * n, LU, 0);
+    for(int i = 0; i < n; ++i)
+        V[i] = i;
+}
+
+bool c_matrix_lup(int n, const double* A, double* LU, int* V)
+{
+    c_matrix_fill_range_array(n, V);
+    fill_d_array(n * n, LU, 2);
     return true;
 }

@@ -45,7 +45,7 @@ bool c_matrix_equal_by_n(int argc, struct matrix** mtrs);
 bool c_matrix_inverse(int n, const double* A, double* B);
 bool c_matrix_adjugate(int n, const double* A, double* B);
 bool c_matrix_exponentiation(int m, int n, const double* A, double* B, int d);
-bool c_matrix_lup(int n, const double* A, double* LU, double* V);
+bool c_matrix_lup(int n, const double* A, double* LU, int* V);
 
 int c_matrix_sum_by_m(int argc, struct matrix** mtrs);
 int c_matrix_sum_by_n(int argc, struct matrix** mtrs);
