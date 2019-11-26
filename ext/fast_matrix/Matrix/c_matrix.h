@@ -32,7 +32,7 @@ void c_matrix_column_vector(int m, int n, const double* M, double* V, int idx);
 void c_matrix_scalar(int n, double* C, double v);
 void c_matrix_minor(int m, int n, const double* A, double* B, int m_idx, int n_idx);
 void c_matrix_vstack(int argc, struct matrix** mtrs, double* C);
-void c_matrix_lup(int n, const double* A, double* LU, int* V, int* sign);
+void c_matrix_lup(int n, const double* A, double* LU, int* V, int* sign, bool* singular);
 
 bool c_matrix_symmetric(int n, const double* C);
 bool c_matrix_antisymmetric(int n, const double* C);

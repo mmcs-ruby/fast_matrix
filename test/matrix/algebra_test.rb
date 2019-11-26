@@ -501,7 +501,7 @@ module FastMatrixTest
     end
 
     def test_lup_singular
-      m = Matrix[[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+      m = Matrix[[1, 2, 3], [1, 2, 4], [2, 4, 5]]
       lp = m.lup
       assert lp.singular?
     end

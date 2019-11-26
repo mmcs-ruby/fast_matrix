@@ -40,6 +40,7 @@ VALUE lup_alloc(VALUE self)
     lp->data = NULL;
     lp->permutation = NULL;
     lp->pivot_sign = 1;
+    lp->singular = false;
 	return TypedData_Wrap_Struct(self, &lup_type, lp);
 }
 
@@ -76,7 +77,7 @@ VALUE lup_determinant(VALUE self)
 VALUE lup_singular(VALUE self)
 {
 	struct lupdecomposition* lp = get_lup_from_rb_value(self);
-    if(c_lup_singular(lp->n, lp->data))
+    if(lp->singular)
         return Qtrue;
     return Qfalse;
 }

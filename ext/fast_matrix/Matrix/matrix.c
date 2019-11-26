@@ -759,14 +759,12 @@ VALUE matrix_lup(VALUE self)
     lp.n = n;
     lp.data = malloc(n * n * sizeof(double));
     lp.permutation = malloc(n * sizeof(double));
-    c_matrix_lup(n, A->data, lp.data, lp.permutation, &(lp.pivot_sign));
+    c_matrix_lup(n, A->data, lp.data, lp.permutation, &(lp.pivot_sign), &(lp.singular));
     
     struct lupdecomposition* p_lp;
     VALUE result = TypedData_Make_Struct(cLUPDecomposition, struct lupdecomposition, &lup_type, p_lp); 
-    p_lp->data = lp.data;
-    p_lp->permutation = lp.permutation;
-    p_lp->n = n;
-    p_lp->pivot_sign = lp.pivot_sign;
+    *p_lp = lp;
+
     return result;
 }
 
