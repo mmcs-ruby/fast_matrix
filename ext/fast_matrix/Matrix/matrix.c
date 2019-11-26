@@ -759,13 +759,8 @@ VALUE matrix_lup(VALUE self)
     lp.n = n;
     lp.data = malloc(n * n * sizeof(double));
     lp.permutation = malloc(n * sizeof(double));
-    if(!c_matrix_lup(n, A->data, lp.data, lp.permutation, &(lp.pivot_sign)))
-    {
-        free(lp.data);
-        free(lp.permutation);
-        rb_raise(fm_eIndexError, "The discriminant is zero");
-    }
-
+    c_matrix_lup(n, A->data, lp.data, lp.permutation, &(lp.pivot_sign));
+    
     struct lupdecomposition* p_lp;
     VALUE result = TypedData_Make_Struct(cLUPDecomposition, struct lupdecomposition, &lup_type, p_lp); 
     p_lp->data = lp.data;

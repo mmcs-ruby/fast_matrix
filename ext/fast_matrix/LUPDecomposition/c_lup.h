@@ -15,4 +15,6 @@ void c_lup_l(int n, const double* LUP, double* L);
 void c_lup_u(int n, const double* LUP, double* U);
 void c_lup_p(int n, const int* prm, double* P);
 
+bool c_lup_singular(int n, const double* LUP);
+
 #endif /* FAST_MATRIX_MATRIX_C_LUPDECOMPOSITION_H */

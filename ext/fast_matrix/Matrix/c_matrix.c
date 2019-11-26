@@ -690,7 +690,7 @@ void c_matrix_fill_range_array(int n, int* V)
         V[i] = i;
 }
 
-bool c_matrix_lup(int n, const double* A, double* LU, int* V, int* sign)
+void c_matrix_lup(int n, const double* A, double* LU, int* V, int* sign)
 {
     copy_d_array(n * n, A, LU);
     c_matrix_fill_range_array(n, V);
@@ -708,7 +708,7 @@ bool c_matrix_lup(int n, const double* A, double* LU, int* V, int* sign)
                 current = fabs(LU[j * n]);
             }
         if(swap_line == -1)
-            return false;
+            continue;
         
         if(swap_line != i)
         {
@@ -729,6 +729,4 @@ bool c_matrix_lup(int n, const double* A, double* LU, int* V, int* sign)
                 w_line[k] -= start * line[k];
         }
     }
-
-    return true;
 }

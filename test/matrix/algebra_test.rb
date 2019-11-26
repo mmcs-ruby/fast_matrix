@@ -499,5 +499,17 @@ module FastMatrixTest
       lp = m.lup
       assert_in_delta -6, lp.det, 1e10
     end
+
+    def test_lup_singular
+      m = Matrix[[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+      lp = m.lup
+      assert lp.singular?
+    end
+
+    def test_lup_not_singular
+      m = Matrix[[1, 2, 3], [4, 5, 6], [7, 8, 11]]
+      lp = m.lup
+      refute lp.singular?
+    end
   end
 end

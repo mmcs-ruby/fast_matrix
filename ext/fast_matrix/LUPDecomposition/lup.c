@@ -73,6 +73,14 @@ VALUE lup_determinant(VALUE self)
     return DBL2NUM(c_lup_determinant(lp->n, lp->data, lp->pivot_sign));
 }
 
+VALUE lup_singular(VALUE self)
+{
+	struct lupdecomposition* lp = get_lup_from_rb_value(self);
+    if(c_lup_singular(lp->n, lp->data))
+        return Qtrue;
+    return Qfalse;
+}
+
 void init_fm_lup()
 {
 	cLUPDecomposition = rb_define_class_under(cMatrix, "LUPDecomposition", rb_cData);
@@ -82,4 +90,5 @@ void init_fm_lup()
 	rb_define_method(cLUPDecomposition, "u", lup_u, 0);
 	rb_define_method(cLUPDecomposition, "p", lup_p, 0);
 	rb_define_method(cLUPDecomposition, "det", lup_determinant, 0);
+	rb_define_method(cLUPDecomposition, "singular?", lup_singular, 0);
 }

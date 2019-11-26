@@ -55,3 +55,11 @@ double c_lup_determinant(int n, double* LUP, int sign)
         res *= LUP[i + i * n];
     return res;
 }
+
+bool c_lup_singular(int n, const double* LUP)
+{
+    for(int i = 0; i < n; ++i)
+        if(0 == LUP[i + i * n])
+            return true;
+    return false;
+}
