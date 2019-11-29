@@ -1,4 +1,5 @@
 require 'fast_matrix/version'
 require 'vector/vector'
 require 'matrix/matrix'
+require 'lup_decomposition/lup_decomposition'
 require 'scalar'
