@@ -82,6 +82,17 @@ VALUE lup_singular(VALUE self)
     return Qfalse;
 }
 
+VALUE lup_pivots(VALUE self)
+{
+	struct lupdecomposition* lp = get_lup_from_rb_value(self);
+    VALUE* v = malloc(lp->n * sizeof(VALUE));
+    for(int i = 0; i < lp->n; ++i)
+        v[i] = INT2NUM(lp->permutation[i]);
+    VALUE res = rb_ary_new_from_values(lp->n, v);
+    free(v);
+    return res;
+}
+
 void init_fm_lup()
 {
 	cLUPDecomposition = rb_define_class_under(cMatrix, "LUPDecomposition", rb_cData);
@@ -92,4 +103,5 @@ void init_fm_lup()
 	rb_define_method(cLUPDecomposition, "p", lup_p, 0);
 	rb_define_method(cLUPDecomposition, "det", lup_determinant, 0);
 	rb_define_method(cLUPDecomposition, "singular?", lup_singular, 0);
+	rb_define_method(cLUPDecomposition, "pivots", lup_pivots, 0);
 }

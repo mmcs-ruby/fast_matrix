@@ -57,5 +57,11 @@ module FastMatrixTest
             pm = Matrix[[0, 1], [1, 0]]
             assert_equal [lm, um, pm], lp.to_ary
         end
+
+        def test_pivots
+            m = Matrix[[1, 2, 3], [4, 5, 6], [7, 8, 10]]
+            lp = m.lup            
+            assert_equal [2, 0, 1], lp.pivots
+        end 
     end
 end
