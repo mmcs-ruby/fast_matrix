@@ -41,6 +41,12 @@ module FastMatrixTest
             lp = m.lup
             refute lp.singular?
         end
+
+        def test_determinant
+            m = Matrix[[1, 2, 3], [4, 5, 6], [7, 8, 11]]
+            lp = m.lup
+            assert_in_delta -6, lp.determinant, 1e10
+        end
         
         def test_to_ary
             m = Matrix[[1, 2], [4, 3]]
