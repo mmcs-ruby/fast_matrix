@@ -24,6 +24,7 @@ module FastMatrix
     alias element []
     alias component []
 
+    alias lup_decomposition lup
     alias t transpose
     alias tr trace
 
