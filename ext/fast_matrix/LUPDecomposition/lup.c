@@ -3,6 +3,7 @@
 #include "LUPDecomposition/helper.h"
 #include "Matrix/matrix.h"
 #include "Matrix/helper.h"
+#include "Helper/errors.h"
 
 VALUE cLUPDecomposition;
 
@@ -93,6 +94,21 @@ VALUE lup_pivots(VALUE self)
     return res;
 }
 
+VALUE lup_solve(VALUE self, VALUE mtrx)
+{
+    raise_check_rbasic(mtrx, cMatrix, "matrix");
+	struct lupdecomposition* lp = get_lup_from_rb_value(self);
+	struct matrix* M = get_matrix_from_rb_value(mtrx);
+    if(lp->singular)
+        rb_raise(fm_eIndexError, "Matrix is singular");
+    if(lp->n != M->n)
+        rb_raise(fm_eIndexError, "Columns of different size");
+
+    MAKE_MATRIX_AND_RB_VALUE(C, result, M->m, lp->n);
+    c_lup_solve(M->m, lp->n, lp->data, M->data, lp->permutation, C->data);
+    return result;
+}
+
 void init_fm_lup()
 {
 	cLUPDecomposition = rb_define_class_under(cMatrix, "LUPDecomposition", rb_cData);
@@ -104,4 +120,5 @@ void init_fm_lup()
 	rb_define_method(cLUPDecomposition, "det", lup_determinant, 0);
 	rb_define_method(cLUPDecomposition, "singular?", lup_singular, 0);
 	rb_define_method(cLUPDecomposition, "pivots", lup_pivots, 0);
+	rb_define_method(cLUPDecomposition, "solve", lup_solve, 1);
 }

@@ -62,6 +62,14 @@ module FastMatrixTest
             m = Matrix[[1, 2, 3], [4, 5, 6], [7, 8, 10]]
             lp = m.lup            
             assert_equal [2, 0, 1], lp.pivots
-        end 
+        end
+
+        def test_solve
+            a = Matrix[[1, 2, 3], [4, 5, 6], [7, 8, 10]]
+            b = Matrix[[2, 3], [5, 6], [8, 8]]
+            lp = a.lup
+            m = lp.solve(b)
+            assert_in_delta b, a * m, Matrix.new(3, 2).fill!(1e-10)
+        end
     end
 end
