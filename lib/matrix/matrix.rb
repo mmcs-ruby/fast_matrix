@@ -144,61 +144,17 @@ module FastMatrix
       fast_matrix
     end
 
-    #
+   #
     # Yields all elements of the matrix, starting with those of the first row
     #
     #   Matrix[ [1,2], [3,4] ].each { |e| puts e }
     #     # => prints the numbers 1 to 4
-     def each(which = :all) # :yield: e
-        return to_enum :each, which unless block_given?
-        case which
-        when :all
-          (0...row_count).each do |i|
-            (0...column_count).each do |j|
-              yield self[i, j]
-            end
-          end
-        when :diagonal
-          (0...[row_count, column_count].min).each do |i|
-                yield self[i, i]
-          end
-        when :off_diagonal
-          (0...row_count).each do |i|
-            (0...column_count).each do |j|
-              if i != j
-                yield self[i, j]
-              end
-            end
-          end
-        when :lower
-          (0...row_count).each do |i|
-            (0..[i,column_count-1].min).each do |j|
-              yield self[i, j]
-            end
-          end
-        when :strict_lower
-          (1...row_count).each do |i|
-            (0...[i,column_count].min).each do |j|
-                yield self[i, j]
-            end
-          end
-        when :strict_upper
-          (0...row_count).each do |i|
-            (i+1...column_count).each do |j|
-              yield self[i, j]
-            end
-          end
-        when :upper
-          (0...row_count).each do |i|
-            (i...column_count).each do |j|
-              yield self[i, j]
-            end
-          end
-        else
-          raise ArgumentError, "expected #{which.inspect} to be one of :all, :diagonal, :off_diagonal, :lower, :strict_lower, :strict_upper or :upper"
-        end
-        self
+      def each(which = :all) # :yield: e
+        return to_enum :each, which unless block_given?        
+        
+        each_with_index(which){ |elem, _, _| yield elem}
       end
+
     #
     # Same as #each, but the row index and column index in addition to the element
     #
@@ -211,17 +167,85 @@ module FastMatrix
     #     #    3 at 1, 0
     #     #    4 at 1, 1
     #
-    def each_with_index
-      raise NotSupportedError unless block_given?
-
-      (0...row_count).each do |i|
-        (0...column_count).each do |j|
-          yield self[i, j], i, j
-        end
+    def each_with_index(which = :all) # :yield: e, row, column
+      return to_enum :each_with_index, which unless block_given?
+      case which
+      when :all
+        each_all{|i, j| yield self[i, j], i, j}
+      when :diagonal
+        each_diagonal{|i, j| yield self[i, j], i, j}
+      when :off_diagonal
+        each_off_diagonal{|i, j| yield self[i, j], i, j}
+      when :lower
+        each_lower{|i, j| yield self[i, j], i, j}
+      when :strict_lower
+        each_strict_lower{|i, j| yield self[i, j], i, j}
+      when :strict_upper
+        each_strict_upper{|i, j| yield self[i, j], i, j}
+      when :upper
+        each_upper{|i, j| yield self[i, j], i, j}
+      else
+        raise ArgumentError, "expected #{which.inspect} to be one of :all, :diagonal, :off_diagonal, :lower, :strict_lower, :strict_upper or :upper"
       end
       self
     end
 
+    def each_all(&block)
+      (0...row_count).each do |i|
+        (0...column_count).each do |j|
+          block[i,j]
+        end
+      end
+    end
+
+    def each_diagonal(&block)
+      (0...[row_count, column_count].min).each do |i|
+        block[i, i]
+      end
+    end
+
+    def each_off_diagonal(&block)
+      (0...row_count).each do |i|
+        (0...column_count).each do |j|
+          if i != j
+            block[i, j]
+          end
+        end
+      end
+    end
+
+    def each_lower(&block)
+      (0...row_count).each do |i|
+        (0..[i,column_count-1].min).each do |j|
+          block[i, j]
+        end
+      end
+    end
+
+    def each_strict_lower(&block)
+      (1...row_count).each do |i|
+        (0...[i,column_count].min).each do |j|
+          block[i, j]
+        end
+      end
+    end
+
+    def each_strict_upper(&block)
+      (0...row_count).each do |i|
+        (i+1...column_count).each do |j|
+          block[i, j]
+        end
+      end
+    end
+
+    def each_upper(&block)
+      (0...row_count).each do |i|
+        (i...column_count).each do |j|
+          block[i, j]
+        end
+      end
+    end
+    
     # don't use (Issue#1)
     def each_with_index!
       (0...row_count).each do |i|
