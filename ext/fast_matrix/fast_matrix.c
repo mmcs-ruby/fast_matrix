@@ -3,6 +3,7 @@
 #include "Matrix/matrix.h"
 #include "Vector/vector.h"
 #include "LUPDecomposition/lup.h"
+#include "EigenvalueDecomposition/eigenvalue.h"
 
 
 void Init_fast_matrix()
@@ -11,4 +12,5 @@ void Init_fast_matrix()
     init_fm_matrix();
     init_fm_vector();
     init_fm_lup();
+    init_fm_eigenvalue();
 }

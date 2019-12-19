@@ -9,3 +9,6 @@
 
 #include "LUPDecomposition/lup.c"
 #include "LUPDecomposition/c_lup.c"
+
+#include "EigenvalueDecomposition/eigenvalue.c"
+#include "EigenvalueDecomposition/c_eigenvalue.c"
