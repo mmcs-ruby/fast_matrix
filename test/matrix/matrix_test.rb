@@ -68,6 +68,17 @@ module FastMatrixTest
       assert_equal "FastMatrix::Matrix[[1.0, 2.0], [3.0, 4.0]]", m1.to_str
     end
 
+    def test_collect
+      m1 = Matrix[[1, 2], [3, 4]]
+      assert_equal m1.collect { |el| el.join(',') }, ["1.0,2.0", "3.0,4.0"]
+    end
+
+    def test_collect!
+      m1 = Matrix[[1, 2], [3, 4]]
+      m1.collect! { |el| el*2 }
+      assert_equal m1, Matrix[[2, 4], [6, 8]]
+    end
+
     def test_symmetric
       m1 = Matrix[[1, 2, 1], [2, 4, 5], [1, 5, 3]]
       assert m1.symmetric?
